@@ -257,6 +257,16 @@ def update_pass(n_pass):
     db.session.commit()
     return jsonify({'user':user.getUser()})
 
+@app.route('/mobilerp/api/v1.0/user/checkLogin/', methods=['GET'])
+def checkLogin():
+    if not request.json or not 'user' in request.json or not 'pass' in request.json:
+        abort(403)
+    user = User.query.filter_by(username=request.json['user'], password = request.json['pass']).first()
+    if (user is None):
+        abort(401)
+    else:
+        return make_response('ok', 200)
+
 @app.route('/')
 def index():
     return "Hello, World!"
