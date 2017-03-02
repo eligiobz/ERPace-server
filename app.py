@@ -265,7 +265,7 @@ def checkLogin():
     if (user is None):
         abort(401)
     else:
-        return make_response('ok', 200)
+        return make_response(jsonify({'success': 'Exito'}), 200)
 
 @app.route('/')
 def index():
