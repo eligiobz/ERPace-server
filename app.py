@@ -94,8 +94,8 @@ class SaleDetails(db.Model):
 ##################################### AUTH #####################################
 
 @auth.get_password
-def get_password(em):
-    user = User.query.filter_by(username=em).first()
+def get_password(user):
+    user = User.query.filter_by(username=user).first()
     if user == None:
         return None
     return user.password
@@ -169,6 +169,14 @@ def makeSale():
             db.session.add(sd)
             db.session.commit()
     return make_response(jsonify({'mobilerp' : '[p.serialize]'}), 200)
+
+@app.route('/mobilerp/api/v1.0/listDepletedProducts/', methods=['GET'])
+@auth.login_required
+def listDepletedProducts():
+    products = Product.query.filter_by(units=0).all()
+    if products is None:
+        abort(400)
+    return make_response(jsonify({'mobilerp' : [p.serialize for p in products]}), 200)
 
 # @app.route('/mobilerp/api/v1.0/salad/', methods=['POST'])
 # @auth.login_required
@@ -257,15 +265,10 @@ def update_pass(n_pass):
     db.session.commit()
     return jsonify({'user':user.getUser()})
 
-@app.route('/mobilerp/api/v1.0/user/checkLogin/', methods=['POST'])
+@app.route('/mobilerp/api/v1.0/user/checkLogin/', methods=['GET'])
+@auth.login_required
 def checkLogin():
-    if not request.json or not 'user' in request.json or not 'pass' in request.json:
-        abort(403)
-    user = User.query.filter_by(username=request.json['user'], password = request.json['pass']).first()
-    if (user is None):
-        abort(401)
-    else:
-        return make_response(jsonify({'logged': 'true'}), 200)
+    return make_response(jsonify({'logged': 'true'}), 200)
 
 @app.route('/')
 def index():
