@@ -17,15 +17,15 @@ It currently saves new items into the stock database and keeps tracks of both sa
 
 ## Roadmap
 
-- [] Provide the following reports
+- [ ] Provide the following reports
 	- [x] All products in stock database
 	- [x] Depleted products
-	- [] Changes in price per item
-	- [] Daily statement
-	- [] Monthly statement
-	- [] Most sold products
-	- [] Least sold products
-- Refactor app to support Flask Blueprints
-- Offer WebUI for people wanting to run it on a single computer.
+	- [ ] Changes in price per item
+	- [ ] Daily statement
+	- [ ] Monthly statement
+	- [ ] Most sold products
+	- [ ] Least sold products
+- [ ] Refactor app to support Flask Blueprints
+- [ ] Offer WebUI for people wanting to run it on a single computer.
 
 [1]: https://github.com/eligiobz/mobilerp-android
