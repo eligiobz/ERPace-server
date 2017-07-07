@@ -5,10 +5,8 @@ from flask_httpauth import HTTPBasicAuth
 from flask_sqlalchemy import SQLAlchemy
 from flask_compress import Compress
 
-# from sqlalchemy import create_engine, MetaData
-# from sqlalchemy.ext.declarative import declarative_base
-
-from models import User, Product, Sale, SaleDetails, db_session
+from models import User, Product, Sale, SaleDetails, PriceHistory
+from models import db_session, init_db
 
 import time, datetime
 import os.path
@@ -17,9 +15,6 @@ import os.path
 
 auth = HTTPBasicAuth()
 app = Flask(__name__)
-app.config ['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mobilerp.db'
-app.config ['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-db = SQLAlchemy(app)
 Compress(app)
 
 ##################################### AUTH #####################################
@@ -35,7 +30,7 @@ def get_password(user):
 def unauthorized():
     return make_response(jsonify({'error': 'Unauthorized access'}), 401)
 
-################################## ORDERS API ##################################
+##################################### API #####################################
 
 @app.route('/mobilerp/api/v1.0/findProduct/<int:bCode>', methods=['GET'])
 @auth.login_required
@@ -61,8 +56,8 @@ def newProduct():
         abort(400)
     p = Product(request.json['barcode'], request.json['name'], 
         request.json['units'], request.json['price'])
-    db.session.add(p)
-    db.session.commit()
+    db_session.add(p)
+    db_session.commit()
     return make_response(jsonify({'mobilerp' : [p.serialize]}), 200)
 
 @app.route('/mobilerp/api/v1.0/updateProduct/<int:bCode>', methods=['PUT'])
@@ -74,10 +69,14 @@ def updateProduct(bCode):
     if p is None:
         abort(404)
     if 'price' in request.json:
+        price_update = PriceHistory(p.barcode)
+        db_session.add(price_update)
+        db_session.commit()
         p.price = float(request.json['price'])
     if 'units' in request.json :
         p.units = p.units + int(request.json['units'])
-    db.session.commit()
+    db_session.add(p)
+    db_session.commit()
     print ("Update Done")
     return make_response(jsonify({'mobilerp' : [p.serialize]}), 200)
 
@@ -89,8 +88,8 @@ def makeSale():
     if 'barcode' not in request.json or len(request.json['barcode']) <= 0:
         abort(400)
     s = Sale()
-    db.session.add(s)
-    db.session.commit()
+    db_session.add(s)
+    db_session.commit()
     for bCode in request.json['barcode']:
         print(bCode)
         ps = Product.query.filter_by(barcode=int(bCode)).first()
@@ -98,8 +97,8 @@ def makeSale():
             abort(406)
         else:
             sd = SaleDetails(s.id, ps.barcode, ps.price)
-            db.session.add(sd)
-            db.session.commit()
+            db_session.add(sd)
+            db_session.commit()
     return make_response(jsonify({'mobilerp' : '[p.serialize]'}), 200)
 
 @app.route('/mobilerp/api/v1.0/listDepletedProducts/', methods=['GET'])
@@ -146,10 +145,10 @@ def index():
 
 def checkDB():
     if not os.path.isfile("mobilerp.db"):
-        db.create_all()
+        init_db()
 
 ################################
 
 if __name__ == '__main__':
-    #checkDB()
+    checkDB()
     app.run(host='0.0.0.0', debug=True)

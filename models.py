@@ -1,21 +1,24 @@
-import os
-import sys
+
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime, PrimaryKeyConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
+
+import os
+import sys
+import time, datetime
  
 engine = create_engine('sqlite:///mobilerp.db', convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))
 
-
 Base = declarative_base()
 Base.query = db_session.query_property()
 
 class User(Base):
+    """ User:: Holds basic user information """
     __tablename__ = "user"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -23,7 +26,6 @@ class User(Base):
     password = Column(String(120))
     level = Column(Integer)
 
-    """ User:: Holds basic user information """
     def __init__(self, username, password, level):
         self.username = username
         self.password = password
@@ -34,7 +36,6 @@ class User(Base):
 
     def getUser(self):
         return {'username': self.username, 'pass': self.password, 'level': self.level}
-
 
 
 class Product(Base):
@@ -58,8 +59,26 @@ class Product(Base):
         return {'barcode': self.barcode,'name': self.name, 
         'units': self.units, 'price': self.price }
 
+class PriceHistory(Base):
+    __tablename__ = "PriceHistory"
+    """docstring for PriceHistory"""
+    date_changed = Column(DateTime)
+    old_price = Column(Float(precision=2))
+    barcode = Column(Integer, primary_key=True)
+
+    def __init__(self, barcode):
+        self.barcode = barcode
+        self.old_price = (Product.query.filter_by(barcode=barcode).first()).price
+        self.date_changed = datetime.datetime.now()
+
+    @property
+    def serialize(self):
+        pass
+        
+
 class Sale (Base):
     __tablename__ = "Sale"
+
     id = Column(Integer, primary_key=True, autoincrement=True)
     date = Column(DateTime)
 
@@ -80,7 +99,7 @@ class SaleDetails(Base):
 
     idSale = Column(Integer)
     idProduct = Column(Integer)
-    productPrice = Column(Float)
+    productPrice = Column(Float(precision=2))
     units = Column(Integer)
 
     """List of all the available ingredients"""
@@ -92,3 +111,9 @@ class SaleDetails(Base):
     def __repr__(self):
         return {'idSale': self.idSale, 'idProduct': self.idProduct,
         'productPrice': self.productPrice}
+
+def init_db():
+    Base.metadata.create_all(engine)
+    u = User("carlo", 123, 0)
+    db_session.add(u)
+    db_session.commit()
