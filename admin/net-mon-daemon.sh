@@ -1,18 +1,18 @@
 #!/bin/sh
 ### BEGIN INIT INFO
-# Provides:          <NAME>
+# Provides:          net-mon
 # Required-Start:    $local_fs $network $named $time $syslog
 # Required-Stop:     $local_fs $network $named $time $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Description:       <DESCRIPTION>
+# Description:       Monitors the wireless network and reconnects if the connection is dropped
 ### END INIT INFO
 
-SCRIPT=/home/mobilerp/admin/mobilerp-monitor.sh
-RUNAS=mobilerp
+SCRIPT=/home/mobilerp/admin/net-mon.sh
+RUNAS=root
 
-PIDFILE=/var/run/mobilerp.pid
-LOGFILE=/var/log/mobilerp.log
+PIDFILE=/var/run/net-mon.pid
+LOGFILE=/var/log/net-mon.log
 
 start() {
   if [ -f /var/run/$PIDNAME ] && kill -0 $(cat /var/run/$PIDNAME); then
@@ -65,5 +65,3 @@ case "$1" in
   *)
     echo "Usage: $0 {start|stop|restart|uninstall}"
 esac
-
-

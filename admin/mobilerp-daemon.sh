@@ -1,19 +1,18 @@
-
 #!/bin/sh
 ### BEGIN INIT INFO
-# Provides:          <NAME>
+# Provides:          mobilerp
 # Required-Start:    $local_fs $network $named $time $syslog
 # Required-Stop:     $local_fs $network $named $time $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Description:       <DESCRIPTION>
+# Description:       A web service for a a mobiler ERP
 ### END INIT INFO
 
-SCRIPT=/home/mobilerp/admin/net-mon.sh
-RUNAS=root
+SCRIPT=/home/mobilerp/admin/mobilerp-monitor.sh
+RUNAS=mobilerp
 
-PIDFILE=/var/run/net-mon.pid
-LOGFILE=/var/log/net-mon.log
+PIDFILE=/var/run/mobilerp.pid
+LOGFILE=/home/mobilerp/mobilerp-server/log/mobilerp.log
 
 start() {
   if [ -f /var/run/$PIDNAME ] && kill -0 $(cat /var/run/$PIDNAME); then
@@ -66,3 +65,5 @@ case "$1" in
   *)
     echo "Usage: $0 {start|stop|restart|uninstall}"
 esac
+
+
