@@ -139,7 +139,7 @@ def checkLogin():
 
 @app.route('/')
 def index():
-    return "Hello, World!"
+    return jsonify({'mobilerp':'Welcome to instance xxx'})
 
 #### FOR DEBUGGING PURPOSES ###########
 
