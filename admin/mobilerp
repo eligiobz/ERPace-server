@@ -1,0 +1,12 @@
+/home/mobilerp/mobilerp-server/log/*log /var/log/net-mon.log {
+        rotate 14
+        daily
+        compress
+        delaycompress
+        sharedscripts
+        postrotate
+                service mobilerp-daemon.sh restart
+                service net-mon-daemon.sh restart
+        endscript
+}
+
