@@ -21,7 +21,9 @@ start() {
   fi
   echo 'Starting service…' >&2
   local CMD="$SCRIPT &> \"$LOGFILE\" & echo \$!"
-  su -c "$CMD" $RUNAS > "$PIDFILE"
+  su -c "$CMD" $RUNAS 
+  sleep 2
+  ps aux | grep python | grep app.py | awk '{print $2}' > "$PIDFILE"
   echo 'Service started' >&2
 }
 
