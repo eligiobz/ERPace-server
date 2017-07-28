@@ -92,11 +92,13 @@ def makeSale():
     db_session.commit()
     for bCode in request.json['barcode']:
         print(bCode)
-        ps = Product.query.filter_by(barcode=int(bCode)).first()
+        ps = Product.query.filter_by(barcode=bCode).first()
         if (ps.units - 1 < 0):
             abort(406)
         else:
             sd = SaleDetails(s.id, ps.barcode, ps.price)
+            ps.units = ps.units - 1
+            db_session.add(ps)
             db_session.add(sd)
             db_session.commit()
     return make_response(jsonify({'mobilerp' : '[p.serialize]'}), 200)
