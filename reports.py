@@ -37,7 +37,7 @@ def dailyReport():
 					.scalar()
 	sales = SaleReport.query.filter(SaleReport.date >= cdate)
 	if sales is None:
-		return 404
+		return 500
 	else:
 		return {'totalItemsSold':totalItemsSold, \
 				'totalSales':totalSales,\
@@ -46,11 +46,28 @@ def dailyReport():
 				}
 
 def monthlyReport():
+	totalItemsSold = SaleReport.query\
+					.filter(SaleReport.date.between(cdate - timedelta(days=30), cdate))\
+					.with_entities(mfunc.sum(SaleReport.units))\
+					.scalar()
+	totalSales = len(db_session.query(\
+					SaleReport.idSale,\
+					mfunc.count(SaleReport.idSale))\
+					.filter(SaleReport.date.between(cdate - timedelta(days=30), cdate))\
+					.group_by(SaleReport.idSale).all())
+	totalEarnings = SaleReport.query\
+					.filter(SaleReport.date.between(cdate - timedelta(days=30), cdate))\
+					.with_entities(mfunc.sum(SaleReport.total_earning))\
+					.scalar()
 	sales = SaleReport.query.filter(SaleReport.date.between(cdate - timedelta(days=30), cdate))
 	if sales is None:
-		abort(404)
+		return 500
 	else:
-		return sales
+		return {'totalItemsSold':totalItemsSold, \
+				'totalSales':totalSales,\
+				'totalEarnings':totalEarnings,\
+				'sales': [s.serialize for s in sales] \
+				}
 
 def jsonReport(sales):
 	print(sales)

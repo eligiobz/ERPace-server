@@ -134,14 +134,13 @@ def listDepletedProducts():
 @app.route('/mobilerp/api/v1.0/dailyReport', methods=['GET'])
 @auth.login_required
 def sendDailyReport():
-    # return make_response(jsonify({'mobilerp': [s.serialize for s in dailyReport()]}), 200)
     return make_response(jsonify({'mobilerp': dailyReport()}), 200)
 
 
 @app.route('/mobilerp/api/v1.0/monthlyReport', methods=['GET'])
 @auth.login_required
 def sendMonthlyReport():
-    return make_response(jsonify({'mobilerp': [ s.serialize for s in monthlyReport()]}), 200)
+    return make_response(jsonify({'mobilerp': monthlyReport()}), 200)
 
 ################################## USERS API ##################################
 
