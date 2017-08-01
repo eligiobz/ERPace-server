@@ -103,10 +103,11 @@ class SaleDetails(Base):
     units = Column(Integer)
 
     """List of all the available ingredients"""
-    def __init__(self, idSale, idProduct, productPrice):
+    def __init__(self, idSale, idProduct, productPrice, units):
         self.idSale = idSale
         self.idProduct = idProduct
         self.productPrice = productPrice
+        self.units = units
 
     def __repr__(self):
         return {'idSale': self.idSale, 'idProduct': self.idProduct,
