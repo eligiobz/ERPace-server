@@ -28,4 +28,9 @@ It currently saves new items into the stock database and keeps tracks of both sa
 - [ ] Refactor app to support Flask Blueprints
 - [ ] Offer WebUI for people wanting to run it on a single computer.
 
+## License
+
+This project is licensed under [AGPL3][2]
+
 [1]: https://github.com/eligiobz/mobilerp-android
+[2]: LICENSE.md
