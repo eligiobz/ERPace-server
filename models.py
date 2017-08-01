@@ -1,5 +1,5 @@
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime, PrimaryKeyConstraint
+from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime, PrimaryKeyConstraint, Table, MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -82,7 +82,6 @@ class Sale (Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     date = Column(DateTime)
 
-    """docstring for CustomSalad"""
     def __init__(self):
         self.date = datetime.datetime.now()
 
@@ -102,16 +101,42 @@ class SaleDetails(Base):
     productPrice = Column(Float(precision=2))
     units = Column(Integer)
 
-    """List of all the available ingredients"""
     def __init__(self, idSale, idProduct, productPrice, units):
         self.idSale = idSale
         self.idProduct = idProduct
         self.productPrice = productPrice
         self.units = units
 
-    def __repr__(self):
+    @property
+    def serialize(self):
         return {'idSale': self.idSale, 'idProduct': self.idProduct,
         'productPrice': self.productPrice}
+
+class SaleReport(Base):
+
+    __tablename__ = "SalesView"
+
+    __table_args__ = (
+        PrimaryKeyConstraint('idSale', 'name'),
+    )
+
+    idSale = Column(Integer)
+    date = Column(DateTime)
+    name = Column(String(700))
+    productPrice = Column(Float(precision=2))
+    units = Column (Integer)
+
+    initDate = ""
+    endDate = ""
+
+    def __init__(self, initDate="", endDate=""):
+        if not initDate == "" and not endDate == "":
+            self.initDate = initDate
+            self.endDate = endDate
+
+    @property
+    def serialize(self):
+        return {'idSale': self.idSale, 'date': self.date, 'name': self.name, 'productPrice': self.productPrice, 'units': self.units}
 
 def init_db():
     Base.metadata.create_all(engine)

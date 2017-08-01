@@ -24,6 +24,8 @@ from flask_compress import Compress
 from models import User, Product, Sale, SaleDetails, PriceHistory
 from models import db_session, init_db
 
+from reports import dailyReport
+
 import time, datetime
 import os.path
 
@@ -128,6 +130,11 @@ def listDepletedProducts():
     if products is None:
         abort(400)
     return make_response(jsonify({'mobilerp' : [p.serialize for p in products]}), 200)
+
+@app.route('/mobilerp/api/v1.0/dailyReport', methods=['GET'])
+@auth.login_required
+def sendDailyReport():
+    return make_response(jsonify({'mobilerp': [s.serialize for s in dailyReport()]}), 200)
 
 ################################## USERS API ##################################
 
