@@ -1,5 +1,5 @@
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime, PrimaryKeyConstraint, Table, MetaData
+from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime, PrimaryKeyConstraint, Table, MetaData, func as mfunc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -125,6 +125,7 @@ class SaleReport(Base):
     name = Column(String(700))
     productPrice = Column(Float(precision=2))
     units = Column (Integer)
+    total_earning = Column(Float(precision=2))
 
     initDate = ""
     endDate = ""

@@ -15,16 +15,44 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from models import User, Product, Sale, SaleDetails, PriceHistory, SaleReport
-from models import db_session, init_db
-from datetime import date as ddate
+from models import db_session, init_db, mfunc
+from datetime import date as ddate, timedelta
+
 
 cdate = ddate.today() 
 
 def dailyReport():
+	totalItemsSold = SaleReport.query\
+					.filter(SaleReport.date >= cdate)\
+					.with_entities(mfunc.sum(SaleReport.units))\
+					.scalar()
+	totalSales = len(db_session.query(\
+					SaleReport.idSale,\
+					mfunc.count(SaleReport.idSale))\
+					.filter(SaleReport.date >= cdate)\
+					.group_by(SaleReport.idSale).all())
+	totalEarnings = SaleReport.query\
+					.filter(SaleReport.date >= cdate)\
+					.with_entities(mfunc.sum(SaleReport.total_earning))\
+					.scalar()
 	sales = SaleReport.query.filter(SaleReport.date >= cdate)
+	if sales is None:
+		return 404
+	else:
+		return {'totalItemsSold':totalItemsSold, \
+				'totalSales':totalSales,\
+				'totalEarnings':totalEarnings,\
+				'sales': [s.serialize for s in sales] \
+				}
+
+def monthlyReport():
+	sales = SaleReport.query.filter(SaleReport.date.between(cdate - timedelta(days=30), cdate))
 	if sales is None:
 		abort(404)
 	else:
 		return sales
 
-#def prepareDate():
+def jsonReport(sales):
+	print(sales)
+	#totalUnits = sale)
+	return {'totalUnits': totalUnits, 'sales': sales}
