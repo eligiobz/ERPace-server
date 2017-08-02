@@ -5,11 +5,17 @@
 	<title>{{ title }}</title>
 </head>
 <body>
-	<h2>{{ title }}</h2>
-	<p>At glance</p>
-	<p><strong>Total items sold</strong> :: <strong>{{ totalItemsSold }}</strong></p>
-	<p><strong>Total sales</strong> :: <strong>{{ totalSales }}</strong></p>
-	<p><strong>Total earnings</strong> :: <strong>{{ totalEarnings }}</strong></p>
+	<div align="center"><h2>{{ title }}</h2></div>
+	<p>Vista rapida</p>
+	<div>
+		<p><strong>Total de articulos vendidos</strong> :: <strong>{{ totalItemsSold }}</strong></p>
+		<p><strong>Total de ventas</strong> :: <strong>{{ totalSales }}</strong></p>
+		<p><strong>Total de ganancias</strong> :: <strong>{{ totalEarnings }}</strong></p>
+	</div>
+
+	<div>
+		<img src="{{ logo }}">
+	</div>
 
 	<table>
 		<thead>
@@ -19,16 +25,28 @@
 			<th>Price</th>
 			<th>Earning</th>
 		</thead>
-		{% for sale in sales %}
-		<tr>
-			<td>{{ sale.idSale }}</td>
-			<td>{{ sale.name }}</td>
-			<td>{{ sale.units }}</td>
-			<td>{{ sale.productPrice }}</td>
-			<td>{{ sale.total_earning }}</td>
-		</tr>
-		{% endfor %}
+		{% with %}
+			{% set lastId = -1 %}
+			{% set trclass = "darker" %}
+			{% for sale in sales %}
+				{% if lastId != sale.idSale %}
+					{% set lastId = sale.idSale %}
+					{% if trclass == "lighter" %}
+						{% set trclass = "darker" %}
+					{% else %}
+						{% set trclass = "lighter" %}
+					{% endif %}
+				{% endif %}
+				<tr>
+					<td class="{{ trclass }}"> {{ sale.idSale }}</td>
+					<td class="{{ trclass }}"> {{ sale.name }}</td>
+					<td class="{{ trclass }}"> {{ sale.units }}</td>
+					<td class="{{ trclass }}"> {{ sale.productPrice }}</td>
+					<td class="{{ trclass }}"> {{ sale.total_earning }}</td>
+				</tr>
+			{% endfor %}
+		{% endwith %}
 	</table>
-	
+
 </body>	
 </html>
