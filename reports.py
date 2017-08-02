@@ -17,6 +17,8 @@
 from models import User, Product, Sale, SaleDetails, PriceHistory, SaleReport
 from models import db_session, init_db, mfunc
 from datetime import date as ddate, timedelta
+from pdfgenerator import generateSalesPdf
+from flask import jsonify
 
 
 cdate = ddate.today() 
@@ -39,13 +41,20 @@ def dailyReport():
 	if sales is None:
 		return 500
 	else:
+		data = {'totalItemsSold':totalItemsSold, \
+				'totalSales':totalSales,\
+				'totalEarnings':totalEarnings,\
+				'sales': [s.serialize for s in sales] \
+				}
+
 		return {'totalItemsSold':totalItemsSold, \
 				'totalSales':totalSales,\
 				'totalEarnings':totalEarnings,\
 				'sales': [s.serialize for s in sales] \
 				}
 
-def monthlyReport():
+# This generates
+def salesReport(initDate, delta=0):
 	totalItemsSold = SaleReport.query\
 					.filter(SaleReport.date.between(cdate - timedelta(days=30), cdate))\
 					.with_entities(mfunc.sum(SaleReport.units))\
@@ -63,11 +72,15 @@ def monthlyReport():
 	if sales is None:
 		return 500
 	else:
-		return {'totalItemsSold':totalItemsSold, \
+		data = {
+				'title': "Report from " + str(cdate - timedelta(days=30)) + " to " + str(cdate),
+				'totalItemsSold':totalItemsSold, \
 				'totalSales':totalSales,\
 				'totalEarnings':totalEarnings,\
 				'sales': [s.serialize for s in sales] \
 				}
+		generateSalesPdf(data)
+		return data
 
 def jsonReport(sales):
 	print(sales)

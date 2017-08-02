@@ -21,8 +21,8 @@ It currently saves new items into the stock database and keeps tracks of both sa
 	- [x] All products in stock database
 	- [x] Depleted products
 	- [X] Changes in price per item
-	- [ ] Daily statement
-	- [ ] Monthly statement
+	- [X] Daily statement
+	- [X] Monthly statement
 	- [ ] Most sold products
 	- [ ] Least sold products
 - [ ] Refactor app to support Flask Blueprints

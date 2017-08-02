@@ -24,9 +24,10 @@ from flask_compress import Compress
 from models import User, Product, Sale, SaleDetails, PriceHistory
 from models import db_session, init_db
 
-from reports import dailyReport, monthlyReport
+from reports import dailyReport, salesReport
 
 import time, datetime
+from datetime import date as ddate
 import os.path
 
 ################################# BOILERPLATE ##################################
@@ -134,7 +135,9 @@ def listDepletedProducts():
 @app.route('/mobilerp/api/v1.0/dailyReport', methods=['GET'])
 @auth.login_required
 def sendDailyReport():
-    return make_response(jsonify({'mobilerp': dailyReport()}), 200)
+    cdate = ddate.today()
+    print(cdate)
+    return make_response(jsonify({'mobilerp': salesReport(cdate)}), 200)
 
 
 @app.route('/mobilerp/api/v1.0/monthlyReport', methods=['GET'])
