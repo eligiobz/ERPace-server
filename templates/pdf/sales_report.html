@@ -5,6 +5,30 @@
 	<title>{{ title }}</title>
 </head>
 <body>
-	<h2>Sales report</h2>
-</body>
+	<h2>{{ title }}</h2>
+	<p>At glance</p>
+	<p><strong>Total items sold</strong> :: <strong>{{ totalItemsSold }}</strong></p>
+	<p><strong>Total sales</strong> :: <strong>{{ totalSales }}</strong></p>
+	<p><strong>Total earnings</strong> :: <strong>{{ totalEarnings }}</strong></p>
+
+	<table>
+		<thead>
+			<th>Sales #</th>
+			<th>Item</th>
+			<th>Amount</th>
+			<th>Price</th>
+			<th>Earning</th>
+		</thead>
+		{% for sale in sales %}
+		<tr>
+			<td>{{ sale.idSale }}</td>
+			<td>{{ sale.name }}</td>
+			<td>{{ sale.units }}</td>
+			<td>{{ sale.productPrice }}</td>
+			<td>{{ sale.total_earning }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+	
+</body>	
 </html>

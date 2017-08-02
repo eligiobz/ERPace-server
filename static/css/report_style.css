@@ -1,0 +1,12 @@
+body{
+	font-family: sans-serif;
+	font-size: 15px;
+}
+
+.lighter{
+	background-color: white;
+}
+
+.darker{
+	background-color: lightgray;
+}

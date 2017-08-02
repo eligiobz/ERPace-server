@@ -81,8 +81,3 @@ def salesReport(initDate, delta=0):
 				}
 		generateSalesPdf(data)
 		return data
-
-def jsonReport(sales):
-	print(sales)
-	#totalUnits = sale)
-	return {'totalUnits': totalUnits, 'sales': sales}

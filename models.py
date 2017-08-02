@@ -137,7 +137,10 @@ class SaleReport(Base):
 
     @property
     def serialize(self):
-        return {'idSale': self.idSale, 'date': self.date, 'name': self.name, 'productPrice': self.productPrice, 'units': self.units}
+        return {'idSale': self.idSale, 'date': self.date,\
+                'name': self.name, 'productPrice': self.productPrice,\
+                'units': self.units, 'total_earning':self.total_earning\
+                }
 
 def init_db():
     Base.metadata.create_all(engine)
