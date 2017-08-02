@@ -56,24 +56,30 @@ def dailyReport():
 # This generates
 def salesReport(initDate, delta=0):
 	totalItemsSold = SaleReport.query\
-					.filter(SaleReport.date.between(cdate - timedelta(days=30), cdate))\
+					.filter(SaleReport.date <= (cdate + timedelta(days=1)))\
+					.filter((SaleReport.date >= (cdate - timedelta(days=delta))))\
 					.with_entities(mfunc.sum(SaleReport.units))\
 					.scalar()
 	totalSales = len(db_session.query(\
 					SaleReport.idSale,\
 					mfunc.count(SaleReport.idSale))\
-					.filter(SaleReport.date.between(cdate - timedelta(days=30), cdate))\
+					.filter(SaleReport.date <= (cdate + timedelta(days=1)))\
+					.filter((SaleReport.date >= (cdate - timedelta(days=delta))))\
 					.group_by(SaleReport.idSale).all())
 	totalEarnings = SaleReport.query\
-					.filter(SaleReport.date.between(cdate - timedelta(days=30), cdate))\
+					.filter(SaleReport.date <= (cdate + timedelta(days=1)))\
+					.filter((SaleReport.date >= (cdate - timedelta(days=delta))))\
 					.with_entities(mfunc.sum(SaleReport.total_earning))\
 					.scalar()
-	sales = SaleReport.query.filter(SaleReport.date.between(cdate - timedelta(days=30), cdate))
+	sales = SaleReport.query.filter(SaleReport.date <= (cdate + timedelta(days=1)))\
+					.filter((SaleReport.date >= (cdate - timedelta(days=delta))))
 	if sales is None:
 		return 500
 	else:
 		data = {
-				'title': "Report from " + str(cdate - timedelta(days=30)) + " to " + str(cdate),
+				'title': "Report from "\
+					+ (str(cdate - timedelta(days=delta))  + " to " if delta > 0 else "")\
+					+ str(cdate),
 				'totalItemsSold':totalItemsSold, \
 				'totalSales':totalSales,\
 				'totalEarnings':totalEarnings,\

@@ -143,7 +143,8 @@ def sendDailyReport():
 @app.route('/mobilerp/api/v1.0/monthlyReport', methods=['GET'])
 @auth.login_required
 def sendMonthlyReport():
-    return make_response(jsonify({'mobilerp': monthlyReport()}), 200)
+    cdate = ddate.today()
+    return make_response(jsonify({'mobilerp': salesReport(cdate, 30)}), 200)
 
 ################################## USERS API ##################################
 
