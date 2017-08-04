@@ -19,7 +19,7 @@ from weasyprint import HTML
 
 SALES_REPORT_TEMPLATE = 'templates/pdf/sales_report.html'
 SALES_REPORT_STYLE = 'static/css/sales_report_style.css'
-SALES_REPORT_TEMPLATE = 'templates/pdf/depleted_product.html'
+DEPLETED_REPORT_TEMPLATE = 'templates/pdf/depleted_product.html'
 DEPLETED_REPORT_STYLE = 'static/css/depleted_report_style.css'
 OUTPUT_FOLDER = 'static/pdf/'
 

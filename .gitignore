@@ -77,3 +77,7 @@ freeline.py
 freeline/
 freeline_project_description.json
 .sublimelinterrc
+
+
+#random anonations
+garbage.txt

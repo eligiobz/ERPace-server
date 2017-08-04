@@ -46,12 +46,8 @@ def dailyReport():
 				'totalEarnings':totalEarnings,\
 				'sales': [s.serialize for s in sales] \
 				}
-
-		return {'totalItemsSold':totalItemsSold, \
-				'totalSales':totalSales,\
-				'totalEarnings':totalEarnings,\
-				'sales': [s.serialize for s in sales] \
-				}
+		generateSalesPdf(data)
+		return data
 
 # This generates
 def salesReport(initDate, delta=0):
