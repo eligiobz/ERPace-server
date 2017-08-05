@@ -22,7 +22,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_compress import Compress
 
 from models import User, Product, Sale, SaleDetails, PriceHistory
-from models import db_session, init_db
+from models import db_session #, init_db
 
 from reports import dailyReport, salesReport
 
