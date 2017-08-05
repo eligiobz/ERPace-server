@@ -14,62 +14,35 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from models import User, Product, Sale, SaleDetails, PriceHistory
-from models.views import SaleReport
-from models import db_session, mfunc
+from models.views import SalesReport
+from models import db_session as db_session, mfunc
 from datetime import date as ddate, timedelta
 from pdfgenerator import generateSalesPdf
 from flask import jsonify
 
-
 cdate = ddate.today() 
-
-def dailyReport():
-	totalItemsSold = SaleReport.query\
-					.filter(SaleReport.date >= cdate)\
-					.with_entities(mfunc.sum(SaleReport.units))\
-					.scalar()
-	totalSales = len(db_session.query(\
-					SaleReport.idSale,\
-					mfunc.count(SaleReport.idSale))\
-					.filter(SaleReport.date >= cdate)\
-					.group_by(SaleReport.idSale).all())
-	totalEarnings = SaleReport.query\
-					.filter(SaleReport.date >= cdate)\
-					.with_entities(mfunc.sum(SaleReport.total_earning))\
-					.scalar()
-	sales = SaleReport.query.filter(SaleReport.date >= cdate)
-	if sales is None:
-		return 500
-	else:
-		data = {'totalItemsSold':totalItemsSold, \
-				'totalSales':totalSales,\
-				'totalEarnings':totalEarnings,\
-				'sales': [s.serialize for s in sales] \
-				}
-		generateSalesPdf(data)
-		return data
 
 # This generates
 def salesReport(initDate, delta=0):
-	totalItemsSold = SaleReport.query\
-					.filter(SaleReport.date <= (cdate + timedelta(days=1)))\
-					.filter((SaleReport.date >= (cdate - timedelta(days=delta))))\
-					.with_entities(mfunc.sum(SaleReport.units))\
+	totalItemsSold = SalesReport.query\
+					.filter(SalesReport.date <= (cdate + timedelta(days=1)))\
+					.filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
+					.with_entities(mfunc.sum(SalesReport.units))\
 					.scalar()
 	totalSales = len(db_session.query(\
-					SaleReport.idSale,\
-					mfunc.count(SaleReport.idSale))\
-					.filter(SaleReport.date <= (cdate + timedelta(days=1)))\
-					.filter((SaleReport.date >= (cdate - timedelta(days=delta))))\
-					.group_by(SaleReport.idSale).all())
-	totalEarnings = SaleReport.query\
-					.filter(SaleReport.date <= (cdate + timedelta(days=1)))\
-					.filter((SaleReport.date >= (cdate - timedelta(days=delta))))\
-					.with_entities(mfunc.sum(SaleReport.total_earning))\
+					SalesReport.idSale,\
+					mfunc.count(SalesReport.idSale))\
+					.filter(SalesReport.date <= (cdate + timedelta(days=1)))\
+					.filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
+					.group_by(SalesReport.idSale).all())
+	totalEarnings = SalesReport.query\
+					.filter(SalesReport.date <= (cdate + timedelta(days=1)))\
+					.filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
+					.with_entities(mfunc.sum(SalesReport.total_earning))\
 					.scalar()
-	sales = SaleReport.query.filter(SaleReport.date <= (cdate + timedelta(days=1)))\
-					.filter((SaleReport.date >= (cdate - timedelta(days=delta))))
+	sales = SalesReport.query.filter(SalesReport.date <= (cdate + timedelta(days=1)))\
+					.filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
+					.order_by(SalesReport.idSale)
 	if sales is None:
 		return 500
 	else:

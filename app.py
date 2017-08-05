@@ -29,21 +29,15 @@ from models.Product import Product
 from models.Sale import Sale
 from models.SaleDetails import SaleDetails
 from models.PriceHistory import PriceHistory
-#from models import db_session #, init_db
+from models import db_session, engine #, init_db
 
-from reports import dailyReport, salesReport
+from reports import salesReport
 
 import time, datetime
 from datetime import date as ddate
 import os.path
 
 ################################# BOILERPLATE ##################################
-
-
-engine = create_engine('sqlite:///mobilerp.db', convert_unicode=True)
-db_session = scoped_session(sessionmaker(autocommit=False,
-                                        autoflush=False,
-                                        bind=engine))
 
 Base.metadata.bind = engine
 Base.metadata.reflect(views=True)
@@ -154,7 +148,6 @@ def listDepletedProducts():
 @auth.login_required
 def sendDailyReport():
     cdate = ddate.today()
-    print(cdate)
     return make_response(jsonify({'mobilerp': salesReport(cdate)}), 200)
 
 
