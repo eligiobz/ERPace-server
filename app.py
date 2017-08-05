@@ -105,7 +105,7 @@ def updateProduct(bCode):
     if p is None:
         abort(404)
     if 'price' in request.json:
-        if string(p.price) != request.json['price']:
+        if str(p.price) != request.json['price']:
             price_update = PriceHistory(p.barcode)
             db_session.add(price_update)
             db_session.commit()

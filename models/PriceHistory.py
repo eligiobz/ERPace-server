@@ -21,11 +21,10 @@ from datetime import datetime
 
 class PriceHistory(Base):
     __tablename__ = "PriceHistory"
-    """docstring for PriceHistory"""
-    date_changed = Column(DateTime, primary_key=True)
-    old_price = Column(Float(precision=2))
     barcode = Column(Integer, primary_key=True)
-
+    old_price = Column(Float(precision=2))
+    date_changed = Column(DateTime, primary_key=True)
+    
     def __init__(self, barcode):
         self.barcode = barcode
         self.old_price = (Product.query.filter_by(barcode=barcode).first()).price
