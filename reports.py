@@ -14,8 +14,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from models import User, Product, Sale, SaleDetails, PriceHistory, SaleReport
-from models import db_session, init_db, mfunc
+from models import User, Product, Sale, SaleDetails, PriceHistory
+from models.views import SaleReport
+from models import db_session, mfunc
 from datetime import date as ddate, timedelta
 from pdfgenerator import generateSalesPdf
 from flask import jsonify

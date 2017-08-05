@@ -20,9 +20,16 @@ from flask import Flask, jsonify, abort, make_response, request
 from flask_httpauth import HTTPBasicAuth
 from flask_sqlalchemy import SQLAlchemy
 from flask_compress import Compress
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
 
-from models import User, Product, Sale, SaleDetails, PriceHistory
-from models import db_session #, init_db
+from models import Base, engine, db_session
+from models.User import User
+from models.Product import Product
+from models.Sale import Sale
+from models.SaleDetails import SaleDetails
+from models.PriceHistory import PriceHistory
+#from models import db_session #, init_db
 
 from reports import dailyReport, salesReport
 
@@ -31,6 +38,16 @@ from datetime import date as ddate
 import os.path
 
 ################################# BOILERPLATE ##################################
+
+
+engine = create_engine('sqlite:///mobilerp.db', convert_unicode=True)
+db_session = scoped_session(sessionmaker(autocommit=False,
+                                        autoflush=False,
+                                        bind=engine))
+
+Base.metadata.bind = engine
+Base.metadata.reflect(views=True)
+Base.query = db_session.query_property()
 
 auth = HTTPBasicAuth()
 app = Flask(__name__)
@@ -88,10 +105,11 @@ def updateProduct(bCode):
     if p is None:
         abort(404)
     if 'price' in request.json:
-        price_update = PriceHistory(p.barcode)
-        db_session.add(price_update)
-        db_session.commit()
-        p.price = float(request.json['price'])
+        if string(p.price) != request.json['price']:
+            price_update = PriceHistory(p.barcode)
+            db_session.add(price_update)
+            db_session.commit()
+            p.price = float(request.json['price'])
     if 'units' in request.json :
         p.units = p.units + int(request.json['units'])
     db_session.add(p)

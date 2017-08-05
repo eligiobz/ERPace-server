@@ -15,19 +15,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from sqlalchemy import Column, Integer, DateTime, Float
-from models import Base, Product
+from models import Base
+from models.Product import Product
+from datetime import datetime
 
 class PriceHistory(Base):
     __tablename__ = "PriceHistory"
     """docstring for PriceHistory"""
-    date_changed = Column(DateTime)
+    date_changed = Column(DateTime, primary_key=True)
     old_price = Column(Float(precision=2))
     barcode = Column(Integer, primary_key=True)
 
     def __init__(self, barcode):
         self.barcode = barcode
         self.old_price = (Product.query.filter_by(barcode=barcode).first()).price
-        self.date_changed = datetime.datetime.now()
+        self.date_changed = datetime.now()
 
     @property
     def serialize(self):
