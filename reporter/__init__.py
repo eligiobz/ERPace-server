@@ -18,25 +18,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-from sqlalchemy import Column, Integer, String
-from models import Base
 
-class User(Base):
-    """ User:: Holds basic user information """
-    __tablename__ = "user"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String(120))
-    password = Column(String(120))
-    level = Column(Integer)
-
-    def __init__(self, username, password, level):
-        self.username = username
-        self.password = password
-        self.level = level
-
-    def __repr__(self):
-        return {'username': self.username, 'pass': self.password, 'level': self.level}
-
-    def getUser(self):
-        return {'username': self.username, 'pass': self.password, 'level': self.level}
+SALES_REPORT_TEMPLATE = 'templates/pdf/sales_report.html'
+SALES_REPORT_STYLE = 'static/css/sales_report_style.css'
+DEPLETED_REPORT_TEMPLATE = 'templates/pdf/depleted_product.html'
+DEPLETED_REPORT_STYLE = 'static/css/depleted_report_style.css'
+OUTPUT_FOLDER = 'static/pdf/'

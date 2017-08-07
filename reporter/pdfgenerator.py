@@ -18,25 +18,26 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-from sqlalchemy import Column, Integer, String
-from models import Base
+from jinja2 import Environment, FileSystemLoader
+from weasyprint import HTML
 
-class User(Base):
-    """ User:: Holds basic user information """
-    __tablename__ = "user"
+from . import *
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String(120))
-    password = Column(String(120))
-    level = Column(Integer)
+env = Environment(loader = FileSystemLoader('.'),\
+					extensions=['jinja2.ext.with_'])
 
-    def __init__(self, username, password, level):
-        self.username = username
-        self.password = password
-        self.level = level
+def generateSalesPdf(data):
+	template = env.get_template(SALES_REPORT_TEMPLATE)
+	template_vars = data
+	html_output = template.render(template_vars)
+	HTML(string=html_output).write_pdf(OUTPUT_FOLDER \
+		+ data['title'] \
+		+ ".pdf", stylesheets=[SALES_REPORT_STYLE])
 
-    def __repr__(self):
-        return {'username': self.username, 'pass': self.password, 'level': self.level}
-
-    def getUser(self):
-        return {'username': self.username, 'pass': self.password, 'level': self.level}
+def generateDepletedReport(data):
+	template = env.get_template(SALES_REPORT_TEMPLATE)
+	template_vars = data
+	html_output = template.render(template_vars)
+	HTML(string=html_output).write_pdf(OUTPUT_FOLDER \
+		+ data['title'] \
+		+ ".pdf", stylesheets=[DEPLETED_REPORT_STYLE])

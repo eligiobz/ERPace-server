@@ -18,25 +18,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-from sqlalchemy import Column, Integer, String
-from models import Base
+from flask import make_response, jsonify
+from reporter.salesreport import salesReport as salesReport
+from . import api, auth
 
-class User(Base):
-    """ User:: Holds basic user information """
-    __tablename__ = "user"
+from datetime import datetime as ddate
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String(120))
-    password = Column(String(120))
-    level = Column(Integer)
+@api.route('/v1.0/dailyReport', methods=['GET'])
+@auth.login_required
+def sendDailyReport():
+    cdate = ddate.today()
+    return make_response(jsonify({'mobilerp': salesReport(cdate)}), 200)
 
-    def __init__(self, username, password, level):
-        self.username = username
-        self.password = password
-        self.level = level
 
-    def __repr__(self):
-        return {'username': self.username, 'pass': self.password, 'level': self.level}
-
-    def getUser(self):
-        return {'username': self.username, 'pass': self.password, 'level': self.level}
+@api.route('/v1.0/monthlyReport', methods=['GET'])
+@auth.login_required
+def sendMonthlyReport():
+    cdate = ddate.today()
+    return make_response(jsonify({'mobilerp': salesReport(cdate, 30)}), 200)
