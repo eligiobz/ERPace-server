@@ -27,8 +27,6 @@ from models.SaleDetails import SaleDetails
 from models.PriceHistory import PriceHistory
 from models import db_session as db_session, engine as engine
 
-
-
 from flask_compress import Compress
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
