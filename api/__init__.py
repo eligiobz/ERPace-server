@@ -1,5 +1,6 @@
-#!env/bin/python
+# -*- coding:utf-8 -*-
 
+##############################################################################
 # MobilEPR - A small self-hosted ERP that works with your smartphone.
 # Copyright (C) 2017  Eligio Becerra
 #
@@ -15,6 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##############################################################################
 
 from flask import Blueprint, make_response, jsonify
 from flask_httpauth import HTTPBasicAuth

@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+
 #!env/bin/python
 
 ##############################################################################
@@ -29,7 +31,6 @@ from flask_compress import Compress
 
 from models import Base, engine, db_session
 from api.views import api as api
-from reports import salesReport
 
 import os
 

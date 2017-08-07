@@ -25,7 +25,7 @@ It currently saves new items into the stock database and keeps tracks of both sa
 	- [X] Monthly statement
 	- [ ] Most sold products
 	- [ ] Least sold products
-- [ ] Refactor app to support Flask Blueprints
+- [X] Refactor app to support Flask Blueprints
 - [ ] Offer WebUI for people wanting to run it on a single computer.
 
 ## License
