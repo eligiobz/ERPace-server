@@ -31,6 +31,8 @@ from models.SaleDetails import SaleDetails
 from models.PriceHistory import PriceHistory
 from models import db_session, engine #, init_db
 
+from api.api import api
+
 from reports import salesReport
 
 import time, datetime
@@ -45,6 +47,7 @@ Base.query = db_session.query_property()
 
 auth = HTTPBasicAuth()
 app = Flask(__name__)
+app.register_blueprint(api)
 Compress(app)
 
 ##################################### AUTH #####################################
