@@ -22,42 +22,41 @@ from models import db_session as db_session, mfunc
 from datetime import date as ddate, timedelta
 from flask import jsonify
 
-from .pdfgenerator import generateSalesPdf 
+from .pdfgenerator import generateSalesPdf
 
-cdate = ddate.today() 
+cdate = ddate.today()
 
-# This generates
+
 def salesReport(initDate, delta=0):
-	totalItemsSold = SalesReport.query\
-					.filter(SalesReport.date <= (cdate + timedelta(days=1)))\
-					.filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
-					.with_entities(mfunc.sum(SalesReport.units))\
-					.scalar()
-	totalSales = len(db_session.query(\
-					SalesReport.idSale,\
-					mfunc.count(SalesReport.idSale))\
-					.filter(SalesReport.date <= (cdate + timedelta(days=1)))\
-					.filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
-					.group_by(SalesReport.idSale).all())
-	totalEarnings = SalesReport.query\
-					.filter(SalesReport.date <= (cdate + timedelta(days=1)))\
-					.filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
-					.with_entities(mfunc.sum(SalesReport.total_earning))\
-					.scalar()
-	sales = SalesReport.query.filter(SalesReport.date <= (cdate + timedelta(days=1)))\
-					.filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
-					.order_by(SalesReport.idSale)
-	if sales is None:
-		return 500
-	else:
-		data = {
-				'title': "Report from "\
-					+ (str(cdate - timedelta(days=delta))  + " to " if delta > 0 else "")\
-					+ str(cdate),
-				'totalItemsSold':totalItemsSold, \
-				'totalSales':totalSales,\
-				'totalEarnings':totalEarnings,\
-				'sales': [s.serialize for s in sales] \
-				}
-		generateSalesPdf(data)
-		return data
+    totalItemsSold = SalesReport.query\
+                    .filter(SalesReport.date <= (cdate + timedelta(days=1)))\
+                    .filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
+                    .with_entities(mfunc.sum(SalesReport.units))\
+                    .scalar()
+    totalSales = len(db_session.query(\
+                    SalesReport.idSale,\
+                    mfunc.count(SalesReport.idSale))\
+                    .filter(SalesReport.date <= (cdate + timedelta(days=1)))\
+                    .filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
+                    .group_by(SalesReport.idSale).all())
+    totalEarnings = SalesReport.query\
+                    .filter(SalesReport.date <= (cdate + timedelta(days=1)))\
+                    .filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
+                    .with_entities(mfunc.sum(SalesReport.total_earning))\
+                    .scalar()
+    sales = SalesReport.query.filter(SalesReport.date <= (cdate + timedelta(days=1)))\
+                    .filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
+                    .order_by(SalesReport.idSale)
+    if sales is None:
+        return 500
+    else:
+        data = {
+                'title': "Report from " + (str(cdate - timedelta(days=delta))\
+                         + " to " if delta > 0 else "") + str(cdate),
+                'totalItemsSold': totalItemsSold,
+                'totalSales': totalSales,
+                'totalEarnings': totalEarnings,
+                'sales': [s.serialize for s in sales]
+                }
+        generateSalesPdf(data)
+        return data

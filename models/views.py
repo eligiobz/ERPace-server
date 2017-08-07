@@ -18,10 +18,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-from sqlalchemy import Column, Integer, DateTime, PrimaryKeyConstraint, String, Float
+"""
+views.py in models
+
+This package doesn't provide any views to the api Blueprint, instead it
+handles all of the views in the database, intead of creating them as a
+separate entity inside this model.
+"""
+
+
+from sqlalchemy import Column, Integer, DateTime, PrimaryKeyConstraint,\
+                       String, Float
 from models import Base
 
 from datetime import datetime
+
 
 class SalesReport(Base):
 
@@ -35,7 +46,7 @@ class SalesReport(Base):
     date = Column(DateTime)
     name = Column(String(700))
     productPrice = Column(Float(precision=2))
-    units = Column (Integer)
+    units = Column(Integer)
     total_earning = Column(Float(precision=2))
 
     initDate = ""
@@ -48,7 +59,6 @@ class SalesReport(Base):
 
     @property
     def serialize(self):
-        return {'idSale': self.idSale, 'date': self.date,\
-                'name': self.name, 'productPrice': self.productPrice,\
-                'units': self.units, 'total_earning':self.total_earning\
-                }
+        return {'idSale': self.idSale, 'date': self.date,
+                'name': self.name, 'productPrice': self.productPrice,
+                'units': self.units, 'total_earning': self.total_earning}

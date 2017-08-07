@@ -21,6 +21,7 @@
 from sqlalchemy import Column, Float, Integer, String, PrimaryKeyConstraint
 from models import Base
 
+
 class SaleDetails(Base):
     __tablename__ = "SaleDetails"
 
@@ -42,4 +43,4 @@ class SaleDetails(Base):
     @property
     def serialize(self):
         return {'idSale': self.idSale, 'idProduct': self.idProduct,
-        'productPrice': self.productPrice}
+                'productPrice': self.productPrice}

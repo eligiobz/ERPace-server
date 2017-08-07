@@ -26,14 +26,15 @@ from models.User import User as User
 api = Blueprint('api', __name__, 'templates')
 auth = HTTPBasicAuth()
 
+
 @auth.get_password
 def get_password(user):
     user = User.query.filter_by(username=user).first()
-    if user == None:
+    if user is None:
         return None
     return user.password
+
 
 @auth.error_handler
 def unauthorized():
     return make_response(jsonify({'error': 'Unauthorized access'}), 401)
-

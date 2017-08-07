@@ -21,6 +21,7 @@
 from sqlalchemy import Column, Float, Integer, String
 from models import Base
 
+
 class Product(Base):
     __tablename__ = "Product"
 
@@ -28,16 +29,16 @@ class Product(Base):
     units = Column(Integer)
     price = Column(Float(precision=2))
     name = Column(String(700))
-    
+
     """Products"""
     def __init__(self, barcode, name,  units, price):
         self.barcode = barcode
         self.name = name
         self.units = units
         self.price = price
-            
+
     """Prepares the Product to be returned in JSON format"""
     @property
     def serialize(self):
-        return {'barcode': self.barcode,'name': self.name, 
-        'units': self.units, 'price': self.price }
+        return {'barcode': self.barcode, 'name': self.name,
+                'units': self.units, 'price': self.price}

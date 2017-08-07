@@ -1,6 +1,5 @@
-# -*- coding:utf-8 -*-
-
 #!env/bin/python
+# -*- coding:utf-8 -*-
 
 ##############################################################################
 # MobilEPR - A small self-hosted ERP that works with your smartphone.
@@ -34,7 +33,7 @@ from api.views import api as api
 
 import os
 
-################################# BOILERPLATE ##################################
+# BOILERPLATE
 
 """
     Bootstrap of basic for database operation in
@@ -46,18 +45,19 @@ Base.metadata.bind = engine
 Base.metadata.reflect(views=True)
 Base.query = db_session.query_property()
 
-# Preaparing app
+# PREPARING APP
 
 app = Flask(__name__)
 app.register_blueprint(api, url_prefix="/api")
 Compress(app)
 
-############################### RUNNING THE APP ################################
+# LAUNCHING THE APP
+
 
 @app.route('/')
-def index(): 
-    return make_response(jsonify({'mobilerp':'Welcome to instance xxx'}), 200)
+def index():
+    return make_response(jsonify({'mobilerp': 'Welcome to instance xxx'}), 200)
 
-if __name__ == '__main__': 
+if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)

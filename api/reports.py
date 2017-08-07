@@ -24,6 +24,7 @@ from . import api, auth
 
 from datetime import datetime as ddate
 
+
 @api.route('/v1.0/dailyReport', methods=['GET'])
 @auth.login_required
 def sendDailyReport():

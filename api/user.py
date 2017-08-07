@@ -25,18 +25,20 @@ from models import db_session
 
 from . import api, auth
 
-## New User
+
 @api.route('/v1.0/users', methods=['POST'])
 def add_user():
-    if not request.json or (not 'user' in request.json and not 'pass' in request.json 
-        or not 'level' in request.json):
+    if not request.json or ('user' not in request.json and
+                            'pass' not in request.json or
+                            'level' not in request.json):
         abort(403)
-    user = User(request.json['user'], request.json['pass'], request.json['level'])
+    user = User(request.json['user'], request.json['pass'],
+                request.json['level'])
     db.session.add(user)
     db.session.commit()
-    return jsonify({'mobilerp':user.getUser()})
+    return jsonify({'mobilerp': user.getUser()})
 
-## Update User
+
 @api.route('/v1.0/users/<string:n_pass>', methods=['PUT'])
 @auth.login_required
 def update_pass(n_pass):
@@ -44,7 +46,8 @@ def update_pass(n_pass):
     user.password = n_pass
     db.session.add(user)
     db.session.commit()
-    return jsonify({'user':user.getUser()})
+    return jsonify({'user': user.getUser()})
+
 
 @api.route('/v1.0/user/checkLogin/', methods=['GET'])
 @auth.login_required

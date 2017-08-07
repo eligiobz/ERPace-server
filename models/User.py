@@ -21,6 +21,7 @@
 from sqlalchemy import Column, Integer, String
 from models import Base
 
+
 class User(Base):
     """ User:: Holds basic user information """
     __tablename__ = "user"
@@ -36,7 +37,9 @@ class User(Base):
         self.level = level
 
     def __repr__(self):
-        return {'username': self.username, 'pass': self.password, 'level': self.level}
+        return {'username': self.username, 'pass': self.password,
+                'level': self.level}
 
     def getUser(self):
-        return {'username': self.username, 'pass': self.password, 'level': self.level}
+        return {'username': self.username, 'pass': self.password,
+                'level': self.level}

@@ -8,6 +8,7 @@ from models.PriceHistory import PriceHistory
 
 from . import api, auth
 
+
 @api.route('/v1.0/makeSale', methods=['POST'])
 @auth.login_required
 def makeSale():
@@ -31,4 +32,4 @@ def makeSale():
             db_session.add(ps)
             db_session.add(sd)
             db_session.commit()
-    return make_response(jsonify({'mobilerp' : '[p.serialize]'}), 200)
+    return make_response(jsonify({'mobilerp': '[p.serialize]'}), 200)

@@ -23,21 +23,25 @@ from weasyprint import HTML
 
 from . import *
 
-env = Environment(loader = FileSystemLoader('.'),\
-					extensions=['jinja2.ext.with_'])
+env = Environment(loader=FileSystemLoader('.'),
+                  extensions=['jinja2.ext.with_'])
+
 
 def generateSalesPdf(data):
-	template = env.get_template(SALES_REPORT_TEMPLATE)
-	template_vars = data
-	html_output = template.render(template_vars)
-	HTML(string=html_output).write_pdf(OUTPUT_FOLDER \
-		+ data['title'] \
-		+ ".pdf", stylesheets=[SALES_REPORT_STYLE])
+    template = env.get_template(SALES_REPORT_TEMPLATE)
+    template_vars = data
+    html_output = template.render(template_vars)
+    HTML(string=html_output).write_pdf(OUTPUT_FOLDER\
+                                       + data['title']\
+                                       + ".pdf",
+                                       stylesheets=[SALES_REPORT_STYLE])
+
 
 def generateDepletedReport(data):
-	template = env.get_template(SALES_REPORT_TEMPLATE)
-	template_vars = data
-	html_output = template.render(template_vars)
-	HTML(string=html_output).write_pdf(OUTPUT_FOLDER \
-		+ data['title'] \
-		+ ".pdf", stylesheets=[DEPLETED_REPORT_STYLE])
+    template = env.get_template(SALES_REPORT_TEMPLATE)
+    template_vars = data
+    html_output = template.render(template_vars)
+    HTML(string=html_output).write_pdf(OUTPUT_FOLDER\
+                                       + data['title']\
+                                       + ".pdf",
+                                       stylesheets=[DEPLETED_REPORT_STYLE])

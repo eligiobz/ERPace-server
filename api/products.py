@@ -26,14 +26,16 @@ from models.PriceHistory import PriceHistory as PriceHistory
 
 from . import auth, api
 
+
 @api.route('/v1.0/findProduct/<int:bCode>', methods=['GET'])
 @auth.login_required
 def findProduct(bCode):
     product = Product.query.filter_by(barcode=bCode).first()
-    if (product == None):
+    if (product is None):
         abort(404)
     else:
-        return make_response(jsonify({'mobilerp' : [product.serialize]}), 200)
+        return make_response(jsonify({'mobilerp': [product.serialize]}), 200)
+
 
 @api.route('/v1.0/listProducts/', methods=['GET'])
 @auth.login_required
@@ -42,18 +44,23 @@ def listProducts():
     products = Product.query.all()
     if products is None:
         abort(400)
-    return make_response(jsonify({'mobilerp' : [p.serialize for p in products]}), 200)
+    return make_response(jsonify({'mobilerp':
+                         [p.serialize for p in products]}), 200)
+
 
 @api.route('/v1.0/newProduct/', methods=['POST'])
 @auth.login_required
 def newProduct():
-    if not request.json or not 'barcode' in request.json or not 'units' in request.json or not 'price' in request.json or not 'name' in request.json:
+    if not request.json or 'barcode' not in request.json\
+       or 'units' not in request.json or 'price' not in request.json\
+       or 'name' not in request.json:
         abort(400)
-    p = Product(request.json['barcode'], request.json['name'], 
-        request.json['units'], request.json['price'])
+    p = Product(request.json['barcode'], request.json['name'],
+                request.json['units'], request.json['price'])
     db_session.add(p)
     db_session.commit()
-    return make_response(jsonify({'mobilerp' : [p.serialize]}), 200)
+    return make_response(jsonify({'mobilerp': [p.serialize]}), 200)
+
 
 @api.route('/v1.0/updateProduct/<int:bCode>', methods=['PUT'])
 @auth.login_required
@@ -69,11 +76,12 @@ def updateProduct(bCode):
             db_session.add(price_update)
             db_session.commit()
             p.price = float(request.json['price'])
-    if 'units' in request.json :
+    if 'units' in request.json:
         p.units = p.units + int(request.json['units'])
     db_session.add(p)
     db_session.commit()
-    return make_response(jsonify({'mobilerp' : [p.serialize]}), 200)
+    return make_response(jsonify({'mobilerp': [p.serialize]}), 200)
+
 
 @api.route('/v1.0/listDepletedProducts', methods=['GET'])
 @auth.login_required
@@ -81,4 +89,5 @@ def listDepletedProducts():
     products = Product.query.filter_by(units=0).all()
     if products is None:
         abort(400)
-    return make_response(jsonify({'mobilerp' : [p.serialize for p in products]}), 200)
+    return make_response(jsonify({'mobilerp':
+                         [p.serialize for p in products]}), 200)

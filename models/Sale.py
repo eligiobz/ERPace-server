@@ -23,6 +23,7 @@ from models import Base
 
 from datetime import datetime
 
+
 class Sale (Base):
     __tablename__ = "Sale"
 
