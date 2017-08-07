@@ -75,7 +75,7 @@ def updateProduct(bCode):
     db_session.commit()
     return make_response(jsonify({'mobilerp' : [p.serialize]}), 200)
 
-@api.route('/v1.0/listDepletedProducts/', methods=['GET'])
+@api.route('/v1.0/listDepletedProducts', methods=['GET'])
 @auth.login_required
 def listDepletedProducts():
     products = Product.query.filter_by(units=0).all()
