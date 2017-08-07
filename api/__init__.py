@@ -16,4 +16,22 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Init file
+from flask import Blueprint, make_response, jsonify
+from flask_httpauth import HTTPBasicAuth
+
+from models.User import User as User
+
+api = Blueprint('api', __name__, 'templates')
+auth = HTTPBasicAuth()
+
+@auth.get_password
+def get_password(user):
+    user = User.query.filter_by(username=user).first()
+    if user == None:
+        return None
+    return user.password
+
+@auth.error_handler
+def unauthorized():
+    return make_response(jsonify({'error': 'Unauthorized access'}), 401)
+

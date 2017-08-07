@@ -1,5 +1,6 @@
 #!env/bin/python
 
+##############################################################################
 # MobilEPR - A small self-hosted ERP that works with your smartphone.
 # Copyright (C) 2017  Eligio Becerra
 #
@@ -15,23 +16,36 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##############################################################################
 
-from flask import Flask, abort, make_response, request, url_for
+"""
+    app.py
+    Main module to run mobiler-server
+"""
+
+from flask import Flask, make_response, request, jsonify
 from flask_httpauth import HTTPBasicAuth
-from flask_sqlalchemy import SQLAlchemy
 from flask_compress import Compress
 
 from models import Base, engine, db_session
-from api.api import api
+from api.views import api as api
 from reports import salesReport
 
 import os
 
 ################################# BOILERPLATE ##################################
 
+"""
+    Bootstrap of basic for database operation in
+    models packagage. We need our context to be
+    set at the root directory.
+"""
+
 Base.metadata.bind = engine
 Base.metadata.reflect(views=True)
 Base.query = db_session.query_property()
+
+# Preaparing app
 
 app = Flask(__name__)
 app.register_blueprint(api, url_prefix="/api")
@@ -40,9 +54,9 @@ Compress(app)
 ############################### RUNNING THE APP ################################
 
 @app.route('/')
-def index():
-    return jsonify({'mobilerp':'Welcome to instance xxx'})
+def index(): 
+    return make_response(jsonify({'mobilerp':'Welcome to instance xxx'}), 200)
 
-if __name__ == '__main__':
+if __name__ == '__main__': 
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
