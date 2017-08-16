@@ -49,7 +49,7 @@ def update_pass(n_pass):
     return jsonify({'user': user.getUser()})
 
 
-@api.route('/v1.0/user/checkLogin/', methods=['GET'])
+@api.route('/v1.0/user/checkLogin', methods=['GET'])
 @auth.login_required
 def checkLogin():
     return make_response(jsonify({'logged': 'true'}), 200)
