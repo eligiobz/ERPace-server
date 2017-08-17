@@ -25,14 +25,14 @@ from . import api, auth
 from datetime import datetime as ddate
 
 
-@api.route('/v1.0/dailyReport', methods=['GET'])
+@api.route('/v1.0/dailyReport/', methods=['GET'])
 @auth.login_required
 def sendDailyReport():
     cdate = ddate.today()
     return make_response(jsonify({'mobilerp': salesReport(cdate)}), 200)
 
 
-@api.route('/v1.0/monthlyReport', methods=['GET'])
+@api.route('/v1.0/monthlyReport/', methods=['GET'])
 @auth.login_required
 def sendMonthlyReport():
     cdate = ddate.today()

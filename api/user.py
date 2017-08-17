@@ -26,7 +26,7 @@ from models import db_session
 from . import api, auth
 
 
-@api.route('/v1.0/users', methods=['POST'])
+@api.route('/v1.0/users/', methods=['POST'])
 def add_user():
     if not request.json or ('user' not in request.json and
                             'pass' not in request.json or
@@ -49,7 +49,7 @@ def update_pass(n_pass):
     return jsonify({'user': user.getUser()})
 
 
-@api.route('/v1.0/user/checkLogin', methods=['GET'])
+@api.route('/v1.0/user/checkLogin/', methods=['GET'])
 @auth.login_required
 def checkLogin():
     return make_response(jsonify({'logged': 'true'}), 200)

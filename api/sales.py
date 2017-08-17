@@ -9,7 +9,7 @@ from models.PriceHistory import PriceHistory
 from . import api, auth
 
 
-@api.route('/v1.0/makeSale', methods=['POST'])
+@api.route('/v1.0/makeSale/', methods=['POST'])
 @auth.login_required
 def makeSale():
     if not request.json:

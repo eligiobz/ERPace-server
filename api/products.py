@@ -37,7 +37,7 @@ def findProduct(bCode):
         return make_response(jsonify({'mobilerp': [product.serialize]}), 200)
 
 
-@api.route('/v1.0/listProducts', methods=['GET'])
+@api.route('/v1.0/listProducts/', methods=['GET'])
 @auth.login_required
 def listProducts():
     print (request)
@@ -48,7 +48,7 @@ def listProducts():
                          [p.serialize for p in products]}), 200)
 
 
-@api.route('/v1.0/newProduct', methods=['POST'])
+@api.route('/v1.0/newProduct/', methods=['POST'])
 @auth.login_required
 def newProduct():
     if not request.json or 'barcode' not in request.json\
@@ -83,7 +83,7 @@ def updateProduct(bCode):
     return make_response(jsonify({'mobilerp': [p.serialize]}), 200)
 
 
-@api.route('/v1.0/listDepletedProducts', methods=['GET'])
+@api.route('/v1.0/listDepletedProducts/', methods=['GET'])
 @auth.login_required
 def listDepletedProducts():
     products = Product.query.filter_by(units=0).all()
