@@ -27,7 +27,7 @@ from models.PriceHistory import PriceHistory as PriceHistory
 from . import auth, api
 
 
-@api.route('/v1.0/findProduct/<int:bCode>', methods=['GET'])
+@api.route('/v1.0/findProduct/<bCode>', methods=['GET'])
 @auth.login_required
 def findProduct(bCode):
     product = Product.query.filter_by(barcode=bCode).first()

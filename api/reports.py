@@ -18,8 +18,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-from flask import make_response, jsonify
+from flask import make_response, jsonify, current_app
 from reporter.salesreport import salesReport as salesReport
+from reporter.pdfgenerator import generateSalesPdf
 from . import api, auth
 
 from datetime import datetime as ddate
@@ -29,11 +30,21 @@ from datetime import datetime as ddate
 @auth.login_required
 def sendDailyReport():
     cdate = ddate.today()
-    return make_response(jsonify({'mobilerp': salesReport(cdate)}), 200)
+    data = salesReport(cdate)
+    generateSalesPdf(data)
+    return make_response(jsonify({'mobilerp': data}), 200)
 
 
 @api.route('/v1.0/monthlyReport/', methods=['GET'])
 @auth.login_required
 def sendMonthlyReport():
     cdate = ddate.today()
-    return make_response(jsonify({'mobilerp': salesReport(cdate, 30)}), 200)
+    data = salesReport(cdate, 30)
+    generateSalesPdf(data)
+    return make_response(jsonify({'mobilerp': data}), 200)
+
+@api.route('/v1.0/getReport/<fn>', methods=['GET'])
+@auth.login_required
+def getReport(fn):
+	print("pdf/"+fn)
+	return current_app.send_static_file("pdf/"+fn)

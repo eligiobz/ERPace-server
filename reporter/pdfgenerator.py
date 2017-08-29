@@ -32,8 +32,7 @@ def generateSalesPdf(data):
     template_vars = data
     html_output = template.render(template_vars)
     HTML(string=html_output).write_pdf(OUTPUT_FOLDER\
-                                       + data['title']\
-                                       + ".pdf",
+                                       + "salesreport.pdf",
                                        stylesheets=[SALES_REPORT_STYLE])
 
 
@@ -42,6 +41,5 @@ def generateDepletedReport(data):
     template_vars = data
     html_output = template.render(template_vars)
     HTML(string=html_output).write_pdf(OUTPUT_FOLDER\
-                                       + data['title']\
-                                       + ".pdf",
+                                       + "depletedreport.pdf",
                                        stylesheets=[DEPLETED_REPORT_STYLE])

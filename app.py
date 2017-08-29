@@ -24,9 +24,11 @@
     Main module to run mobiler-server
 """
 
-from flask import Flask, make_response, request, jsonify
+from flask import Flask, make_response, request, jsonify, url_for
 from flask_httpauth import HTTPBasicAuth
 from flask_compress import Compress
+from flask_script import Manager
+
 
 from models import Base, engine, db_session
 from api.views import api as api
@@ -50,6 +52,30 @@ Base.query = db_session.query_property()
 app = Flask(__name__)
 app.register_blueprint(api, url_prefix="/api")
 Compress(app)
+manager = Manager(app)
+
+# manager commands
+
+@manager.command
+def list_routes():
+    import urllib
+    output = []
+    for rule in app.url_map.iter_rules():
+
+        options = {}
+        for arg in rule.arguments:
+            options[arg] = "[{0}]".format(arg)
+
+        methods = ','.join(rule.methods)
+        try:
+        	url = url_for(rule.endpoint, **options)
+        	line = urllib.unquote("{:50s} {:20s} {}".format(rule.endpoint, methods, url))
+        except:
+        	continue
+        output.append(line)
+    
+    for line in sorted(output):
+    	print (line)
 
 # LAUNCHING THE APP
 
@@ -59,5 +85,6 @@ def index():
     return make_response(jsonify({'mobilerp': 'Welcome to instance xxx'}), 200)
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+	manager.run()
+    # port = int(os.environ.get('PORT', 5000))
+    # app.run(host='0.0.0.0', port=port, debug=True)

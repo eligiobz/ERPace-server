@@ -22,8 +22,6 @@ from models import db_session as db_session, mfunc
 from datetime import date as ddate, timedelta
 from flask import jsonify
 
-from .pdfgenerator import generateSalesPdf
-
 cdate = ddate.today()
 
 
@@ -51,12 +49,11 @@ def salesReport(initDate, delta=0):
         return 500
     else:
         data = {
-                'title': "Report from " + (str(cdate - timedelta(days=delta))\
-                         + " to " if delta > 0 else "") + str(cdate),
+                'title': "Reporte del " + (str(cdate - timedelta(days=delta))\
+                         + " a " if delta > 0 else "") + str(cdate),
                 'totalItemsSold': totalItemsSold,
                 'totalSales': totalSales,
                 'totalEarnings': totalEarnings,
                 'sales': [s.serialize for s in sales]
                 }
-        generateSalesPdf(data)
         return data

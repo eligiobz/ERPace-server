@@ -23,7 +23,7 @@ from flask_httpauth import HTTPBasicAuth
 
 from models.User import User as User
 
-api = Blueprint('api', __name__, 'templates')
+api = Blueprint('api', __name__, static_folder='static', template_folder='templates')
 auth = HTTPBasicAuth()
 
 
