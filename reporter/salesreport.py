@@ -21,6 +21,7 @@ from models.views import SalesReport
 from models import db_session as db_session, mfunc
 from datetime import date as ddate, timedelta
 from flask import jsonify
+from .pdfgenerator import generateSalesPdf
 
 cdate = ddate.today()
 
@@ -56,4 +57,5 @@ def salesReport(initDate, delta=0):
                 'totalEarnings': totalEarnings,
                 'sales': [s.serialize for s in sales]
                 }
+        generateSalesPdf(data)
         return data

@@ -1,1 +1,30 @@
+/* Created by Eligio Becerra Zavala - 2017*/
 
+body{
+	font-family: serif;
+	font-size: 15px;
+}
+
+.lighter{
+	background-color: white;
+}
+
+.darker{
+	background-color: lightgray;
+}
+
+table, th, td, tr{
+	padding: 3px;
+	border-spacing: 3px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: black;
+}
+
+.datemissing_0_10{
+
+}
+
+.datemissing_11_more{
+
+}

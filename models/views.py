@@ -62,3 +62,21 @@ class SalesReport(Base):
         return {'idSale': self.idSale, 'date': self.date,
                 'name': self.name, 'productPrice': self.productPrice,
                 'units': self.units, 'total_earning': self.total_earning}
+
+class DepletedItems(Base):
+
+    __tablename__ = "DepletedItemsView"
+
+    __table_args__ = (
+        PrimaryKeyConstraint('idSale', 'barcode', 'date'),
+    )
+
+    idSale = Column(Integer)
+    date = Column(DateTime)
+    name = Column(String(700))
+    barcode = Column(String(50))
+
+    @property
+    def serialize(self):
+        return {'idSale': self.idSale, 'date': self.date,
+                'name': self.name, 'productPrice': self.barcode}

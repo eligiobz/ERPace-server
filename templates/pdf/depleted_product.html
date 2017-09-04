@@ -1,11 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title> Productos agotados</title>
+	<meta charset="UTF-8">
+	<title>{{ title }}</title>
 </head>
 <body>
+	<div align="center"><h2> Productos agotados</h2></div>
+	
+	<div>
+		<img src="{{ logo }}">
+	</div>
 
-	<h1>Productos agotados</h1>
+	<table>
+		<thead>
+			<th>Articulo</th>
+			<th>Ultima fecha vendido</th>
+		</thead>
+		{% with %}
+			{% set lastId = -1 %}
+			{% set trclass = "darker" %}
+			{% for p in mobilerp %}
+					{% set lastId =  lastId + 1 %}
+					{% if lastId % 2 == 0 %}
+						{% set trclass = "lighter" %}
+					{% else %}
+						{% set trclass = "darker" %}
+					{% endif %}
+				<tr>
+					<td class="{{ trclass }}"> {{ p.name }}</td>
+					<td class="{{ trclass }}"> {{ p.date }}</td>
+				</tr>
+			{% endfor %}
+		{% endwith %}
+	</table>
 
-</body>
+</body>	
 </html>

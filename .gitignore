@@ -81,3 +81,4 @@ freeline_project_description.json
 
 #random anonations
 garbage.txt
+*.db-journal

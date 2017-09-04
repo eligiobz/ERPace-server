@@ -23,7 +23,9 @@ from flask import abort, jsonify, make_response, request
 from models import db_session
 from models.Product import Product as Product
 from models.PriceHistory import PriceHistory as PriceHistory
+from models.views import DepletedItems
 
+from reporter.pdfgenerator import generateDepletedReport
 from . import auth, api
 
 
@@ -86,8 +88,9 @@ def updateProduct(bCode):
 @api.route('/v1.0/listDepletedProducts/', methods=['GET'])
 @auth.login_required
 def listDepletedProducts():
-    products = Product.query.filter_by(units=0).all()
+    products = DepletedItems.query.group_by('barcode')
     if products is None:
         abort(400)
-    return make_response(jsonify({'mobilerp':
-                         [p.serialize for p in products]}), 200)
+    data = {'mobilerp': [p.serialize for p in products]}
+    generateDepletedReport(data)
+    return make_response(jsonify(data), 200)
