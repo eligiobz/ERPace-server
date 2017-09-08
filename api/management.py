@@ -18,10 +18,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-from flask import Flask, abort, url_for, jsonify, make_response, request
+from flask import make_response, jsonify, current_app
+from reporter.salesreport import salesReport as salesReport
+from reporter.pdfgenerator import generateSalesPdf
+from . import api, auth
 
-from .products import *
-from .user import *
-from .reports import *
-from .sales import *
-from .management import *
+import os, shutil
+
+@api.route('/v1.0/dbBackup/', methods=['GET'])
+@auth.login_required
+def sendDatabase():
+	try:
+		os.makedirs('static/db/')
+	except FileExistsError:
+		print ("Already exist")
+	shutil.copyfile("mobilerp.db", "static/db/mobilerp.db")
+	return current_app.send_static_file("db/mobilerp.db")
