@@ -57,6 +57,9 @@ def newProduct():
        or 'units' not in request.json or 'price' not in request.json\
        or 'name' not in request.json:
         abort(400)
+    if request.json['barcode'] is '' or request.json['name'] is ''\
+       or request.json['units'] is '' or request.json['price'] is '':
+        abort(401)
     p = Product(request.json['barcode'], request.json['name'],
                 request.json['units'], request.json['price'])
     db_session.add(p)
