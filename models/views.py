@@ -36,16 +36,16 @@ from datetime import datetime
 
 class SalesReport(Base):
 
-    __tablename__ = "SalesView"
+    __tablename__ = "salesview"
 
     __table_args__ = (
-        PrimaryKeyConstraint('idSale', 'name'),
+        PrimaryKeyConstraint('idsale', 'name'),
     )
 
-    idSale = Column(Integer)
+    idsale = Column(Integer)
     date = Column(DateTime)
     name = Column(String(700))
-    productPrice = Column(Float(precision=2))
+    productprice = Column(Float(precision=2))
     units = Column(Integer)
     total_earning = Column(Float(precision=2))
 
@@ -59,24 +59,24 @@ class SalesReport(Base):
 
     @property
     def serialize(self):
-        return {'idSale': self.idSale, 'date': self.date,
-                'nameme': self.name, 'productPrice': self.productPrice,
+        return {'idSale': self.idsale, 'date': self.date,
+                'name': self.name, 'productprice': self.productprice,
                 'units': self.units, 'total_earning': self.total_earning}
 
 class DepletedItems(Base):
 
-    __tablename__ = "DepletedItemsView"
+    __tablename__ = "depleteditemsview"
 
     __table_args__ = (
-        PrimaryKeyConstraint('idSale', 'barcode', 'date'),
+        PrimaryKeyConstraint('idsale', 'barcode', 'date'),
     )
 
-    idSale = Column(Integer)
+    idsale = Column(Integer)
     date = Column(DateTime)
     name = Column(String(700))
     barcode = Column(String(50))
 
     @property
     def serialize(self):
-        return {'idSale': self.idSale, 'date': self.date,
-                'name': self.name, 'productPrice': self.barcode}
+        return {'idSale': self.idsale, 'date': self.date,
+                'name': self.name, 'barcode': self.barcode}

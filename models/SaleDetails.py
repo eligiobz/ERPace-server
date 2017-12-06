@@ -23,24 +23,24 @@ from models import Base
 
 
 class SaleDetails(Base):
-    __tablename__ = "SaleDetails"
+    __tablename__ = "saledetails"
 
     __table_args__ = (
-        PrimaryKeyConstraint('idSale', 'idProduct'),
+        PrimaryKeyConstraint('idsale', 'idproduct'),
     )
 
-    idSale = Column(Integer)
-    idProduct = Column(Integer)
-    productPrice = Column(Float(precision=2))
+    idsale = Column(Integer)
+    idproduct = Column(Integer)
+    productprice = Column(Float(precision=2))
     units = Column(Integer)
 
     def __init__(self, idSale, idProduct, productPrice, units):
-        self.idSale = idSale
-        self.idProduct = idProduct
-        self.productPrice = productPrice
+        self.idsale = idSale
+        self.idproduct = idProduct
+        self.productprice = productPrice
         self.units = units
 
     @property
     def serialize(self):
-        return {'idSale': self.idSale, 'idProduct': self.idProduct,
-                'productPrice': self.productPrice}
+        return {'idSale': self.idsale, 'idproduct': self.idproduct,
+                'productprice': self.productprice}

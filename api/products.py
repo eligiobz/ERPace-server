@@ -91,7 +91,7 @@ def updateProduct(bCode):
 @api.route('/v1.0/listDepletedProducts/', methods=['GET'])
 @auth.login_required
 def listDepletedProducts():
-    products = DepletedItems.query.group_by('barcode')
+    products = DepletedItems.query.all()
     if products is None:
         abort(400)
     data = {'mobilerp': [p.serialize for p in products]}

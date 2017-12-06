@@ -25,7 +25,7 @@ from datetime import datetime
 
 
 class Sale (Base):
-    __tablename__ = "Sale"
+    __tablename__ = "sale"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     date = Column(DateTime)

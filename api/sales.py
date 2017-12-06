@@ -22,14 +22,14 @@ def makeSale():
     for i in range(0, len(request.json['barcode'])):
         bCode = request.json['barcode'][i]
         units = request.json['units'][i]
-        print(bCode, units)
         ps = Product.query.filter_by(barcode=bCode).first()
         if (ps.units - units < 0):
             abort(406)
         else:
-            sd = SaleDetails(s.id, ps.barcode, ps.price, units)
             ps.units = ps.units - units
             db_session.add(ps)
+            db_session.commit()
+            sd = SaleDetails(s.id, ps.barcode, ps.price, units)
             db_session.add(sd)
             db_session.commit()
     return make_response(jsonify({'mobilerp': '[p.serialize]'}), 200)

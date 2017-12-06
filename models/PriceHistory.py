@@ -24,7 +24,7 @@ from datetime import datetime
 
 
 class PriceHistory(Base):
-    __tablename__ = "PriceHistory"
+    __tablename__ = "pricehistory"
     barcode = Column(Integer, primary_key=True)
     old_price = Column(Float(precision=2))
     date_changed = Column(DateTime, primary_key=True)

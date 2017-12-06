@@ -23,7 +23,7 @@ from models import Base
 
 
 class Product(Base):
-    __tablename__ = "Product"
+    __tablename__ = "product"
 
     barcode = Column(Integer, primary_key=True)
     units = Column(Integer)

@@ -33,11 +33,11 @@ def salesReport(initDate, delta=0):
                     .with_entities(mfunc.sum(SalesReport.units))\
                     .scalar()
     totalSales = len(db_session.query(\
-                    SalesReport.idSale,\
-                    mfunc.count(SalesReport.idSale))\
+                    SalesReport.idsale,\
+                    mfunc.count(SalesReport.idsale))\
                     .filter(SalesReport.date <= (cdate + timedelta(days=1)))\
                     .filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
-                    .group_by(SalesReport.idSale).all())
+                    .group_by(SalesReport.idsale).all())
     totalEarnings = SalesReport.query\
                     .filter(SalesReport.date <= (cdate + timedelta(days=1)))\
                     .filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
@@ -45,7 +45,7 @@ def salesReport(initDate, delta=0):
                     .scalar()
     sales = SalesReport.query.filter(SalesReport.date <= (cdate + timedelta(days=1)))\
                     .filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
-                    .order_by(SalesReport.idSale)
+                    .order_by(SalesReport.idsale)
     if sales is None:
         return 500
     else:
