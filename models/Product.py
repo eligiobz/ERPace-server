@@ -25,7 +25,7 @@ from models import Base
 class Product(Base):
     __tablename__ = "product"
 
-    barcode = Column(Integer, primary_key=True)
+    barcode = Column(String, primary_key=True)
     units = Column(Integer)
     price = Column(Float(precision=2))
     name = Column(String(700))
