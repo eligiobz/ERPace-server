@@ -24,7 +24,7 @@ from models import Base
 
 class User(Base):
     """ User:: Holds basic user information """
-    __tablename__ = "user"
+    __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(120))

@@ -21,7 +21,7 @@
 from sqlalchemy import create_engine, func as mfunc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
-from flask_migrate import Migrate, MigrateCommand
+#from flask_migrate import Migrate, MigrateCommand
 
 import os
 
