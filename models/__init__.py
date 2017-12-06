@@ -21,9 +21,12 @@
 from sqlalchemy import create_engine, func as mfunc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
+from flask_migrate import Migrate, MigrateCommand
+
+import os
 
 Base = declarative_base()
-engine = create_engine('sqlite:///mobilerp.db', convert_unicode=True)
+engine = create_engine(os.environ['DATABASE_URL'], convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
                             autoflush=False,
                             bind=engine))
