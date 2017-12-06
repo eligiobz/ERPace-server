@@ -43,7 +43,7 @@ defaultDrugStore = text("INSERT INTO DrugStore(name) values('default')")
 insertMasterListData = text("INSERT INTO MasterList(barcode, name, price) "\
 							"SELECT barcode, name, price FROM Product")
 FillProductData = text("INSERT INTO Product(barcode, units, storeid)"\
- 					" SELECT barcode, units, MAX(DrugStore.id) FROM tmp_Product, DrugStore;")
+ 					" SELECT barcode, units, 1 FROM tmp_Product;")
 SetDefaultStore = text(" UPDATE Product SET storeid = (SELECT MAX(id) FROM DrugStore);")
 
 #Downgrade queries
@@ -66,11 +66,11 @@ def upgrade(migrate_engine):
 	migrate_engine.execute(SetDefaultStore)
 	migrate_engine.execute(DropTMPTable)
 
-def downgrade(migrate_engine):
-	# pass
+def downgrade(migrate_engine):m
 	migrate_engine.execute(CreateTMPUpdateTable)
 	Product_downgrade.create()
 	migrate_engine.execute(FillDowngradeData)
 	migrate_engine.execute(DropTMPTable)
+	migrate_engine.execute(UpdateTableName)
 	MasterList.drop()
 	DrugStore.drop()
