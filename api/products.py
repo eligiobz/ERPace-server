@@ -67,7 +67,7 @@ def newProduct():
     return make_response(jsonify({'mobilerp': [p.serialize]}), 200)
 
 
-@api.route('/v1.0/updateProduct/<int:bCode>', methods=['PUT'])
+@api.route('/v1.0/updateProduct/<bCode>', methods=['PUT'])
 @auth.login_required
 def updateProduct(bCode):
     if not request.json:
