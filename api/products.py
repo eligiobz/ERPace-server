@@ -43,7 +43,7 @@ def findProduct(bCode):
 @auth.login_required
 def listProducts():
     print (request)
-    products = Product.query.all()
+    products = Product.query.all().order_by(Product.name.desc())
     if products is None:
         abort(400)
     return make_response(jsonify({'mobilerp':
