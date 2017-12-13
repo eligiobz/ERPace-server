@@ -27,7 +27,7 @@ from models.views import DepletedItems
 
 from reporter.pdfgenerator import generateDepletedReport
 from . import auth, api
-
+from . import logger
 
 @api.route('/v1.0/findProduct/<bCode>', methods=['GET'])
 @auth.login_required
@@ -43,7 +43,7 @@ def findProduct(bCode):
 @auth.login_required
 def listProducts():
     print (request)
-    products = Product.query.all().order_by(Product.name.desc())
+    products = Product.query.order_by(Product.name.asc()).all()
     if products is None:
         abort(400)
     return make_response(jsonify({'mobilerp':
@@ -60,11 +60,14 @@ def newProduct():
     if request.json['barcode'] is '' or request.json['name'] is ''\
        or request.json['units'] is '' or request.json['price'] is '':
         abort(401)
-    p = Product(request.json['barcode'], request.json['name'],
-                request.json['units'], request.json['price'])
-    db_session.add(p)
-    db_session.commit()
-    return make_response(jsonify({'mobilerp': [p.serialize]}), 200)
+    if (logger.log_op(request.json)):
+        p = Product(request.json['barcode'], request.json['name'],
+                    request.json['units'], request.json['price'])
+        db_session.add(p)
+        db_session.commit()
+        return make_response(jsonify({'mobilerp': [p.serialize]}), 200)
+    else:
+        return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 200)
 
 
 @api.route('/v1.0/updateProduct/<bCode>', methods=['PUT'])
@@ -75,17 +78,20 @@ def updateProduct(bCode):
     p = Product.query.filter_by(barcode=bCode).first()
     if p is None:
         abort(404)
-    if 'price' in request.json:
-        if str(p.price) != request.json['price']:
-            price_update = PriceHistory(p.barcode)
-            db_session.add(price_update)
-            db_session.commit()
-            p.price = float(request.json['price'])
-    if 'units' in request.json:
-        p.units = p.units + int(request.json['units'])
-    db_session.add(p)
-    db_session.commit()
-    return make_response(jsonify({'mobilerp': [p.serialize]}), 200)
+    if (logger.log_op(request.json)):
+        if 'price' in request.json:
+            if str(p.price) != request.json['price']:
+                price_update = PriceHistory(p.barcode)
+                db_session.add(price_update)
+                db_session.commit()
+                p.price = float(request.json['price'])
+        if 'units' in request.json:
+            p.units = p.units + int(request.json['units'])
+        db_session.add(p)
+        db_session.commit()
+        return make_response(jsonify({'mobilerp': [p.serialize]}), 200)
+    else:
+        return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 200)
 
 
 @api.route('/v1.0/listDepletedProducts/', methods=['GET'])

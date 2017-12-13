@@ -22,9 +22,11 @@ from flask import Blueprint, make_response, jsonify
 from flask_httpauth import HTTPBasicAuth
 
 from models.User import User as User
+from utils import Logger as Logger
 
 api = Blueprint('api', __name__, static_folder='static', template_folder='templates')
 auth = HTTPBasicAuth()
+logger = Logger()
 
 
 @auth.get_password
