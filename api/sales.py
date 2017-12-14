@@ -6,7 +6,7 @@ from models.Sale import Sale
 from models.SaleDetails import SaleDetails
 from models.PriceHistory import PriceHistory
 
-from . import api, auth
+from . import api, auth, logger
 
 
 @api.route('/v1.0/makeSale/', methods=['POST'])
@@ -35,4 +35,4 @@ def makeSale():
                 db_session.commit()
         return make_response(jsonify({'mobilerp': '[p.serialize]'}), 200)
     else:
-        return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 200)
+        return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)

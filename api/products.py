@@ -67,7 +67,7 @@ def newProduct():
         db_session.commit()
         return make_response(jsonify({'mobilerp': [p.serialize]}), 200)
     else:
-        return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 200)
+        return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 
 
 @api.route('/v1.0/updateProduct/<bCode>', methods=['PUT'])
@@ -91,7 +91,7 @@ def updateProduct(bCode):
         db_session.commit()
         return make_response(jsonify({'mobilerp': [p.serialize]}), 200)
     else:
-        return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 200)
+        return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 
 
 @api.route('/v1.0/listDepletedProducts/', methods=['GET'])
