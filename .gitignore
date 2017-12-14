@@ -81,5 +81,7 @@ freeline_project_description.json
 
 #random anonations
 garbage.txt
+operations_log.txt
+test.json
 *.db-journal
 *.glue
