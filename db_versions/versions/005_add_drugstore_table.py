@@ -5,12 +5,15 @@ meta = MetaData()
 
 # New tables
 DrugStore = Table(
+	__tablename__ = "drugstore"
+
 	"DrugStore", meta,
 	Column('id', Integer, primary_key=True, autoincrement=True),
 	Column('name', String(150)),
 )
 
 MasterList = Table(
+	__tablename__ = "masterlist"
 	"MasterList", meta,
 	Column('barcode', String(40)),
 	Column('name', String(150)),
@@ -19,6 +22,7 @@ MasterList = Table(
 
 #Update product table
 Product = Table(
+	__tablename__ = "drugstore",
 	'Product', meta,
 	Column('barcode', Integer, primary_key=True),
 	Column('units', Integer),
@@ -66,7 +70,7 @@ def upgrade(migrate_engine):
 	migrate_engine.execute(SetDefaultStore)
 	migrate_engine.execute(DropTMPTable)
 
-def downgrade(migrate_engine):m
+def downgrade(migrate_engine):
 	migrate_engine.execute(CreateTMPUpdateTable)
 	Product_downgrade.create()
 	migrate_engine.execute(FillDowngradeData)
