@@ -85,3 +85,4 @@ operations_log.txt
 test.json
 *.db-journal
 *.glue
+creation.sql
