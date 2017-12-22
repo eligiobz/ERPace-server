@@ -18,25 +18,39 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-from flask import Blueprint, make_response, jsonify
-from flask_httpauth import HTTPBasicAuth
+from . import OperationsLogs
+from models import db_session
 
-from models.User import User as User
-from utils.Logger import Logger as Logger
-
-api = Blueprint('api', __name__, static_folder='static', template_folder='templates')
-auth = HTTPBasicAuth()
-logger = Logger()
+import os, json
 
 
-@auth.get_password
-def get_password(user):
-    user = User.query.filter_by(username=user).first()
-    if user is None:
-        return None
-    return user.password
+class Logger:
 
+	str_data = ""
+	log_limit = 6
 
-@auth.error_handler
-def unauthorized():
-    return make_response(jsonify({'error': 'Unauthorized access'}), 401)
+	def log_op(self, op):
+		self.str_data = json.dumps(op)
+		if(self.__check_op__()):
+			op = OperationsLogs(self.str_data)
+			db_session.add(op)
+			db_session.commit()
+			self.__remove_last_op__()
+			return True
+		else:
+			return False
+
+	def __remove_last_op__(self):
+		total_ops = OperationsLogs.query.count()
+		while (total_ops > self.log_limit):
+			op = OperationsLogs.query.first()
+			db_session.delete(op)
+			db_session.commit()
+			total_ops -= 1
+
+	def __check_op__(self):
+		ops_log = OperationsLogs.query.filter_by(str_data=self.str_data).first()
+		if ops_log is None:
+			return True
+		else:
+			return False

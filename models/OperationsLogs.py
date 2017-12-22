@@ -18,25 +18,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-from flask import Blueprint, make_response, jsonify
-from flask_httpauth import HTTPBasicAuth
+from sqlalchemy import Column, Float, Integer, String, func
+from models import Base
 
-from models.User import User as User
-from utils.Logger import Logger as Logger
+class OperationsLogs(Base):
 
-api = Blueprint('api', __name__, static_folder='static', template_folder='templates')
-auth = HTTPBasicAuth()
-logger = Logger()
-
-
-@auth.get_password
-def get_password(user):
-    user = User.query.filter_by(username=user).first()
-    if user is None:
-        return None
-    return user.password
+	__tablename__ = "operation_logs"
+	id = Column(Integer, primary_key=True, autoincrement=True)
+	str_data = Column(String)
 
 
-@auth.error_handler
-def unauthorized():
-    return make_response(jsonify({'error': 'Unauthorized access'}), 401)
+	def __init__(self, str_data):
+		self.str_data = str_data

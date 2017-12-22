@@ -1,5 +1,4 @@
 CREATE TABLE operation_logs(
-	id bigserial,
-	data json,
-	token text primary key
+	id bigserial primary key,
+	str_data text 
 );

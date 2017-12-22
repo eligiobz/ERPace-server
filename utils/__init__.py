@@ -18,4 +18,5 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-from .logger import *
+from models.OperationsLogs import OperationsLogs as OperationsLogs
+from . import *
