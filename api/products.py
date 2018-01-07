@@ -87,12 +87,13 @@ def updateProduct(bCode):
                 p.price = float(request.json['price'])
         if 'units' in request.json:
             p.units = p.units + int(request.json['units'])
+        if 'name' in request.json:
+            p.name = request.json['name']
         db_session.add(p)
         db_session.commit()
         return make_response(jsonify({'mobilerp': [p.serialize]}), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
-
 
 @api.route('/v1.0/listDepletedProducts/', methods=['GET'])
 @auth.login_required
