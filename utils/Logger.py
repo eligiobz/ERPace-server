@@ -23,7 +23,6 @@ from models import db_session
 
 import os, json
 
-
 class Logger:
 
 	str_data = ""

@@ -27,18 +27,16 @@ class Product(Base):
 
     barcode = Column(String, primary_key=True)
     units = Column(Integer)
-    price = Column(Float(precision=2))
-    name = Column(String(700))
+    storeid = Column(Integer)
 
     """Products"""
-    def __init__(self, barcode, name,  units, price):
+    def __init__(self, barcode, units, storeid):
         self.barcode = barcode
-        self.name = name
         self.units = units
-        self.price = price
+        self.storeid = storeid
 
     """Prepares the Product to be returned in JSON format"""
     @property
     def serialize(self):
-        return {'barcode': self.barcode, 'name': self.name,
-                'units': self.units, 'price': self.price}
+        return {'barcode': self.barcode,
+                'units': self.units, 'storeid': self.storeid}

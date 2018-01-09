@@ -18,11 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-from flask import Flask, abort, url_for, jsonify, make_response, request
+from flask import abort, make_response, request, jsonify
 
-from .products import *
-from .user import *
-from .reports import *
-from .sales import *
-from .management import *
-from .drugstore import *
+from models import db_session
+from models.DrugStores import Drugstore
+
+from . import api, auth, logger
+
+@api.route('/v1.0/listDrugstores/', methods=['GET'])
+@auth.login_required
+def listDrugstores():
+	storeslist = Drugstore.query.all()
+	return make_response(jsonify({'mobilerp':
+                         [s.serialize for s in storeslist]}), 200)
+

@@ -2,7 +2,7 @@
 
 ##############################################################################
 # MobilEPR - A small self-hosted ERP that works with your smartphone.
-# Copyright (C) 2017  Eligio Becerra
+# Copyright (C) 2018  Eligio Becerra
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -18,11 +18,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-from flask import Flask, abort, url_for, jsonify, make_response, request
+from sqlalchemy import Column, Float, Integer, String
+from models import Base
 
-from .products import *
-from .user import *
-from .reports import *
-from .sales import *
-from .management import *
-from .drugstore import *
+class Drugstore(Base):
+    __tablename__ = "drugstore"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(700))
+
+    """Drugstore"""
+    def __init__(self, id, name):
+        self.id = barcode
+        self.name = name
+        
+    """Prepares the Drugstore to be returned in JSON format"""
+    @property
+    def serialize(self):
+        return {'id': self.id, 'name': self.name}
