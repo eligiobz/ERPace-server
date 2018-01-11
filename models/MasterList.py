@@ -24,17 +24,17 @@ from models import Base
 class MasterList(Base):
     __tablename__ = "masterlist"
 
-    barcode = Column(String(60))
+    barcode = Column(String(60), primary_key=True)
     name = Column(String(700))
     price = Column(Float(precision=2))
 
-    """Drugstore"""
+    """MasterList"""
     def __init__(self, barcode, name, price):
         self.barcode = barcode
         self.name = name
         self.price = price
         
-    """Prepares the Drugstore to be returned in JSON format"""
+    """Prepares the MasterList to be returned in JSON format"""
     @property
     def serialize(self):
-        return {'id': self.id, 'name': self.name, 'price': self.price}
+        return {'barcode': self.barcode, 'name': self.name, 'price': self.price}

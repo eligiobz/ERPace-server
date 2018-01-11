@@ -32,3 +32,24 @@ def listDrugstores():
 	return make_response(jsonify({'mobilerp':
                          [s.serialize for s in storeslist]}), 200)
 
+@api.route('/v1.0/addDrugstore/', methods=['POST'])
+@auth.login_required
+def addDrugstore():
+	if not request.json or not 'name' in request.json:
+		abort(406)
+	store = Drugstore(request.json['name'])
+	db_session.add(store)
+	db_session.commit()
+	return make_response(jsonify({'mobilerp': store.serialize}) , 200)
+
+@api.route('/v1.0/editDrugstore/', methods=['PUT'])
+@auth.login_required
+def editDrugstore():
+	if not request.json or not 'name' in request.json\
+		or not 'id' in request.json:
+		abort(406)
+	store = Drugstore.query.filter_by(id = request.json['id']).first()
+	store.name = request.json['name']
+	db_session.add(store)
+	db_session.commit()
+	return make_response(jsonify({'mobilerp': store.serialize }), 200)

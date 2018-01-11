@@ -24,6 +24,7 @@ from models import db_session
 from models.Product import Product as Product
 from models.PriceHistory import PriceHistory as PriceHistory
 from models.views import DepletedItems
+from models.MasterList import MasterList as MasterList
 
 from reporter.pdfgenerator import generateDepletedReport
 from . import auth, api
@@ -43,7 +44,7 @@ def findProduct(bCode):
 @auth.login_required
 def listProducts():
     print (request)
-    products = Product.query.order_by(Product.name.asc()).all()
+    products = MasterList.query.order_by(MasterList.name.asc()).all()
     if products is None:
         abort(400)
     return make_response(jsonify({'mobilerp':

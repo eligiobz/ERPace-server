@@ -28,8 +28,7 @@ class Drugstore(Base):
     name = Column(String(700))
 
     """Drugstore"""
-    def __init__(self, id, name):
-        self.id = barcode
+    def __init__(self, name):
         self.name = name
         
     """Prepares the Drugstore to be returned in JSON format"""
