@@ -20,8 +20,9 @@
 
 from flask import abort, make_response, request, jsonify
 
-from models import db_session
+from models import db_session, engine
 from models.Product import Product
+from models.MasterList import MasterList
 from models.Sale import Sale
 from models.SaleDetails import SaleDetails
 from models.PriceHistory import PriceHistory
@@ -61,7 +62,7 @@ def makeSale():
 @api.route('/v1.1/makeSale/', methods=['POST'])
 @auth.login_required
 def makeSale_v1_1():
-    if not request.json:
+    if not request.json or 'storeid' not in request.json:
         abort(400)
     if 'barcode' not in request.json or len(request.json['barcode']) <= 0:
         abort(400)
@@ -72,16 +73,23 @@ def makeSale_v1_1():
         for i in range(0, len(request.json['barcode'])):
             bCode = request.json['barcode'][i]
             units = request.json['units'][i]
-            ps = Product.query.filter_by(barcode=bCode).first()
+            m = MasterList.query.filter_by(barcode=bCode).first()
+            ps = Product.query.filter_by(barcode=bCode, \
+                storeid=request.json['storeid']).first()
             if (ps.units - units < 0):
                 abort(406)
             else:
-                ps.units = ps.units - units
-                db_session.add(ps)
-                db_session.commit()
-                sd = SaleDetails(s.id, ps.barcode, ps.price, units)
+                q = updateHelper(bCode, units, request.json['storeid'])
+                engine.execute(q)
+                sd = SaleDetails(s.id, m.barcode, m.price, units)
                 db_session.add(sd)
                 db_session.commit()
         return make_response(jsonify({'mobilerp': '[p.serialize]'}), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
+
+def updateHelper(barcode, units, storeid):
+    p = Product.query.filter_by(storeid=storeid, barcode=barcode).first()
+    u = p.units - units
+    return "UPDATE product set units={0} where barcode='{1}' and storeid={2}"\
+        .format(u, barcode, storeid)

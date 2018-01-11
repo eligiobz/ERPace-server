@@ -178,10 +178,12 @@ def updateProduct_v1_1(bCode):
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 
-def updateHelper(barcode, units, storeid):
-    p = Product.query.filter_by(storeid=storeid, barcode=barcode).first()
-    if p is None:
-        p = Product(barcode, 0, storeid)
-    u = p.units + units
-    return "UPDATE product set units={0} where barcode='{1}' and storeid={2}"\
-        .format(u, barcode, storeid)
+@api.route('/v1.1/listDepletedProducts/<storeid>', methods=['GET'])
+@auth.login_required
+def listDepletedProducts_v1_1(storeid):
+    products = DepletedItems.query.filter_by(storeid=int(storeid)).all()
+    if products is None:
+        abort(400)
+    data = {'mobilerp': [p.serialize for p in products]}
+    generateDepletedReport(data)
+    return make_response(jsonify(data), 200)

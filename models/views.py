@@ -72,14 +72,17 @@ class DepletedItems(Base):
     )
 
     idsale = Column(Integer)
-    date = Column(DateTime)
     name = Column(String(700))
+    date = Column(DateTime)
+    storeid = Column(Integer)
+    units = Column(Integer)
     barcode = Column(String(50))
 
     @property
     def serialize(self):
-        return {'idSale': self.idsale, 'date': self.date,
-                'name': self.name, 'barcode': self.barcode}
+        return {'idSale': self.idsale, 'name': self.name,
+            'date': self.date, 'storeid' : self.storeid,
+            'units' : self.units, 'barcode': self.barcode}
 
 
 class ProductStore(Base):
