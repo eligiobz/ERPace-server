@@ -19,7 +19,7 @@
 ##############################################################################
 from sqlalchemy import Column, Integer, DateTime, Float
 from models import Base
-from models.Product import Product
+from models.MasterList import MasterList
 from datetime import datetime
 
 
@@ -31,7 +31,7 @@ class PriceHistory(Base):
 
     def __init__(self, barcode):
         self.barcode = barcode
-        self.old_price = (Product.query
+        self.old_price = (MasterList.query
                                  .filter_by(barcode=barcode)
                                  .first()).price
         self.date_changed = datetime.now()

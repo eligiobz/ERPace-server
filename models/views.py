@@ -80,3 +80,24 @@ class DepletedItems(Base):
     def serialize(self):
         return {'idSale': self.idsale, 'date': self.date,
                 'name': self.name, 'barcode': self.barcode}
+
+
+class ProductStore(Base):
+
+    __tablename__ = "products_store"
+
+    __table_args__ = (
+        PrimaryKeyConstraint('barcode', 'storeid'),
+    )
+
+    barcode = Column(String(60))
+    name = Column(String(700))
+    units = Column(Integer)
+    price = Column(Float(precision=2))
+    storeid =  Column(Integer)
+
+    @property
+    def serialize(self):
+        return {'units': self.units, 'price': self.price,
+                'name': self.name, 'barcode': self.barcode,
+                'storeid': self.storeid}

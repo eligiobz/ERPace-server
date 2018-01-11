@@ -25,14 +25,14 @@ from models.DrugStores import Drugstore
 
 from . import api, auth, logger
 
-@api.route('/v1.0/listDrugstores/', methods=['GET'])
+@api.route('/v1.1/listDrugstores/', methods=['GET'])
 @auth.login_required
 def listDrugstores():
 	storeslist = Drugstore.query.all()
 	return make_response(jsonify({'mobilerp':
                          [s.serialize for s in storeslist]}), 200)
 
-@api.route('/v1.0/addDrugstore/', methods=['POST'])
+@api.route('/v1.1/addDrugstore/', methods=['POST'])
 @auth.login_required
 def addDrugstore():
 	if not request.json or not 'name' in request.json:
@@ -42,11 +42,11 @@ def addDrugstore():
 	db_session.commit()
 	return make_response(jsonify({'mobilerp': store.serialize}) , 200)
 
-@api.route('/v1.0/editDrugstore/', methods=['PUT'])
+@api.route('/v1.1/editDrugstore/', methods=['PUT'])
 @auth.login_required
 def editDrugstore():
-	if not request.json or not 'name' in request.json\
-		or not 'id' in request.json:
+	if not request.json or 'name' not in request.json\
+		or 'id' not in request.json:
 		abort(406)
 	store = Drugstore.query.filter_by(id = request.json['id']).first()
 	store.name = request.json['name']
