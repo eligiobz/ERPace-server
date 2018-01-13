@@ -194,7 +194,7 @@ def updateHelper(barcode, units, storeid):
         p = Product(barcode, 0, storeid)
     db_session.add(p)
     db_session.commit()
-    u = p.units - units
+    u = p.units + units
     return "UPDATE product set units={0} where barcode='{1}' and storeid={2}"\
         .format(u, barcode, storeid)
 
