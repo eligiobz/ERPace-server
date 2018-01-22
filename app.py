@@ -50,6 +50,7 @@ Base.query = db_session.query_property()
 # PREPARING APP
 
 app = Flask(__name__)
+app.config['DEBUG'] = True
 app.register_blueprint(api, url_prefix="/api")
 Compress(app)
 manager = Manager(app)

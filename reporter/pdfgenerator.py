@@ -39,7 +39,6 @@ def generateSalesPdf(data):
 def generateDepletedReport(data):
     template = env.get_template(DEPLETED_REPORT_TEMPLATE)
     template_vars = data
-    print (template_vars)
     html_output = template.render(template_vars)
     HTML(string=html_output).write_pdf(OUTPUT_FOLDER\
                                        + "depletedreport.pdf",
