@@ -1,1 +1,1 @@
-web: gunicorn --log-level debug --worker-class gevent wsgi:app
+web: gunicorn --access-logfile - --log-level debug --worker-class gevent wsgi:app
