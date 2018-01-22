@@ -1,19 +1,21 @@
 # MobilERP
 
-**_Currently under heavy development_**
-
 A small self-hosted ERP that works with your smarphone and laptop.
 
-## The idea
+## Goal
 
-Have a small business who want or need an ERP but have no internet access or can't afford to pay a susbcrition to a cloud hosted service? This solution is for you.
-You can either find someone to run this on Raspberry Pi and help you configure your Android phone to work with it or DIY.
+Provide people with an easy to use, no bs, FOSS solution to help them manage their stores/shops, giving them the choice on how and where they want to deploy the system.
 
-This is MobilERP-server. Check the companion repo [MobilERP-android][1].
+
+This is MobilERP-server. Check the companion repo [MobilERP-kotlin][1].
 
 ## What it currently does
 
-It currently saves new items into the stock database and keeps tracks of both sales and changes in item price. It also reports all items on stock (including depleted) or depleted articles exclusively. Needs an instance on [MobilERP-android][1].
+* Saves new items into the stock database 
+* Keeps tracks of both sales and changes in item price
+* It also reports all items on stock (including depleted) or depleted articles exclusively
+* Manage multiple store witht the same stock
+* Report of most/least sold items
 
 ## Roadmap
 
@@ -27,10 +29,11 @@ It currently saves new items into the stock database and keeps tracks of both sa
 	- [ ] Least sold products
 - [X] ~~Refactor app to support Flask Blueprints~~
 - [ ] Offer WebUI for people wanting to run it on a single computer.
+- [ ] Multiple users with permision levels
 
 ## License
 
 This project is licensed under [AGPL3][2]
 
-[1]: https://github.com/eligiobz/mobilerp-android
+[1]: https://github.com/eligiobz/mobilerp-kotlin
 [2]: LICENSE.md
