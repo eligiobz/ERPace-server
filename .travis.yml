@@ -1,7 +1,6 @@
-language: python
-python:
-	- "3.6"
-install:
-	- pip install -r requeriments.txt
-script:
-	- pytest
+  language: python
+  python:
+    - "3.6"
+    - "nightly"
+  script:
+    - pytest
