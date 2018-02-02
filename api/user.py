@@ -27,6 +27,7 @@ from . import api, auth
 
 
 @api.route('/v1.0/users/', methods=['POST'])
+@api.route('/v1.1/users/', methods=['POST'])
 def add_user():
     if not request.json or ('user' not in request.json and
                             'pass' not in request.json or
@@ -34,9 +35,14 @@ def add_user():
         abort(403)
     user = User(request.json['user'], request.json['pass'],
                 request.json['level'])
-    db.session.add(user)
-    db.session.commit()
+    db_session.add(user)
+    db_session.commit()
     return jsonify({'mobilerp': user.getUser()})
+
+@api.route('/v1.1/users/<id>', methods=['DELETE'])
+@auth.login_required
+def delete_user():
+    abort(404)
 
 
 @api.route('/v1.0/users/<string:n_pass>', methods=['PUT'])
@@ -44,8 +50,8 @@ def add_user():
 def update_pass(n_pass):
     user = User.query.filter_by(email=auth.username()).first()
     user.password = n_pass
-    db.session.add(user)
-    db.session.commit()
+    db_session.add(user)
+    db_session.commit()
     return jsonify({'user': user.getUser()})
 
 
