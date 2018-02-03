@@ -7,8 +7,7 @@ import json
 
 class ProductTestCase(unittest.TestCase):
 
-	username = 'carlo'
-	password = '123'
+	auth_string = 'Basic ' + base64.b64encode(bytes('carlo' + ":" + '123', 'ascii')).decode('ascii')
 
 	def setUp(self):
 		app.app.testing = True
@@ -19,15 +18,10 @@ class ProductTestCase(unittest.TestCase):
 
 	def open_with_auth(self, url, method, data=None):
 		return self.app.open(url, method=method,
-			headers={
-			'Authorization': 'Basic ' + base64.b64encode(bytes(self.username + ":" + self.password, 'ascii')).decode('ascii')
-			}, data=data, content_type='application/json'
-			)
-
-	def get_headers(self):
-		return {
-			'Authorization': 'Basic ' + base64.b64encode(bytes(self.username + ":" + self.password, 'ascii')).decode('ascii')
-			} 
+			headers={ 'Authorization': self.auth_string },
+			data=data,
+			content_type='application/json'
+			) 
 
 	def add_product_1_0(self, barcode, price, units, name):
 		return self.open_with_auth('/api/v1.0/add_product/', 'POST', json.dumps(dict(

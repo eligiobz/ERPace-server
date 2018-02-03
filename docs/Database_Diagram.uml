@@ -1,0 +1,84 @@
+@startuml
+
+Interface depleteditemsview{
+	idsale: interger
+	name: varchar
+	date: timestamp
+	storeid: integer
+	units: integer
+	barcode: varchar
+}
+
+class drugstore{
+	<b>id: serial</b>
+	name: text
+}
+
+class masterlist{
+	<b>barcode: varchar</b>
+	price: float
+	name: varchar
+}
+
+class operations_log{
+	<b>id: bigserial</b>
+	str_data: text
+}
+
+class pricehistory{
+	<b>barcode:varchar</b>
+	old_price: float
+	<b>date_changed: timestamp</b>
+}
+class product{
+	<b>barcode: varchar</b>
+	units: integer
+	storeid: integer
+}
+interface products_store{
+	<b>barcode: varchar</b>
+	name: varchar
+	price: float
+	units: integer
+	storeid: integer
+}
+class sale{
+	<b>id: bigserial</b>
+	date: timestamp
+}
+class saledetails{
+	<b>idsale: integer</b>
+	<b>idproduct: varchar</b>
+	productprice: float
+	units: integer
+	storeid: integer
+}
+
+interface salesview{
+	date: timestamp
+	name: varchar
+	idsale: integer
+	productprice: float
+	units: integer
+	total_earning: float
+}
+
+class users{
+	id: integer
+	username: varchar
+	password: varchar
+	level: integer
+}
+
+depleteditemsview <|-- masterlist : barcode
+pricehistory <|-- masterlist : barcode
+product <|-- masterlist : barcode
+product <|-- drugstore : storeid
+products_store <|-- masterlist : barcode
+products_store <|-- product : storeid
+saledetails <|-- sale : saleid
+saledetails <|-- product : idproduct
+saledetails <|-- drugstore : storeid
+salesview <|-- sale: idsale
+salesview <|-- masterlist : name
+@enduml

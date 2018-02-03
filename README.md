@@ -1,5 +1,7 @@
 # MobilERP
 
+[![Build Status](https://travis-ci.org/eligiobz/mobilerp-server.svg?branch=master)](https://travis-ci.org/eligiobz/mobilerp-server)
+
 A small self-hosted ERP that works with your smarphone and laptop.
 
 ## Goal

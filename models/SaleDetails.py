@@ -33,14 +33,16 @@ class SaleDetails(Base):
     idproduct = Column(Integer)
     productprice = Column(Float(precision=2))
     units = Column(Integer)
+    storeid = Column(Integer)
 
-    def __init__(self, idSale, idProduct, productPrice, units):
+    def __init__(self, idSale, idProduct, productPrice, units, storeid):
         self.idsale = idSale
         self.idproduct = idProduct
         self.productprice = productPrice
         self.units = units
+        self.storeid = storeid
 
     @property
     def serialize(self):
         return {'idSale': self.idsale, 'idproduct': self.idproduct,
-                'productprice': self.productprice}
+                'productprice': self.productprice, 'storeid': self.storeid}

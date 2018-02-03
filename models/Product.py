@@ -18,16 +18,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-from sqlalchemy import Column, Float, Integer, String
+from sqlalchemy import Column, Float, Integer, String, ForeignKey
 from models import Base
-
 
 class Product(Base):
     __tablename__ = "product"
 
-    barcode = Column(String, primary_key=True)
+    barcode = Column(String, ForeignKey('masterlist.barcode') primary_key=True)
     units = Column(Integer)
-    storeid = Column(Integer)
+    storeid = Column(Integer, ForeignKey('drugstore.id'))
 
     """Products"""
     def __init__(self, barcode, units, storeid):
