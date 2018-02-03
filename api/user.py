@@ -25,37 +25,37 @@ from models import db_session
 
 from . import api, auth
 
-
-@api.route('/v1.0/users/', methods=['POST'])
-@api.route('/v1.1/users/', methods=['POST'])
+@api.route('/v1.0/user/add/', methods=['POST'])
+@api.route('/v1.1/user/add/', methods=['POST'])
 def add_user():
-    if not request.json or ('user' not in request.json and
-                            'pass' not in request.json or
+    if not request.json or ('username' not in request.json or
+                            'password' not in request.json or
                             'level' not in request.json):
-        abort(403)
-    user = User(request.json['user'], request.json['pass'],
+        abort(406)
+    user = User(request.json['username'], request.json['password'],
                 request.json['level'])
     db_session.add(user)
     db_session.commit()
-    return jsonify({'mobilerp': user.getUser()})
+    return jsonify({'mobilerp': [user.serialize]})
 
-@api.route('/v1.1/users/<id>', methods=['DELETE'])
+@api.route('/v1.1/user/delete/<username>', methods=['DELETE'])
 @auth.login_required
 def delete_user():
-    abort(404)
+    #user = (User)
 
 
-@api.route('/v1.0/users/<string:n_pass>', methods=['PUT'])
+@api.route('/v1.0/user/update_pass/<string:n_pass>', methods=['PUT'])
+@api.route('/v1.1/user/update_pass/<string:n_pass>', methods=['PUT'])
 @auth.login_required
 def update_pass(n_pass):
-    user = User.query.filter_by(email=auth.username()).first()
+    user = User.query.filter_by(username=auth.username()).first()
     user.password = n_pass
     db_session.add(user)
     db_session.commit()
-    return jsonify({'user': user.getUser()})
-
+    return jsonify({'user': [user.serialize]})
 
 @api.route('/v1.0/user/checkLogin/', methods=['GET'])
+@api.route('/v1.1/user/checkLogin/', methods=['GET'])
 @auth.login_required
 def checkLogin():
     return make_response(jsonify({'logged': 'true'}), 200)

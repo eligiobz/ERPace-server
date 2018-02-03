@@ -36,10 +36,7 @@ class User(Base):
         self.password = password
         self.level = level
 
-    def __repr__(self):
-        return {'username': self.username, 'pass': self.password,
-                'level': self.level}
-
-    def getUser(self):
-        return {'username': self.username, 'pass': self.password,
+    @property
+    def serialize(self):
+        return {'username': self.username, 'password': self.password,
                 'level': self.level}

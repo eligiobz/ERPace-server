@@ -1,6 +1,6 @@
   language: python
   python:
     - "3.6"
-    - "nightly"
   script:
-    - python flaskr_test.py
+    - python user_tests.py
+    - python product_tests.py
