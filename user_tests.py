@@ -10,7 +10,7 @@ class UsersTestCase(unittest.TestCase):
 	username = 'foo'
 	password = 'man'
 	new_pass = '54321'
-	tmp_pass = 'man'
+	tmp_pass = 'man1'
 	level = 10
 
 	def setUp(self):
@@ -19,18 +19,11 @@ class UsersTestCase(unittest.TestCase):
 
 	def tearDown(self):
 		pass
-
-	def open_with_auth(self, url, method):
+		
+	def open_with_auth(self, url, method, username, password):
 		return self.app.open(url, method=method,
 			headers={
-			'Authorization': 'Basic ' + base64.b64encode(bytes(self.username + ":" + self.password, 'ascii')).decode('ascii')
-			}
-			)
-
-	def open_with_auth_2(self, url, method):
-		return self.app.open(url, method=method,
-			headers={
-			'Authorization': 'Basic ' + base64.b64encode(bytes(self.username + ":" + self.new_pass, 'ascii')).decode('ascii')
+			'Authorization': 'Basic ' + base64.b64encode(bytes(username + ":" +password, 'ascii')).decode('ascii')
 			}
 			)
 
@@ -46,40 +39,60 @@ class UsersTestCase(unittest.TestCase):
 			password = password,
 			level = level)), content_type='application/json', follow_redirects=True)
 
-	def test_add_user_1_0(self):
-		rv = self.add_user_1_0(self.username, self.password, '12')
+	def update_pass_1_0(self, passwd):
+		return self.open_with_auth('/api/v1.0/user/update_pass/'+passwd, 'PUT', 'foo1', self.tmp_pass)
+
+	def update_pass_1_1(self, passwd):
+		return self.open_with_auth('/api/v1.1/user/update_pass/'+passwd, 'PUT', 'foo1', self.new_pass)
+
+	def delete_user_1_1(self, user):
+		return self.open_with_auth('api/v1.1/user/delete/'+user, 'DELETE', self.username, self.password)
+
+	def test_001_add_user_1_0(self):
+		rv = self.add_user_1_0(self.username, self.password, self.level)
 		assert b'"username": "foo"' in rv.data
-		assert b'"level": 12' in rv.data
+		assert b'"level": 10' in rv.data
 		assert rv.status_code == 200
 
-	def test_add_user_1_0_fail(self):
-		pass
-
-	def test_add_user_1_1(self):
-		rv = self.add_user_1_1('foo1', 'man1', '13')
+	def test_002_add_user_1_1(self):
+		rv = self.add_user_1_1('foo1', self.tmp_pass, '13')
 		assert b'"username": "foo1"' in rv.data
 		assert b'"level": 13' in rv.data
 		assert rv.status_code == 200
 
-	def test_add_user_1_1_fail(self):
-		pass
+	def test_003_add_user_1_0_fail(self):
+		rv = self.add_user_1_0(None, None, None)
+		assert rv.status_code == 406
+		rv = self.add_user_1_0('', '', '')
+		assert rv.status_code == 406
+		rv = self.add_user_1_0("", "", "")
+		assert rv.status_code == 406
 
-	def update_pass_1_0(self, passwd):
-		return self.open_with_auth('/api/v1.0/user/update_pass/'+passwd, 'PUT')
+	def test_004_add_user_1_1_fail(self):
+		rv = self.add_user_1_0(None, None, None)
+		assert rv.status_code == 406
+		rv = self.add_user_1_0('', '', '')
+		assert rv.status_code == 406
+		rv = self.add_user_1_0("", "", "")
+		assert rv.status_code == 406
 
-	def update_pass_1_1(self, passwd):
-		return self.open_with_auth_2('/api/v1.1/user/update_pass/'+passwd, 'PUT')
-
-	def test_update_pass_1_0(self):
+	def test_005_update_pass_1_0(self):
 		rv = self.update_pass_1_0(self.new_pass)
 		assert b'"password": "54321"' in rv.data
 		assert rv.status_code == 200
 
-	def test_update_pass_1_1(self):
+	def test_006_update_pass_1_1(self):
 		rv = self.update_pass_1_1(self.tmp_pass)
-		assert b'"password": "man"' in rv.data
+		assert b'"password": "man1"' in rv.data
 		assert rv.status_code == 200
-		self.password = self.tmp_pass
+
+	def test_007_delete_user_1_1(self):
+		rv = self.delete_user_1_1('foo1')
+		assert rv.status_code == 200
+		assert b'deleted' in rv.data
+		rv = self.delete_user_1_1('foo')
+		assert rv.status_code == 200
+		assert b'deleted' in rv.data
 
 if __name__ == '__main__':
 	unittest.main()

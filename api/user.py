@@ -32,6 +32,10 @@ def add_user():
                             'password' not in request.json or
                             'level' not in request.json):
         abort(406)
+    if not request.json['username'] or \
+        not request.json['password'] or \
+        not request.json['level']:
+        abort(406)
     user = User(request.json['username'], request.json['password'],
                 request.json['level'])
     db_session.add(user)
@@ -40,8 +44,13 @@ def add_user():
 
 @api.route('/v1.1/user/delete/<username>', methods=['DELETE'])
 @auth.login_required
-def delete_user():
-    pass
+def delete_user(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        abort(404)
+    db_session.delete(user)
+    db_session.commit()
+    return make_response(jsonify({'mobilerp': 'deleted'}, 200))
 
 
 @api.route('/v1.0/user/update_pass/<string:n_pass>', methods=['PUT'])

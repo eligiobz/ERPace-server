@@ -50,9 +50,9 @@ def listProducts():
     return make_response(jsonify({'mobilerp':
                          [p.serialize for p in products]}), 200)
 
-@api.route('/v1.0/newProduct/', methods=['POST'])
+@api.route('/v1.0/add_product/', methods=['POST'])
 @auth.login_required
-def newProduct():
+def add_product_1_0():
     if not request.json or 'barcode' not in request.json\
        or 'units' not in request.json or 'price' not in request.json\
        or 'name' not in request.json:
@@ -61,8 +61,12 @@ def newProduct():
        or request.json['units'] is '' or request.json['price'] is '':
         abort(401)
     if (logger.log_op(request.json)):
-        p = Product(request.json['barcode'], request.json['name'],
-                    request.json['units'], request.json['price'])
+        m = MasterList(request.json['barcode'], request.json['name'],
+            request.json['price'])
+        db_session.add(m)
+        db_session.commit()
+        p = Product(request.json['barcode'], request.json['units'],
+            1)
         db_session.add(p)
         db_session.commit()
         return make_response(jsonify({'mobilerp': [p.serialize]}), 200)
@@ -125,9 +129,9 @@ def findProduct_v1_1(bCode):
     else:
         return make_response(jsonify({'mobilerp': [product.serialize]}), 200)
 
-@api.route('/v1.1/newProduct/', methods=['POST'])
+@api.route('/v1.1/add_product/', methods=['POST'])
 @auth.login_required
-def newProduct_v1_1():
+def add_product_1_1():
     if not request.json or 'barcode' not in request.json\
        or 'units' not in request.json or 'price' not in request.json\
        or 'name' not in request.json or 'storeid' not in request.json :
