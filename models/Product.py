@@ -24,7 +24,7 @@ from models import Base
 class Product(Base):
     __tablename__ = "product"
 
-    barcode = Column(String, ForeignKey('masterlist.barcode') primary_key=True)
+    barcode = Column(String, ForeignKey('masterlist.barcode'), primary_key=True)
     units = Column(Integer)
     storeid = Column(Integer, ForeignKey('drugstore.id'))
 
