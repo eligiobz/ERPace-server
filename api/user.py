@@ -41,7 +41,7 @@ def add_user():
 @api.route('/v1.1/user/delete/<username>', methods=['DELETE'])
 @auth.login_required
 def delete_user():
-    #user = (User)
+    pass
 
 
 @api.route('/v1.0/user/update_pass/<string:n_pass>', methods=['PUT'])
