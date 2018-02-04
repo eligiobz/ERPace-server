@@ -31,20 +31,34 @@ from reporter.pdfgenerator import generateDepletedReport
 from . import auth, api
 from . import logger
 
-@api.route('/v1.0/findProduct/<bCode>', methods=['GET'])
+@api.route('/v1.0/find_product/<bCode>', methods=['GET'])
+@api.route('/v1.1/find_product/<bCode>', methods=['GET'])
 @auth.login_required
-def findProduct(bCode):
-    product = Product.query.filter_by(barcode=bCode).first()
+def find_product(bCode):
+    product = ProductStore.query.filter_by(barcode=bCode).first()
     if (product is None):
         abort(404)
     else:
-        return make_response(jsonify({'mobilerp': [product.serialize]}), 200)
+        return make_response(jsonify( product.serialize ), 200)
 
-
-@api.route('/v1.0/listProducts/', methods=['GET'])
+@api.route('/v1.0/list_products/', methods=['GET'])
+@api.route('/v1.1/listProducts/<int:storeid>', methods=['GET'])
 @auth.login_required
-def listProducts():
-    products = ProductStore.query.order_by(ProductStore.name.asc()).all()
+def list_products(storeid=None):
+    rule = request.url_rule
+    if storeid is None:
+        products = ProductStore.query.filter_by(storeid=1).order_by(ProductStore.name.asc()).all()
+    else:
+        products = ProductStore.query.filter_by(storeid=storeid).order_by(ProductStore.name.asc()).all()
+    if products is None:
+        abort(400)
+    return make_response(jsonify({'mobilerp':
+                         [p.serialize for p in products]}), 200)
+
+
+@auth.login_required
+def listProducts_v1_1(storeid):
+    
     if products is None:
         abort(400)
     return make_response(jsonify({'mobilerp':
@@ -69,7 +83,8 @@ def add_product_1_0():
             1)
         db_session.add(p)
         db_session.commit()
-        return make_response(jsonify({'mobilerp': [p.serialize]}), 200)
+        prod = ProductStore.query.filter_by(barcode=request.json['barcode']).filter_by(storeid=1).first()
+        return make_response(jsonify( prod.serialize ), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 
@@ -111,23 +126,6 @@ def listDepletedProducts():
 
 ################################## V1.1 #######################################
 
-@api.route('/v1.1/listProducts/<int:storeid>', methods=['GET'])
-@auth.login_required
-def listProducts_v1_1(storeid):
-    products = ProductStore.query.filter_by(storeid=storeid).order_by(ProductStore.name.asc()).all()
-    if products is None:
-        abort(400)
-    return make_response(jsonify({'mobilerp':
-                         [p.serialize for p in products]}), 200)
-
-@api.route('/v1.1/findProduct/<bCode>', methods=['GET'])
-@auth.login_required
-def findProduct_v1_1(bCode):
-    product = MasterList.query.filter_by(barcode=bCode).first()
-    if (product is None):
-        abort(404)
-    else:
-        return make_response(jsonify({'mobilerp': [product.serialize]}), 200)
 
 @api.route('/v1.1/add_product/', methods=['POST'])
 @auth.login_required
@@ -149,7 +147,8 @@ def add_product_1_1():
             request.json['storeid'])
         db_session.add(p)
         db_session.commit()
-        return make_response(jsonify({'mobilerp': [p.serialize]}), 200)
+        prod = ProductStore.query.filter_by(barcode=request.json['barcode']).filter_by(storeid=request.json['storeid']).first()
+        return make_response(jsonify( prod.serialize ), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 
