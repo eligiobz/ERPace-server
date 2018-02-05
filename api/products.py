@@ -42,7 +42,7 @@ def find_product(bCode):
         return make_response(jsonify( product.serialize ), 200)
 
 @api.route('/v1.0/list_products/', methods=['GET'])
-@api.route('/v1.1/listProducts/<int:storeid>', methods=['GET'])
+@api.route('/v1.1/list_products/<int:storeid>', methods=['GET'])
 @auth.login_required
 def list_products(storeid=None):
     rule = request.url_rule
