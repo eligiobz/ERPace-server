@@ -117,30 +117,35 @@ class ProductTestCase(unittest.TestCase):
 
 	def test_001_add_product_1_0(self):
 		rv = self.add_product_1_0(self.json_prod_6)
+		print (rv.data)
 		json_data = json.loads(rv.data)
 		assert rv.status_code == 200
 		assert jsoncompare.are_same(json_data, self.json_prod_6, False, ['storeid'])
 
 	def test_002_add_product_1_1(self):
 		rv = self.add_product_1_1(self.json_prod_7)
+		print (rv.data)
 		json_data = json.loads(rv.data)
 		assert rv.status_code == 200
 		assert jsoncompare.are_same(json_data, self.json_prod_7, True)
 
 	def test_003_find_product_1_0(self):
 		rv = self.find_product_1_0('1000')
+		print (rv.data)
 		json_data = json.loads(rv.data)
 		assert jsoncompare.are_same(json_data, self.json_prod_6, False, ['storeid'])
 		assert rv.status_code == 200
 
 	def test_004_find_product_1_1(self):
 		rv = self.find_product_1_1('1001')
+		print (rv.data)
 		json_data = json.loads(rv.data)
 		assert jsoncompare.are_same(json_data, self.json_prod_7, False, ['storeid'])
 		assert rv.status_code == 200
 
 	def test_005_list_products_1_0(self):
 		rv = self.list_products_1_0()
+		print (rv.data)
 		json_data = json.loads(rv.data)
 		assert len(json_data['mobilerp']) == 4
 		assert rv.status_code == 200
@@ -160,6 +165,7 @@ class ProductTestCase(unittest.TestCase):
 		
 	def test_006_list_products_1_1(self):
 		rv = self.list_products_1_1(1)
+		print (rv.data)
 		json_data = json.loads(rv.data)
 		assert len(json_data['mobilerp']) == 4
 		assert rv.status_code == 200
@@ -177,6 +183,7 @@ class ProductTestCase(unittest.TestCase):
 			if item['barcode'] == '1000':
 				assert jsoncompare.are_same(item, self.json_prod_6, True)
 		rv = self.list_products_1_1(2)
+		print (rv.data)
 		json_data = json.loads(rv.data)
 		assert len(json_data['mobilerp']) == 3
 		assert rv.status_code == 200
