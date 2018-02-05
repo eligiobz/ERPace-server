@@ -2,5 +2,5 @@
   python:
     - "3.6"
   script:
-    - python user_tests.py
-    - python product_tests.py
+    - python user_tests.py -v
+    - python product_tests.py -v
