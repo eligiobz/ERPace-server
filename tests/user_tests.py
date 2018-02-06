@@ -49,50 +49,50 @@ class UsersTestCase(unittest.TestCase):
 		return self.open_with_auth('api/v1.1/user/delete/'+user, 'DELETE', self.username, self.password)
 
 	def test_001_add_user_1_0(self):
-		rv = self.add_user_1_0(self.username, self.password, self.level)
-		assert b'"username": "foo"' in rv.data
-		assert b'"level": 10' in rv.data
-		assert rv.status_code == 200
+		response = self.add_user_1_0(self.username, self.password, self.level)
+		assert b'"username": "foo"' in response.data
+		assert b'"level": 10' in response.data
+		assert response.status_code == 200
 
 	def test_002_add_user_1_1(self):
-		rv = self.add_user_1_1('foo1', self.tmp_pass, '13')
-		assert b'"username": "foo1"' in rv.data
-		assert b'"level": 13' in rv.data
-		assert rv.status_code == 200
+		response = self.add_user_1_1('foo1', self.tmp_pass, '13')
+		assert b'"username": "foo1"' in response.data
+		assert b'"level": 13' in response.data
+		assert response.status_code == 200
 
 	def test_003_add_user_1_0_fail(self):
-		rv = self.add_user_1_0(None, None, None)
-		assert rv.status_code == 406
-		rv = self.add_user_1_0('', '', '')
-		assert rv.status_code == 406
-		rv = self.add_user_1_0("", "", "")
-		assert rv.status_code == 406
+		response = self.add_user_1_0(None, None, None)
+		assert response.status_code == 406
+		response = self.add_user_1_0('', '', '')
+		assert response.status_code == 406
+		response = self.add_user_1_0("", "", "")
+		assert response.status_code == 406
 
 	def test_004_add_user_1_1_fail(self):
-		rv = self.add_user_1_0(None, None, None)
-		assert rv.status_code == 406
-		rv = self.add_user_1_0('', '', '')
-		assert rv.status_code == 406
-		rv = self.add_user_1_0("", "", "")
-		assert rv.status_code == 406
+		response = self.add_user_1_0(None, None, None)
+		assert response.status_code == 406
+		response = self.add_user_1_0('', '', '')
+		assert response.status_code == 406
+		response = self.add_user_1_0("", "", "")
+		assert response.status_code == 406
 
 	def test_005_update_pass_1_0(self):
-		rv = self.update_pass_1_0(self.new_pass)
-		assert b'"password": "54321"' in rv.data
-		assert rv.status_code == 200
+		response = self.update_pass_1_0(self.new_pass)
+		assert b'"password": "54321"' in response.data
+		assert response.status_code == 200
 
 	def test_006_update_pass_1_1(self):
-		rv = self.update_pass_1_1(self.tmp_pass)
-		assert b'"password": "man1"' in rv.data
-		assert rv.status_code == 200
+		response = self.update_pass_1_1(self.tmp_pass)
+		assert b'"password": "man1"' in response.data
+		assert response.status_code == 200
 
 	def test_007_delete_user_1_1(self):
-		rv = self.delete_user_1_1('foo1')
-		assert rv.status_code == 200
-		assert b'deleted' in rv.data
-		rv = self.delete_user_1_1('foo')
-		assert rv.status_code == 200
-		assert b'deleted' in rv.data
+		response = self.delete_user_1_1('foo1')
+		assert response.status_code == 200
+		assert b'deleted' in response.data
+		response = self.delete_user_1_1('foo')
+		assert response.status_code == 200
+		assert b'deleted' in response.data
 
 if __name__ == '__main__':
 	unittest.main()

@@ -36,7 +36,7 @@ from . import logger
 @auth.login_required
 def find_product(bCode):
     product = ProductStore.query.filter_by(barcode=bCode).first()
-    if (product is None):
+    if product is None:
         abort(404)
     else:
         return make_response(jsonify( product.serialize ), 200)

@@ -25,26 +25,25 @@ from models.DrugStores import Drugstore
 
 from . import api, auth, logger
 
-@api.route('/v1.1/listDrugstores/', methods=['GET'])
+@api.route('/v1.1/add_drugstore/', methods=['POST'])
 @auth.login_required
-def listDrugstores():
-	storeslist = Drugstore.query.all()
-	return make_response(jsonify({'mobilerp':
-                         [s.serialize for s in storeslist]}), 200)
-
-@api.route('/v1.1/addDrugstore/', methods=['POST'])
-@auth.login_required
-def addDrugstore():
+def add_drugstore():
 	if not request.json or not 'name' in request.json:
 		abort(406)
 	store = Drugstore(request.json['name'])
 	db_session.add(store)
 	db_session.commit()
-	return make_response(jsonify({'mobilerp': store.serialize}) , 200)
+	return make_response(jsonify( store.serialize ) , 200)
 
-@api.route('/v1.1/editDrugstore/', methods=['PUT'])
+@api.route('/v1.1/list_drugstores/', methods=['GET'])
 @auth.login_required
-def editDrugstore():
+def list_drugstores():
+	storeslist = Drugstore.query.all()
+	return make_response(jsonify( [s.serialize for s in storeslist] ), 200)
+
+@api.route('/v1.1/edit_drugstore/', methods=['PUT'])
+@auth.login_required
+def edit_drugstore():
 	if not request.json or 'name' not in request.json\
 		or 'id' not in request.json:
 		abort(406)
@@ -52,4 +51,4 @@ def editDrugstore():
 	store.name = request.json['name']
 	db_session.add(store)
 	db_session.commit()
-	return make_response(jsonify({'mobilerp': store.serialize }), 200)
+	return make_response(jsonify( store.serialize ), 200)
