@@ -2,7 +2,7 @@
 
 ##############################################################################
 # MobilEPR - A small self-hosted ERP that works with your smartphone.
-# Copyright (C) 2017  Eligio Becerra
+# Copyright (C) 2017-2018  Eligio Becerra
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -23,15 +23,16 @@ from flask import abort, make_response, request, jsonify
 from models import db_session, engine
 from models.Product import Product
 from models.MasterList import MasterList
+from models.views import ProductStore
 from models.Sale import Sale
 from models.SaleDetails import SaleDetails
 from models.PriceHistory import PriceHistory
 
 from . import api, auth, logger
 
-@api.route('/v1.0/makeSale/', methods=['POST'])
+@api.route('/v1.0/make_sale/', methods=['POST'])
 @auth.login_required
-def makeSale():
+def make_sale_1_0():
     if not request.json:
         abort(400)
     if 'barcode' not in request.json or len(request.json['barcode']) <= 0:
@@ -43,25 +44,27 @@ def makeSale():
         for i in range(0, len(request.json['barcode'])):
             bCode = request.json['barcode'][i]
             units = request.json['units'][i]
-            ps = Product.query.filter_by(barcode=bCode).first()
+            ps = ProductStore.query.filter_by(barcode=bCode).filter_by(storeid=1).first()
             if (ps.units - units < 0):
                 abort(406)
             else:
-                ps.units = ps.units - units
-                db_session.add(ps)
+                p = Product.query.filter_by(barcode=bCode).filter_by(storeid=1).first()
+                p.units = p.units - units
+                db_session.add(p)
                 db_session.commit()
-                sd = SaleDetails(s.id, ps.barcode, ps.price, units)
+                sd = SaleDetails(s.id, ps.barcode, ps.price, units, 1)
                 db_session.add(sd)
                 db_session.commit()
-        return make_response(jsonify({'mobilerp': '[p.serialize]'}), 200)
+        sd = SaleDetails.query.filter_by(idsale=s.id).all()
+        return make_response(jsonify( [sd_.serialize for sd_ in sd] ), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 
 ################################## V1.1 #######################################
 
-@api.route('/v1.1/makeSale/', methods=['POST'])
+@api.route('/v1.1/make_sale/', methods=['POST'])
 @auth.login_required
-def makeSale_v1_1():
+def make_sale_1_1():
     if not request.json or 'storeid' not in request.json:
         abort(400)
     if 'barcode' not in request.json or len(request.json['barcode']) <= 0:

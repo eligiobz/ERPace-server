@@ -1,4 +1,23 @@
+
 # -*- coding:utf-8 -*-
+
+##############################################################################
+# MobilEPR - A small self-hosted ERP that works with your smartphone.
+# Copyright (C) 2017  Eligio Becerra
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##############################################################################
 
 import os
 import app
@@ -11,7 +30,7 @@ from models.MasterList import MasterList as MasterList
 from models.Product import Product as Product
 from models import db_session as db_session, engine, Base
 
-class ProductTestCase(unittest.TestCase):
+class SalesTestCase(unittest.TestCase):
 
 	auth_string = 'Basic ' + base64.b64encode(bytes('carlo' + ":" + '123', 'ascii')).decode('ascii')
 	ClasIsSetup = False
@@ -355,7 +374,7 @@ class ProductTestCase(unittest.TestCase):
 	# def test_015_list_depleted_products_1_0(self):
 	# 	# We need a fake sale so depleted items views will populated properly
 	# 	json_sale = json.dumps({
-			
+
 	# 		})
 	# 	self.open_with_auth('make')
 	# 	print (res.fetchall())
@@ -366,7 +385,6 @@ class ProductTestCase(unittest.TestCase):
 	# 	assert len(json_data) == 2
 	# 	assert b'0001' in response.data
 	# 	assert b'0002' in response.data
-
 
 	# def test_016_list_depleted_products_1_1(self):
 	# 	engine.execute("update product set units = 0 where storeid = 1 and barcode='0003';")

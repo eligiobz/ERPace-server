@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+
 import os
 import app
 import unittest
