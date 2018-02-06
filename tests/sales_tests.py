@@ -52,17 +52,18 @@ class SalesTestCase(unittest.TestCase):
 			'storeid' :  2})
 
 	json_prod_6 = json.dumps({
-			'barcode' : '1000',
-			'price' : 23.50,
-			'units' : 8,
-			'name' : 'crema_X'}, ensure_ascii=False, sort_keys=True)
+			'barcode' : '0002',
+			'price' : 1,
+			'units' : 5,
+			'name' : 'crema_2',
+			'storeid' :  2})
 
 	json_prod_7 = json.dumps({
-			'barcode' : '1001',
-			'price' : 28.30,
-			'units' : 4,
-			'name' : 'crema_X2',
-			'storeid': 2})
+			'barcode' : '0001',
+			'price' : 50.50,
+			'units' : 5,
+			'name' : 'crema_1',
+			'storeid' :  2})
 
 	def setupClass(self):
 		engine.execute("delete from operation_logs;")
@@ -73,6 +74,8 @@ class SalesTestCase(unittest.TestCase):
 		self.add_product_1_1(self.json_prod_3)
 		self.add_product_1_1(self.json_prod_4)
 		self.add_product_1_1(self.json_prod_5)
+		self.update_product_1_1('0002',self.json_prod_6)
+		self.update_product_1_1('0001',self.json_prod_7)
 		unittest.TestCase.setUp(self)
 
 	@classmethod
@@ -99,14 +102,17 @@ class SalesTestCase(unittest.TestCase):
 	def add_product_1_1(self, data):
 		return self.open_with_auth('/api/v1.1/add_product/', 'POST', data)
 
-	def find_product_1_1(self, data):
-		return self.open_with_auth('/api/v1.1/find_product/'+data, 'GET')
+	def find_product_1_1(self, storeid, barcode):
+		return self.open_with_auth('/api/v1.1/find_product/'+storeid+'/'+barcode, 'GET')
 
 	def update_product_1_1(self, bcode, data):
-		return self.open_with_auth('/api/v1.1/update_product/'+bcode, 'GET', data)
+		return self.open_with_auth('/api/v1.1/update_product/'+bcode, 'PUT', data)
 
 	def make_sale_1_0(self, data):
 		return self.open_with_auth('/api/v1.0/make_sale/', 'POST', data)
+
+	def make_sale_1_1(self, data):
+		return self.open_with_auth('/api/v1.1/make_sale/', 'POST', data)
 
 	def test_001_make_sale_1_0_normal(self):
 		item_1 = dict(
@@ -119,11 +125,11 @@ class SalesTestCase(unittest.TestCase):
 			units = 8,
 			price = 0.0
 			)
-		response = self.find_product_1_1(item_1['barcode'])
+		response = self.find_product_1_1('1', item_1['barcode'])
 		assert response.status_code == 200
 		data = json.loads(response.data)
 		item_1['price'] = float(data['price'])
-		response = self.find_product_1_1(item_2['barcode'])
+		response = self.find_product_1_1('1', item_2['barcode'])
 		assert response.status_code == 200
 		data = json.loads(response.data)
 		item_2['price'] = data['price']
@@ -142,17 +148,67 @@ class SalesTestCase(unittest.TestCase):
 			elif item['barcode'] == item_2['barcode']:
 				assert int(item['units']) == 8
 				assert (float(item['price']) * int (item['units'])) == item_2['price'] * item_2['units']
-		response = self.find_product_1_1('0001')
+		response = self.find_product_1_1('1','0001')
 		assert response.status_code==200
 		data = json.loads(response.data)
+		assert int(data['storeid']) == 1
 		assert int(data['units']) == 2 # 4 - 2
-		response = self.find_product_1_1('0002')
+		response = self.find_product_1_1('1','0002')
 		assert response.status_code==200
 		data = json.loads(response.data)
+		assert int(data['storeid']) == 1
 		assert int(data['units']) == 0 # 8 - 4
 
-	def test_002_make_sale_1_0_fail_duplicated_sale(self):
-		response = self.find_product_1_1('0002')
+	def test_002_make_sale_1_1_normal(self):
+		item_1 = dict(
+			barcode = '0001',
+			units = 2,
+			price = 0.0,
+			storeid = 2
+			)
+		item_2 = dict(
+			barcode = '0004',
+			units = 3,
+			price = 0.0,
+			storeid = 2 
+			)
+		response = self.find_product_1_1(str(item_1['storeid']), item_1['barcode'])
+		assert response.status_code == 200
+		data = json.loads(response.data)
+		item_1['price'] = float(data['price'])
+		response = self.find_product_1_1(str(item_2['storeid']), item_2['barcode'])
+		assert int(data['storeid']) == 2
+		assert response.status_code == 200
+		data = json.loads(response.data)
+		item_2['price'] = data['price']
+		assert int(data['storeid']) == 2
+		sale = json.dumps({
+					"barcode": [item_1['barcode'], item_2['barcode']],
+					"units" : [item_1['units'], item_2['units']],
+					"token": "5",
+					"storeid": 2
+				})
+		response = self.make_sale_1_1(sale)
+		assert response.status_code == 200
+		json_data = json.loads(response.data)
+		for item in json_data:
+			if item['barcode'] == item_1['barcode']:
+				assert int(item['units']) == 2 # 2
+				assert (float(item['price']) * int (item['units'])) == item_1['price'] * item_1['units']
+			elif item['barcode'] == item_2['barcode']:
+				assert int(item['units']) == 3 # 1
+				assert (float(item['price']) * int (item['units'])) == item_2['price'] * item_2['units']
+		response = self.find_product_1_1('2', item_1['barcode'])
+		assert response.status_code==200
+		data = json.loads(response.data)
+		assert int(data['units']) == 3 # 5 - 2
+		response = self.find_product_1_1('2', item_2['barcode'])
+		assert response.status_code==200
+		data = json.loads(response.data)
+		assert int(data['units']) == 0 # 3 - 1
+
+	def test_003_make_sale_1_0_fail_duplicated_sale(self):
+		response = self.find_product_1_1('1', '0002')
 		assert response.status_code == 200
 		sale = json.dumps({
 					"barcode": ['0001', '0002'],
@@ -162,8 +218,20 @@ class SalesTestCase(unittest.TestCase):
 		response = self.make_sale_1_0(sale)
 		assert response.status_code == 428
 
-	def test_003_make_sale_1_0_fail_not_enough_products(self):
-		response = self.find_product_1_1('0002')
+	def test_004_make_sale_1_1_fail_duplicated_sale(self):
+		response = self.find_product_1_1('2','0004')
+		assert response.status_code == 200
+		sale = json.dumps({
+					"barcode": ['0001', '0004'],
+					"units" : [2, 3],
+					"token" : "5",
+					"storeid": 2
+				})
+		response = self.make_sale_1_1(sale)
+		assert response.status_code == 428
+
+	def test_005_make_sale_1_0_fail_not_enough_products(self):
+		response = self.find_product_1_1('1', '0002')
 		assert response.status_code == 200
 		sale = json.dumps({
 					"barcode": ['0002'],
@@ -173,7 +241,21 @@ class SalesTestCase(unittest.TestCase):
 		response = self.make_sale_1_0(sale)
 		assert response.status_code == 406
 
-	def test_004_make_sale_1_0_fail_malformed_request(self):
+
+	def test_006_make_sale_1_1_fail_not_enough_products(self):
+		response = self.find_product_1_1('2','0004')
+		assert response.status_code == 200
+		sale = json.dumps({
+					"barcode": ['0004'],
+					"units" : [8],
+					"token" : "8",
+					"storeid": 2
+				})
+		response = self.make_sale_1_1(sale)
+		assert response.status_code == 406
+
+
+	def test_007_make_sale_1_0_fail_malformed_request(self):
 		sale = json.dumps({
 					"barcode": [],
 					"units" : [8],
@@ -181,6 +263,39 @@ class SalesTestCase(unittest.TestCase):
 				})
 		response = self.make_sale_1_0(sale)
 		assert response.status_code == 400
+
+	def test_008_make_sale_1_1_fail_malformed_request(self):
+		sale = json.dumps({
+					"barcode": [],
+					"units" : [8],
+					"token" : "2"
+				})
+		response = self.make_sale_1_1(sale)
+		assert response.status_code == 400
+
+
+	def test_009_make_sale_1_1_fail_no_store_id(self):
+		response = self.find_product_1_1('2','0004')
+		assert response.status_code == 200
+		sale = json.dumps({
+					"barcode": ['0004'],
+					"units" : [8],
+					"token" : "8",
+				})
+		response = self.make_sale_1_1(sale)
+		assert response.status_code == 400
+
+	def test_010_make_sale_1_1_fail_invalid_store_id(self):
+		response = self.find_product_1_1('2','0004')
+		assert response.status_code == 200
+		sale = json.dumps({
+					"barcode": ['0004'],
+					"units" : [8],
+					"token" : "8",
+					"storeid" : 10
+				})
+		response = self.make_sale_1_1(sale)
+		assert response.status_code == 406
 
 if __name__ == "__main__":
 	unittest.main()

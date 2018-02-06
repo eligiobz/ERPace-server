@@ -32,10 +32,16 @@ from . import auth, api
 from . import logger
 
 @api.route('/v1.0/find_product/<bCode>', methods=['GET'])
-@api.route('/v1.1/find_product/<bCode>', methods=['GET'])
+@api.route('/v1.1/find_product/<storeid>/<bCode>', methods=['GET'])
 @auth.login_required
-def find_product(bCode):
-    product = ProductStore.query.filter_by(barcode=bCode).first()
+def find_product(bCode, storeid=None):
+    rule = request.url_rule
+    product = None
+    if '/v1.1/' in rule.rule:
+        product = ProductStore.query.filter_by(barcode=bCode).\
+                    filter_by(storeid=storeid).first()
+    else:
+        product = ProductStore.query.filter_by(barcode=bCode).first()
     if product is None:
         abort(404)
     else:

@@ -27,6 +27,7 @@ from models.views import ProductStore
 from models.Sale import Sale
 from models.SaleDetails import SaleDetails
 from models.PriceHistory import PriceHistory
+from models.DrugStores import Drugstore
 
 from . import api, auth, logger
 
@@ -48,10 +49,8 @@ def make_sale_1_0():
             if (ps.units - units < 0):
                 abort(406)
             else:
-                p = Product.query.filter_by(barcode=bCode).filter_by(storeid=1).first()
-                p.units = p.units - units
-                db_session.add(p)
-                db_session.commit()
+                q = updateHelper(bCode, units, 1)
+                engine.execute(q)
                 sd = SaleDetails(s.id, ps.barcode, ps.price, units, 1)
                 db_session.add(sd)
                 db_session.commit()
@@ -65,10 +64,12 @@ def make_sale_1_0():
 @api.route('/v1.1/make_sale/', methods=['POST'])
 @auth.login_required
 def make_sale_1_1():
-    if not request.json or 'storeid' not in request.json:
+    if not request.json or 'storeid' not in request.json or\
+        'barcode' not in request.json or len(request.json['barcode']) <= 0:
         abort(400)
-    if 'barcode' not in request.json or len(request.json['barcode']) <= 0:
-        abort(400)
+    drugstore = Drugstore.query.filter_by(id=request.json['storeid'])
+    if drugstore is None:
+        abort (406, { "message" : "storeid invalido"})
     if (logger.log_op(request.json)):
         s = Sale()
         db_session.add(s)
@@ -77,17 +78,20 @@ def make_sale_1_1():
             bCode = request.json['barcode'][i]
             units = request.json['units'][i]
             m = MasterList.query.filter_by(barcode=bCode).first()
-            ps = Product.query.filter_by(barcode=bCode, \
-                storeid=request.json['storeid']).first()
+            ps = Product.query.filter_by(barcode=bCode).\
+                filter_by(storeid=request.json['storeid']).first()
+            if ps is None:
+                abort(406, {"message": 'Uno de tus articulos no existe'})
             if (ps.units - units < 0):
                 abort(406)
             else:
                 q = updateHelper(bCode, units, request.json['storeid'])
                 engine.execute(q)
-                sd = SaleDetails(s.id, m.barcode, m.price, units)
+                sd = SaleDetails(s.id, m.barcode, m.price, units, request.json['storeid'])
                 db_session.add(sd)
                 db_session.commit()
-        return make_response(jsonify({'mobilerp': '[p.serialize]'}), 200)
+        sd = SaleDetails.query.filter_by(idsale = s.id).all()
+        return make_response(jsonify( [sd_.serialize for sd_ in sd] ), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 

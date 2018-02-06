@@ -123,8 +123,8 @@ class SalesTestCase(unittest.TestCase):
 	def find_product_1_0(self, barcode):
 		return self.open_with_auth('/api/v1.0/find_product/'+barcode, 'GET')
 
-	def find_product_1_1(self, barcode):
-		return self.open_with_auth('/api/v1.1/find_product/'+barcode, 'GET')
+	def find_product_1_1(self, storeid, barcode):
+		return self.open_with_auth('/api/v1.1/find_product/'+storeid+'/'+barcode, 'GET')
 
 	def list_products_1_0(self):
 		return self.open_with_auth('/api/v1.0/list_products/', 'GET')
@@ -163,9 +163,9 @@ class SalesTestCase(unittest.TestCase):
 		assert response.status_code == 200
 
 	def test_004_find_product_1_1(self):
-		response = self.find_product_1_1('1001')
+		response = self.find_product_1_1('2','1001')
 		json_data = json.loads(response.data)
-		assert jsoncompare.are_same(json_data, self.json_prod_7, False, ['storeid'])
+		assert jsoncompare.are_same(json_data, self.json_prod_7, True)
 		assert response.status_code == 200
 
 	def test_005_list_products_1_0(self):
@@ -240,7 +240,7 @@ class SalesTestCase(unittest.TestCase):
 	def test_008_update_item_1_1_add_items(self):
 		bCode = '0002'
 		units = 2
-		response = self.find_product_1_1(bCode)
+		response = self.find_product_1_1('1',bCode)
 		assert response.status_code == 200
 		updated_product = json.dumps({
 			'barcode' : bCode,
@@ -275,7 +275,7 @@ class SalesTestCase(unittest.TestCase):
 	def test_010_update_item_1_1_change_name(self):
 		bCode = '0004'
 		name = 'tostitos'
-		response = self.find_product_1_1(bCode)
+		response = self.find_product_1_1('2',bCode)
 		assert response.status_code == 200
 		updated_product = json.dumps({
 			'barcode' : bCode,
@@ -311,7 +311,7 @@ class SalesTestCase(unittest.TestCase):
 	def test_012_update_item_1_1_change_price(self):
 		bCode = '0005'
 		price = 32.5
-		response = self.find_product_1_1(bCode)
+		response = self.find_product_1_1('2',bCode)
 		assert response.status_code == 200
 		updated_product = json.dumps({
 			'barcode' : bCode,
@@ -353,7 +353,7 @@ class SalesTestCase(unittest.TestCase):
 		price = 701
 		name = 'mani'
 		units = 9
-		response = self.find_product_1_1(bCode)
+		response = self.find_product_1_1('2', bCode)
 		assert response.status_code == 200
 		updated_product = json.dumps({
 			'barcode' : bCode,
@@ -390,6 +390,18 @@ class SalesTestCase(unittest.TestCase):
 	# 	engine.execute("update product set units = 0 where storeid = 1 and barcode='0003';")
 	# 	engine.execute("update product set units = 0 where storeid = 2 and barcode='0004';")
 	# 	assert True == False
+
+	# def test_017_find_product_fail_1_0(self):
+	# 	assert True == False
+
+	# def test_018_find_product_fail_1_1_product_doesnt_exists(self):
+	# 	assert True == False
+
+	# def test_019_find_product_fail_1_1_product_exists_not_in_this_store(self):
+	# 	assert True == False
+
+	# def test_020_find_product_fail_1_1_product_exists_invalid_store():
+	# 	pass
 
 if __name__ == '__main__':
 	unittest.main()
