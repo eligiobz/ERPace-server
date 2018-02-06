@@ -55,15 +55,6 @@ def list_products(storeid=None):
     return make_response(jsonify({'mobilerp':
                          [p.serialize for p in products]}), 200)
 
-
-@auth.login_required
-def listProducts_v1_1(storeid):
-    
-    if products is None:
-        abort(400)
-    return make_response(jsonify({'mobilerp':
-                         [p.serialize for p in products]}), 200)
-
 @api.route('/v1.0/add_product/', methods=['POST'])
 @auth.login_required
 def add_product_1_0():
@@ -89,34 +80,40 @@ def add_product_1_0():
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 
 
-@api.route('/v1.0/updateProduct/<bCode>', methods=['PUT'])
+@api.route('/v1.0/update_product/<bCode>', methods=['PUT'])
 @auth.login_required
-def updateProduct(bCode):
+def update_product_1_0(bCode):
     if not request.json:
         abort(400)
     p = Product.query.filter_by(barcode=bCode).first()
+    mlist = MasterList.query.filter_by(barcode=bCode).first()
     if p is None:
         abort(404)
     if (logger.log_op(request.json)):
         if 'price' in request.json:
-            if str(p.price) != request.json['price']:
+            if str(mlist.price) != request.json['price']:
                 price_update = PriceHistory(p.barcode)
                 db_session.add(price_update)
                 db_session.commit()
-                p.price = float(request.json['price'])
+                mlist.price = float(request.json['price'])
+                db_session.add(mlist)
+                db_session.commit()
         if 'units' in request.json:
             p.units = p.units + int(request.json['units'])
         if 'name' in request.json:
-            p.name = request.json['name']
+            mlist = MasterList.query.filter_by(barcode=bCode).first()
+            mlist.name = request.json['name']
+            db_session.add(mlist)
         db_session.add(p)
         db_session.commit()
-        return make_response(jsonify({'mobilerp': [p.serialize]}), 200)
+        ps = ProductStore.query.filter_by(storeid=1).filter_by(barcode=bCode).first()
+        return make_response(jsonify( ps.serialize ), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 
-@api.route('/v1.0/listDepletedProducts/', methods=['GET'])
+@api.route('/v1.0/list_depleted_products/', methods=['GET'])
 @auth.login_required
-def listDepletedProducts():
+def list_depleted_products_1_0():
     products = DepletedItems.query.all()
     if products is None:
         abort(400)
@@ -153,9 +150,9 @@ def add_product_1_1():
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 
 
-@api.route('/v1.1/updateProduct/<bCode>', methods=['PUT'])
+@api.route('/v1.1/update_product/<bCode>', methods=['PUT'])
 @auth.login_required
-def updateProduct_v1_1(bCode):
+def update_product_1_1(bCode):
     if not request.json or 'storeid' not in request.json:
         abort(400)
     m = MasterList.query.filter_by(barcode=bCode).first()
@@ -177,13 +174,14 @@ def updateProduct_v1_1(bCode):
             engine.execute(updateHelper(bCode, int(request.json['units']), int(request.json['storeid'])))
         else:
             engine.execute(updateHelper(bCode, 0, int(request.json['storeid'])))
-        return make_response(jsonify({'mobilerp': [m.serialize]}), 200)
+        ps = ProductStore.query.filter_by(barcode=bCode).filter_by(storeid=request.json['storeid']).first()
+        return make_response(jsonify( ps.serialize ), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 
-@api.route('/v1.1/listDepletedProducts/<storeid>', methods=['GET'])
+@api.route('/v1.1/list_depleted_products/<storeid>', methods=['GET'])
 @auth.login_required
-def listDepletedProducts_v1_1(storeid):
+def list_depleted_products_1_1(storeid):
     products = DepletedItems.query.filter_by(storeid=int(storeid)).all()
     if products is None:
         abort(400)
@@ -200,3 +198,9 @@ def updateHelper(barcode, units, storeid):
     db_session.commit()
     return "UPDATE product set units={0} where barcode='{1}' and storeid={2}"\
         .format(u, barcode, storeid)
+
+@api.route('/v1.1/product_price_history/<bCode>', methods=['GET'])
+@auth.login_required
+def product_price_hisorty(bCode):
+    # TODO Implement
+    abort(501)

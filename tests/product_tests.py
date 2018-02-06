@@ -87,11 +87,7 @@ class ProductTestCase(unittest.TestCase):
 			print ("Initalizing testing environment")
 			self.setupClass()
 			self.__class__.ClasIsSetup = True
-		
-
-	def tearDown(self):
-		pass
-
+	
 	def open_with_auth(self, url, method, data=None):
 		return self.app.open(url, method=method,
 			headers={ 'Authorization': self.auth_string },
@@ -116,6 +112,18 @@ class ProductTestCase(unittest.TestCase):
 
 	def list_products_1_1(self, storeid):
 		return self.open_with_auth('/api/v1.1/list_products/'+str(storeid), 'GET')
+
+	def update_product_1_0(self, barcode, data):
+		return self.open_with_auth('/api/v1.0/update_product/'+str(barcode), 'PUT', data)
+
+	def update_product_1_1(self, barcode, data):
+		return self.open_with_auth('/api/v1.1/update_product/'+str(barcode), 'PUT', data)
+
+	def list_depleted_products_1_0(self):
+		return self.open_with_auth('/api/v1.0/list_depleted_products/', 'GET')
+
+	def list_depleted_products_1_1(self):
+		return self.open_with_auth('/api/v1.1/list_depleted_products/', 'GET')
 
 	def test_001_add_product_1_0(self):
 		response = self.add_product_1_0(self.json_prod_6)
@@ -192,6 +200,178 @@ class ProductTestCase(unittest.TestCase):
 				assert jsoncompare.are_same(item, self.json_prod_5, True)
 			if item['barcode'] == '0003':
 				assert jsoncompare.are_same(item, self.json_prod_7, True)
+
+	def test_007_update_product_1_0_add_items(self):
+		bCode = '0001'
+		units = 4
+		response = self.find_product_1_0(bCode)
+		assert response.status_code == 200
+		updated_product = json.dumps({
+			'barcode' : bCode,
+			'units' : units
+			})
+		response = self.update_product_1_0(bCode, updated_product)
+		assert response.status_code == 200
+		json_data = json.loads(response.data)
+		assert json_data['barcode'] == bCode
+		assert float(json_data['price']) ==  50.5
+		assert int(json_data['units']) == 8 # 4 + 4 = 8
+		assert json_data['name'] == 'crema_1'
+
+	def test_008_update_item_1_1_add_items(self):
+		bCode = '0002'
+		units = 2
+		response = self.find_product_1_1(bCode)
+		assert response.status_code == 200
+		updated_product = json.dumps({
+			'barcode' : bCode,
+			'units' : units,
+			})
+		response = self.update_product_1_0(bCode, updated_product)
+		assert response.status_code == 200
+		json_data = json.loads(response.data)
+		assert json_data['barcode'] == bCode
+		assert float(json_data['price']) ==  1.0
+		assert int(json_data['units']) == 10 # 8 + 2 = 10
+		assert json_data['name'] == 'crema_2'
+		assert int(json_data['storeid']) == 1
+
+	def test_009_update_item_1_0_change_name(self):
+		bCode = '0003'
+		name = 'doritos'
+		response = self.find_product_1_0(bCode)
+		assert response.status_code == 200
+		updated_product = json.dumps({
+			'barcode' : bCode,
+			'name' : name,
+			})
+		response = self.update_product_1_0(bCode, updated_product)
+		assert response.status_code == 200
+		json_data = json.loads(response.data)
+		assert json_data['barcode'] == bCode
+		assert float(json_data['price']) ==  150
+		assert int(json_data['units']) == 6
+		assert json_data['name'] == name
+
+	def test_010_update_item_1_1_change_name(self):
+		bCode = '0004'
+		name = 'tostitos'
+		response = self.find_product_1_1(bCode)
+		assert response.status_code == 200
+		updated_product = json.dumps({
+			'barcode' : bCode,
+			'name' : name,
+			'storeid' : 2
+			})
+		response = self.update_product_1_1(bCode, updated_product)
+		assert response.status_code == 200
+		json_data = json.loads(response.data)
+		assert json_data['barcode'] == bCode
+		assert float(json_data['price']) ==  3.4
+		assert int(json_data['units']) == 3
+		assert json_data['name'] == name
+		assert int(json_data['storeid']) ==  2
+
+	def test_011_update_item_1_0_change_price(self):
+		bCode = '0001'
+		price = 10.5
+		response = self.find_product_1_0(bCode)
+		assert response.status_code == 200
+		updated_product = json.dumps({
+			'barcode' : bCode,
+			'price' : price
+			})
+		response = self.update_product_1_0(bCode, updated_product)
+		assert response.status_code == 200
+		json_data = json.loads(response.data)
+		assert json_data['barcode'] == bCode
+		assert float(json_data['price']) ==  price
+		assert int(json_data['units']) == 8 # From last operation in database
+		assert json_data['name'] == 'crema_1'
+
+	def test_012_update_item_1_1_change_price(self):
+		bCode = '0005'
+		price = 32.5
+		response = self.find_product_1_1(bCode)
+		assert response.status_code == 200
+		updated_product = json.dumps({
+			'barcode' : bCode,
+			'price' : price,
+			'storeid': 2
+			})
+		response = self.update_product_1_1(bCode, updated_product)
+		assert response.status_code == 200
+		json_data = json.loads(response.data)
+		assert json_data['barcode'] == bCode
+		assert float(json_data['price']) ==  price
+		assert int(json_data['units']) == 1 # From last operation in database
+		assert json_data['name'] == 'crema_5'
+		assert json_data['storeid'] == 2
+
+	def test_013_update_item_1_0_change_all(self):
+		bCode = '1000'
+		price = 597.15
+		name = 'orcos'
+		units = 4
+		response = self.find_product_1_0(bCode)
+		assert response.status_code == 200
+		updated_product = json.dumps({
+			'barcode' : bCode,
+			'price' : price,
+			'name' : name,
+			'units' : units
+			})
+		response = self.update_product_1_0(bCode, updated_product)
+		assert response.status_code == 200
+		json_data = json.loads(response.data)
+		assert json_data['barcode'] == bCode
+		assert float(json_data['price']) ==  price
+		assert int(json_data['units']) == 12 # 8 + 4
+		assert json_data['name'] == name
+
+	def test_014_update_item_1_1_change_all(self):
+		bCode = '1001'
+		price = 701
+		name = 'mani'
+		units = 9
+		response = self.find_product_1_1(bCode)
+		assert response.status_code == 200
+		updated_product = json.dumps({
+			'barcode' : bCode,
+			'price' : price,
+			'name' : name,
+			'units' : units,
+			'storeid': 2
+			})
+		response = self.update_product_1_1(bCode, updated_product)
+		assert response.status_code == 200
+		json_data = json.loads(response.data)
+		assert json_data['barcode'] == bCode
+		assert float(json_data['price']) ==  price
+		assert int(json_data['units']) == 13 # From last operation in database
+		assert json_data['name'] == name
+		assert json_data['storeid'] == 2
+	
+	# def test_015_list_depleted_products_1_0(self):
+	# 	# We need a fake sale so depleted items views will populated properly
+	# 	json_sale = json.dumps({
+			
+	# 		})
+	# 	self.open_with_auth('make')
+	# 	print (res.fetchall())
+	# 	response = self.list_depleted_products_1_0()
+	# 	print(response.data)
+	# 	assert response.status_code == 200
+	# 	json_data = json.loads(response.data)
+	# 	assert len(json_data) == 2
+	# 	assert b'0001' in response.data
+	# 	assert b'0002' in response.data
+
+
+	# def test_016_list_depleted_products_1_1(self):
+	# 	engine.execute("update product set units = 0 where storeid = 1 and barcode='0003';")
+	# 	engine.execute("update product set units = 0 where storeid = 2 and barcode='0004';")
+	# 	assert True == False
 
 if __name__ == '__main__':
 	unittest.main()

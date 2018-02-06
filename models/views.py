@@ -76,7 +76,7 @@ class DepletedItems(Base):
     date = Column(DateTime)
     storeid = Column(Integer)
     units = Column(Integer)
-    barcode = Column(String(50))
+    barcode = Column(String(60))
 
     @property
     def serialize(self):

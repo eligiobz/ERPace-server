@@ -44,8 +44,6 @@ CREATE VIEW salesview AS
      JOIN sale ON ((sale.id = saledetails.idsale)))
      JOIN masterlist ON (((masterlist.barcode)::text = (saledetails.idproduct)::text)));
 
--- New version of the views
-
 CREATE VIEW depleteditemsview AS
  SELECT saledetails.idsale,
     masterlist.name,
@@ -57,5 +55,4 @@ CREATE VIEW depleteditemsview AS
      JOIN saledetails ON (((saledetails.idproduct)::text = (product.barcode)::text)))
      JOIN masterlist on (((masterlist.barcode)::text = (product.barcode)::text))
      JOIN sale ON ((sale.id = saledetails.idsale)))
-
   WHERE (product.units = 0);
