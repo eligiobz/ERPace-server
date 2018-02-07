@@ -52,7 +52,6 @@ def delete_user(username):
     db_session.commit()
     return make_response(jsonify({'mobilerp': 'deleted'}, 200))
 
-
 @api.route('/v1.0/user/update_pass/<string:n_pass>', methods=['PUT'])
 @api.route('/v1.1/user/update_pass/<string:n_pass>', methods=['PUT'])
 @auth.login_required
@@ -63,8 +62,8 @@ def update_pass(n_pass):
     db_session.commit()
     return jsonify({'user': [user.serialize]})
 
-@api.route('/v1.0/user/checkLogin/', methods=['GET'])
-@api.route('/v1.1/user/checkLogin/', methods=['GET'])
+@api.route('/v1.0/user/check_login/', methods=['GET'])
+@api.route('/v1.1/user/check_login/', methods=['GET'])
 @auth.login_required
 def checkLogin():
     return make_response(jsonify({'logged': 'true'}), 200)

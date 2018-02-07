@@ -68,15 +68,58 @@ class DrugstoreTestCase(unittest.TestCase):
 		response = self.open_with_auth('/api/v1.1/list_drugstores/', 'GET')
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
+		i = 2
 		for item in json_data:
 			new_json = json.dumps({
-				'name' : 'Store X',
+				'name' : 'Store X' + str(i),
 				'id': item['id']
 				})
 			response = self.open_with_auth('/api/v1.1/edit_drugstore/', 'PUT', new_json)
 			assert response.status_code == 200
 			new_data = json.loads(response.data)
 			assert jsoncompare.are_same(new_data, new_json)
+			i = i + 1
+
+	def test_004_add_drugstore_fail_no_data(self):
+		response = self.add_drugstore(json.dumps(None))
+		assert response.status_code == 406
+
+	"""
+		Disabled until further notice
+	"""
+	# def test_005_add_drugstore_fail_empty_data(self):
+	# 	data = dict(
+	# 		name = None)
+	# 	response = self.add_drugstore(json.dumps(data))
+	# 	assert response.status_code == 400
+	# 	data = dict(
+	# 		name = '')
+	# 	response = self.add_drugstore(json.dumps(data))
+	# 	assert response.status_code == 400
+
+	def test_006_edit_drugstore_fail_no_data(self):
+		response = self.open_with_auth('/api/v1.1/edit_drugstore/', 'PUT', json.dumps(None))
+		assert response.status_code == 406
+
+	def test_007_edit_drugstore_fail_empty_data(self):
+		data = dict(
+			name = None)
+		response = self.open_with_auth('/api/v1.1/edit_drugstore/', 'PUT', json.dumps(data))
+		assert response.status_code == 406
+		data = dict(
+			name = '')
+		response = self.open_with_auth('/api/v1.1/edit_drugstore/', 'PUT', json.dumps(data))
+		assert response.status_code == 406
+
+	def test_008_edit_drugstore_fail_incomplete_data(self):
+		data = dict(
+			name = "")
+		response = self.open_with_auth('/api/v1.1/edit_drugstore/', 'PUT', json.dumps(data))
+		assert response.status_code == 406
+		data = dict(
+			id = 1)
+		response = self.open_with_auth('/api/v1.1/edit_drugstore/', 'PUT', json.dumps(data))
+		assert response.status_code == 406
 
 if __name__ == "__main__":
 	unittest.main()

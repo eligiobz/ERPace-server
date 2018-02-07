@@ -97,6 +97,7 @@ class SalesTestCase(unittest.TestCase):
 	@classmethod
 	def tearDownClass(cls):
 		engine.execute('delete from pricehistory; delete from product; delete from masterlist ;')
+		engine.execute('delete from saledetails; ')
 		engine.execute("delete from drugstore;")
 
 	def setUp(self):
@@ -141,8 +142,8 @@ class SalesTestCase(unittest.TestCase):
 	def list_depleted_products_1_0(self):
 		return self.open_with_auth('/api/v1.0/list_depleted_products/', 'GET')
 
-	def list_depleted_products_1_1(self):
-		return self.open_with_auth('/api/v1.1/list_depleted_products/', 'GET')
+	def list_depleted_products_1_1(self, storeid):
+		return self.open_with_auth('/api/v1.1/list_depleted_products/'+str(storeid), 'GET')
 
 	def test_001_add_product_1_0(self):
 		response = self.add_product_1_0(self.json_prod_6)
@@ -171,13 +172,13 @@ class SalesTestCase(unittest.TestCase):
 	def test_005_list_products_1_0(self):
 		response = self.list_products_1_0()
 		json_data = json.loads(response.data)
-		assert len(json_data['mobilerp']) == 4
+		assert len(json_data) == 4
 		assert response.status_code == 200
 		assert b'0001' in response.data
 		assert b'0002' in response.data
 		assert b'0003' in response.data
 		assert b'1000' in response.data
-		for item in json_data['mobilerp']:
+		for item in json_data:
 			if item['barcode'] == '0001':
 				assert jsoncompare.are_same(item, self.json_prod_1, False, ['storeid'])
 			if item['barcode'] == '0002':
@@ -190,13 +191,13 @@ class SalesTestCase(unittest.TestCase):
 	def test_006_list_products_1_1(self):
 		response = self.list_products_1_1(1)
 		json_data = json.loads(response.data)
-		assert len(json_data['mobilerp']) == 4
+		assert len(json_data) == 4
 		assert response.status_code == 200
 		assert b'0001' in response.data
 		assert b'0002' in response.data
 		assert b'0003' in response.data
 		assert b'1000' in response.data
-		for item in json_data['mobilerp']:
+		for item in json_data:
 			if item['barcode'] == '0001':
 				assert jsoncompare.are_same(item, self.json_prod_1, True)
 			if item['barcode'] == '0002':
@@ -207,12 +208,12 @@ class SalesTestCase(unittest.TestCase):
 				assert jsoncompare.are_same(item, self.json_prod_6, True)
 		response = self.list_products_1_1(2)
 		json_data = json.loads(response.data)
-		assert len(json_data['mobilerp']) == 3
+		assert len(json_data) == 3
 		assert response.status_code == 200
 		assert b'0004' in response.data
 		assert b'0005' in response.data
 		assert b'1001' in response.data
-		for item in json_data['mobilerp']:
+		for item in json_data:
 			if item['barcode'] == '0004':
 				assert jsoncompare.are_same(item, self.json_prod_4, True)
 			if item['barcode'] == '0005':
@@ -269,7 +270,7 @@ class SalesTestCase(unittest.TestCase):
 		json_data = json.loads(response.data)
 		assert json_data['barcode'] == bCode
 		assert float(json_data['price']) ==  150
-		assert int(json_data['units']) == 6
+		assert int(json_data['units']) == 6 
 		assert json_data['name'] == name
 
 	def test_010_update_item_1_1_change_name(self):
@@ -370,38 +371,224 @@ class SalesTestCase(unittest.TestCase):
 		assert int(json_data['units']) == 13 # From last operation in database
 		assert json_data['name'] == name
 		assert json_data['storeid'] == 2
+
+	def test_015_list_depleted_products_1_0_fail_no_products(self):
+		response = self.list_depleted_products_1_0()
+		print (response.data)
+		assert response.status_code == 400
 	
-	# def test_015_list_depleted_products_1_0(self):
-	# 	# We need a fake sale so depleted items views will populated properly
-	# 	json_sale = json.dumps({
+	def test_015_list_depleted_products_1_0_sucess(self):
+		# We need a fake sale so depleted items views will populated properly
+		json_sale = dict(
+			barcode = ['0001', '0002'],
+			units = [8, 10],
+			storeid = 1
+			)
+		response = self.open_with_auth('/api/v1.1/make_sale/', 'POST', json.dumps(json_sale))
+		assert response.status_code == 200
+		response = self.list_depleted_products_1_0()
+		assert response.status_code == 200
+		json_data = json.loads(response.data)
+		assert len(json_data) == 2
+		assert b'0001' in response.data
+		assert b'0002' in response.data
 
-	# 		})
-	# 	self.open_with_auth('make')
-	# 	print (res.fetchall())
-	# 	response = self.list_depleted_products_1_0()
-	# 	print(response.data)
-	# 	assert response.status_code == 200
-	# 	json_data = json.loads(response.data)
-	# 	assert len(json_data) == 2
-	# 	assert b'0001' in response.data
-	# 	assert b'0002' in response.data
+	def test_016_list_depleted_products_1_1_fail_no_products(self):
+		response = self.list_depleted_products_1_1(2)
+		assert response.status_code == 400
 
-	# def test_016_list_depleted_products_1_1(self):
-	# 	engine.execute("update product set units = 0 where storeid = 1 and barcode='0003';")
-	# 	engine.execute("update product set units = 0 where storeid = 2 and barcode='0004';")
-	# 	assert True == False
+	def test_016_list_depleted_products_1_1_success(self):
+		# We need a fake sale so depleted items views will populated properly
+		json_sale = dict(
+			barcode = ['0004', '0005'],
+			units = [3, 1],
+			storeid = 2
+			)
+		response = self.open_with_auth('/api/v1.1/make_sale/', 'POST', json.dumps(json_sale))
+		assert response.status_code == 200
+		response = self.list_depleted_products_1_1(json_sale['storeid'])
+		assert response.status_code == 200
+		json_data = json.loads(response.data)
+		assert len(json_data) == 2
+		assert b'0004' in response.data
+		assert b'0005' in response.data
 
-	# def test_017_find_product_fail_1_0(self):
-	# 	assert True == False
+	def test_017_find_product_fail_1_0(self):
+		response = self.find_product_1_0('5001')
+		assert response.status_code == 404
 
-	# def test_018_find_product_fail_1_1_product_doesnt_exists(self):
-	# 	assert True == False
+	def test_018_find_product_fail_1_1_product_doesnt_exists(self):
+		response = self.find_product_1_1('1', '5001')
+		assert response.status_code == 404
 
-	# def test_019_find_product_fail_1_1_product_exists_not_in_this_store(self):
-	# 	assert True == False
+	def test_019_find_product_fail_1_1_product_exists_not_in_this_store(self):
+		response = self.find_product_1_1('1', '0004')
+		assert response.status_code == 404
 
-	# def test_020_find_product_fail_1_1_product_exists_invalid_store():
-	# 	pass
+	def test_020_find_product_fail_1_1_product_exists_invalid_store(self):
+		response = self.find_product_1_1('5', '0004')
+		assert response.status_code == 404
+
+	def test_021_list_products_non_existent_store(self):
+		response = self.list_products_1_1('5')
+		assert response.status_code == 412
+
+	def test_022_add_product_1_0_fail_existent_product(self):
+		response = self.add_product_1_0(self.json_prod_6)
+		assert response.status_code == 409
+		
+
+	def test_023_add_product_1_1_fail_existent_product(self):
+		response = self.add_product_1_1(self.json_prod_7)
+		assert response.status_code == 409
+
+	def test_024_add_product_1_0_fail_no_json(self):
+		response = self.add_product_1_0(None)
+		assert response.status_code == 400
+
+	def test_025_add_product_1_1_fail_no_json(self):
+		response = self.add_product_1_1(None)
+		assert response.status_code == 400
+
+	def test_026_add_product_1_1_fail_incomplete_json(self):
+		product = dict(
+			barcode = '',
+			name = 'huirr',
+			price = 1.2
+			)
+		response = self.add_product_1_0(json.dumps(product))
+		assert response.status_code == 400
+		product = dict(
+			barcode = '78965',
+			name = 'huirr',
+			price = 1.2
+			)
+		response = self.add_product_1_0(json.dumps(product))
+		assert response.status_code == 400
+
+	def test_027_add_product_1_1_fail_incomplete_json(self):
+		product = dict(
+			barcode = '9871',
+			units = 4,
+			name = 'huirr',
+			price = 1.2
+			)
+		response = self.add_product_1_1(json.dumps(product))
+		assert response.status_code == 400
+		product = dict(
+			barcode = '78965',
+			name = 'huirr',
+			price = 1.2,
+			storeid = -1
+			)
+		response = self.add_product_1_0(json.dumps(product))
+		assert response.status_code == 400
+
+	def test_028_add_product_1_0_fail_empty_data(self):
+		product = dict(
+			barcode = '',
+			name = '',
+			price = 1.2,
+			units = 3
+			)
+		response = self.add_product_1_0(json.dumps(product))
+		assert response.status_code == 400
+
+	def test_029_add_product_1_1_fail_empty_data(self):
+		product = dict(
+			barcode = '',
+			name = '',
+			price = 1.2,
+			units = 3,
+			storeid = 1
+			)
+		response = self.add_product_1_1(json.dumps(product))
+		assert response.status_code == 400
+
+	def test_030_add_product_1_0_fail_duplicated_operation(self):
+		response = self.add_product_1_0(self.json_prod_6)
+		assert response.status_code == 428
+
+	def test_031_add_product_1_1_fail_duplicated_operation(self):
+		response = self.add_product_1_1(self.json_prod_7)
+		assert response.status_code == 428
+
+	def test_032_update_product_1_0_fail_no_json_data(self):
+		response = self.update_product_1_0('0001', json.dumps(None))
+		assert response.status_code == 400
+
+	def test_033_update_product_1_1_fail_no_json_data(self):
+		response = self.update_product_1_1('0001', json.dumps(None))
+		assert response.status_code == 400
+
+	def test_034_update_product_1_0_fail_invalid_product(self):
+		products = dict(
+			barcode = '0111',
+			units = 1)
+		response = self.update_product_1_0(products['barcode'], json.dumps(products))
+		assert response.status_code == 400
+
+	def test_034_update_product_1_1_fail_invalid_product(self):
+		products = dict(
+			barcode = '0111',
+			units = 1)
+		response = self.update_product_1_1(products['barcode'], json.dumps(products))
+		assert response.status_code == 400
+
+	def test_036_update_product_1_0_fail_duplicated_operation(self):
+		bCode = '1000'
+		price = 597.15
+		name = 'orcos'
+		units = 4
+		updated_product = json.dumps({
+			'barcode' : bCode,
+			'price' : price,
+			'name' : name,
+			'units' : units
+			})
+		response = self.update_product_1_0(bCode, updated_product)
+		assert response.status_code == 428
+
+	def test_037_update_product_1_0_fail_duplicated_operation(self):
+		bCode = '1001'
+		price = 701
+		name = 'mani'
+		units = 9
+		updated_product = json.dumps({
+			'barcode' : bCode,
+			'price' : price,
+			'name' : name,
+			'units' : units,
+			'storeid': 2
+			})
+		response = self.update_product_1_1(bCode, updated_product)
+		assert response.status_code == 428
+		
+	def test_038_add_product_1_1_fail_invalid_drugstore(self):
+		product = dict(
+			barcode = '9871',
+			units = 4,
+			name = 'huirr',
+			price = 1.2,
+			storeid = 10
+			)
+		response = self.add_product_1_1(json.dumps(product))
+		assert response.status_code == 400
+
+	def test_039_update_product_1_1_fail_inexistent_product(self):
+		bCode = '1111'
+		price = 701
+		name = 'mani'
+		units = 9
+		updated_product = json.dumps({
+			'barcode' : bCode,
+			'price' : price,
+			'name' : name,
+			'units' : units,
+			'storeid': 2
+			})
+		response = self.update_product_1_1(bCode, updated_product)
+		assert response.status_code == 400
 
 if __name__ == '__main__':
 	unittest.main()

@@ -36,6 +36,10 @@ class PriceHistory(Base):
                                  .first()).price
         self.date_changed = datetime.now()
 
-    @property
-    def serialize(self):
-        pass
+    """ 
+    Commented out for the time being as serialization 
+    of this object doesn't currently takes place during operation
+    """
+    # @property
+    # def serialize(self):
+    #     pass

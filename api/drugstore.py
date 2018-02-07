@@ -28,7 +28,7 @@ from . import api, auth, logger
 @api.route('/v1.1/add_drugstore/', methods=['POST'])
 @auth.login_required
 def add_drugstore():
-	if not request.json or not 'name' in request.json:
+	if not request.json or 'name' not in request.json:
 		abort(406)
 	store = Drugstore(request.json['name'])
 	db_session.add(store)

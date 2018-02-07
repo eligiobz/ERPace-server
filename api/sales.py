@@ -36,7 +36,8 @@ from . import api, auth, logger
 def make_sale_1_0():
     if not request.json:
         abort(400)
-    if 'barcode' not in request.json or len(request.json['barcode']) <= 0:
+    if 'barcode' not in request.json or len(request.json['barcode']) <= 0 or\
+        'units' not in request.json or len(request.json['units']) <= 0:
         abort(400)
     if (logger.log_op(request.json)):
         s = Sale()
@@ -47,7 +48,7 @@ def make_sale_1_0():
             units = request.json['units'][i]
             ps = ProductStore.query.filter_by(barcode=bCode).filter_by(storeid=1).first()
             if (ps.units - units < 0):
-                abort(406)
+                abort(406, {"message": 'articulos insuficientes'})
             else:
                 q = updateHelper(bCode, units, 1)
                 engine.execute(q)
@@ -67,7 +68,7 @@ def make_sale_1_1():
     if not request.json or 'storeid' not in request.json or\
         'barcode' not in request.json or len(request.json['barcode']) <= 0:
         abort(400)
-    drugstore = Drugstore.query.filter_by(id=request.json['storeid'])
+    drugstore = Drugstore.query.filter_by(id=request.json['storeid']).first()
     if drugstore is None:
         abort (406, { "message" : "storeid invalido"})
     if (logger.log_op(request.json)):
@@ -83,7 +84,7 @@ def make_sale_1_1():
             if ps is None:
                 abort(406, {"message": 'Uno de tus articulos no existe'})
             if (ps.units - units < 0):
-                abort(406)
+                abort(406, {"message": 'articulos insuficientes'})
             else:
                 q = updateHelper(bCode, units, request.json['storeid'])
                 engine.execute(q)

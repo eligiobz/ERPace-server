@@ -33,6 +33,11 @@ class Sale (Base):
     def __init__(self):
         self.date = datetime.now()
 
-    @property
-    def serialize(self):
-        return {'sale': self.id, 'date': self.date}
+
+""" 
+Commented out for the time being as serialization 
+of this object doesn't currently takes place during operation
+"""
+    # @property
+    # def serialize(self):
+    #     return {'sale': self.id, 'date': self.date}

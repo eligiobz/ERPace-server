@@ -26,6 +26,7 @@ from models.PriceHistory import PriceHistory as PriceHistory
 from models.views import DepletedItems
 from models.MasterList import MasterList as MasterList
 from models.views import ProductStore as ProductStore
+from models.DrugStores import Drugstore
 
 from reporter.pdfgenerator import generateDepletedReport
 from . import auth, api
@@ -51,15 +52,13 @@ def find_product(bCode, storeid=None):
 @api.route('/v1.1/list_products/<int:storeid>', methods=['GET'])
 @auth.login_required
 def list_products(storeid=None):
-    rule = request.url_rule
     if storeid is None:
         products = ProductStore.query.filter_by(storeid=1).order_by(ProductStore.name.asc()).all()
     else:
         products = ProductStore.query.filter_by(storeid=storeid).order_by(ProductStore.name.asc()).all()
-    if products is None:
-        abort(400)
-    return make_response(jsonify({'mobilerp':
-                         [p.serialize for p in products]}), 200)
+    if products is None or len(products) == 0:
+        abort(412, "Por alguna razon la lista esta vacia")
+    return make_response(jsonify( [p.serialize for p in products] ), 200)
 
 @api.route('/v1.0/add_product/', methods=['POST'])
 @auth.login_required
@@ -68,10 +67,13 @@ def add_product_1_0():
        or 'units' not in request.json or 'price' not in request.json\
        or 'name' not in request.json:
         abort(400)
-    if request.json['barcode'] is '' or request.json['name'] is ''\
-       or request.json['units'] is '' or request.json['price'] is '':
-        abort(401)
+    if not request.json['barcode'] or not request.json['name']\
+       or not request.json['units'] or not request.json['price']:
+        abort(400)
     if (logger.log_op(request.json)):
+        m = MasterList.query.filter_by(barcode=request.json['barcode']).first()
+        if m is not None:
+            abort(409, {"message": "Producto existente"})
         m = MasterList(request.json['barcode'], request.json['name'],
             request.json['price'])
         db_session.add(m)
@@ -94,7 +96,7 @@ def update_product_1_0(bCode):
     p = Product.query.filter_by(barcode=bCode).first()
     mlist = MasterList.query.filter_by(barcode=bCode).first()
     if p is None:
-        abort(404)
+        abort(400)
     if (logger.log_op(request.json)):
         if 'price' in request.json:
             if str(mlist.price) != request.json['price']:
@@ -121,11 +123,11 @@ def update_product_1_0(bCode):
 @auth.login_required
 def list_depleted_products_1_0():
     products = DepletedItems.query.all()
-    if products is None:
+    if products is None or len(products) <= 0:
         abort(400)
     data = {'mobilerp': [p.serialize for p in products]}
     generateDepletedReport(data)
-    return make_response(jsonify(data), 200)
+    return make_response(jsonify([p.serialize for p in products]), 200)
 
 ################################## V1.1 #######################################
 
@@ -140,8 +142,14 @@ def add_product_1_1():
     if request.json['barcode'] is '' or request.json['name'] is ''\
        or request.json['units'] is '' or request.json['price'] is ''\
        or request.json['storeid'] is '':
-        abort(401)
+        abort(400)
+    drugstore = Drugstore.query.filter_by(id=request.json['storeid']).first()
+    if drugstore is None:
+        abort(400) 
     if (logger.log_op(request.json)):
+        m = MasterList.query.filter_by(barcode=request.json['barcode']).first()
+        if m is not None:
+            abort(409, { "message" : "Producto existente" })
         m = MasterList(request.json['barcode'], request.json['name'],
             request.json['price'])
         db_session.add(m)
@@ -163,7 +171,7 @@ def update_product_1_1(bCode):
         abort(400)
     m = MasterList.query.filter_by(barcode=bCode).first()
     if m is None:
-        abort(404)
+        abort(400)
     if (logger.log_op(request.json)):
         if 'price' in request.json:
             if str(m.price) != request.json['price']:
@@ -189,11 +197,11 @@ def update_product_1_1(bCode):
 @auth.login_required
 def list_depleted_products_1_1(storeid):
     products = DepletedItems.query.filter_by(storeid=int(storeid)).all()
-    if products is None:
+    if products is None or len(products) <= 0:
         abort(400)
     data = {'mobilerp': [p.serialize for p in products]}
     generateDepletedReport(data)
-    return make_response(jsonify(data), 200)
+    return make_response(jsonify([p.serialize for p in products]), 200)
 
 def updateHelper(barcode, units, storeid):
     p = Product.query.filter_by(storeid=storeid, barcode=barcode).first()
@@ -205,8 +213,8 @@ def updateHelper(barcode, units, storeid):
     return "UPDATE product set units={0} where barcode='{1}' and storeid={2}"\
         .format(u, barcode, storeid)
 
-@api.route('/v1.1/product_price_history/<bCode>', methods=['GET'])
-@auth.login_required
-def product_price_hisorty(bCode):
-    # TODO Implement
-    abort(501)
+# @api.route('/v1.1/product_price_history/<bCode>', methods=['GET'])
+# @auth.login_required
+# def product_price_hisorty(bCode):
+#     # TODO Implement
+#     abort(501)

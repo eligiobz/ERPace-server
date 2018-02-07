@@ -240,6 +240,7 @@ class SalesTestCase(unittest.TestCase):
 				})
 		response = self.make_sale_1_0(sale)
 		assert response.status_code == 406
+		assert b'insuficientes' in response.data
 
 
 	def test_006_make_sale_1_1_fail_not_enough_products(self):
@@ -253,6 +254,7 @@ class SalesTestCase(unittest.TestCase):
 				})
 		response = self.make_sale_1_1(sale)
 		assert response.status_code == 406
+		assert b'insuficientes' in response.data
 
 
 	def test_007_make_sale_1_0_fail_malformed_request(self):
@@ -295,7 +297,48 @@ class SalesTestCase(unittest.TestCase):
 					"storeid" : 10
 				})
 		response = self.make_sale_1_1(sale)
+		assert b'storeid' in response.data
 		assert response.status_code == 406
+
+	def test_011_make_sale_1_0_fail_no_data(self):
+		response = self.make_sale_1_0(None)
+		assert response.status_code == 400
+
+	def test_012_make_sale_1_1_fail_no_data(self):
+		response = self.make_sale_1_1(None)
+		assert response.status_code == 400
+
+	def test_013_make_sale_1_0_fail_no_json(self):
+		response = self.make_sale_1_0(json.dumps(None))
+		assert response.status_code == 400
+
+	def test_014_make_sale_1_1_fail_no_json(self):
+		response = self.make_sale_1_1(json.dumps(None))
+		assert response.status_code == 400
+
+	def test_015_make_sale_1_1_fail_inexistent_product(self):
+		sale = json.dumps({
+					"barcode": ['0010'],
+					"units" : [8],
+					"token" : "8",
+					"storeid": 2
+				})
+		response = self.make_sale_1_1(sale)
+		assert response.status_code == 406
+		assert b'no existe' in response.data
+
+	def test_016_make_sale_1_1_fail_existent_product_no_in_this_store(self):
+		response = self.find_product_1_1('1','0002')
+		assert response.status_code == 200
+		sale = json.dumps({
+					"barcode": ['0003'],
+					"units" : [8],
+					"token" : "8",
+					"storeid": 2
+				})
+		response = self.make_sale_1_1(sale)
+		assert response.status_code == 406
+		assert b'no existe' in response.data
 
 if __name__ == "__main__":
 	unittest.main()

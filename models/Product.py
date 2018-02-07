@@ -34,8 +34,12 @@ class Product(Base):
         self.units = units
         self.storeid = storeid
 
+    """ 
+    Commented out for the time being as serialization 
+    of this object doesn't currently takes place during operation
+    """
     """Prepares the Product to be returned in JSON format"""
-    @property
-    def serialize(self):
-        return {'barcode': self.barcode,
-                'units': self.units, 'storeid': self.storeid}
+    # @property
+    # def serialize(self):
+    #     return {'barcode': self.barcode,
+    #             'units': self.units, 'storeid': self.storeid}
