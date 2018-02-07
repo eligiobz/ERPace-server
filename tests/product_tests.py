@@ -507,10 +507,12 @@ class SalesTestCase(unittest.TestCase):
 
 	def test_030_add_product_1_0_fail_duplicated_operation(self):
 		response = self.add_product_1_0(self.json_prod_6)
+		print (response.data)
 		assert response.status_code == 428
 
 	def test_031_add_product_1_1_fail_duplicated_operation(self):
 		response = self.add_product_1_1(self.json_prod_7)
+		print (response.data)
 		assert response.status_code == 428
 
 	def test_032_update_product_1_0_fail_no_json_data(self):
