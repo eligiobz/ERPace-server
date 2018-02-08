@@ -23,8 +23,29 @@ from models.MasterList import MasterList
 from datetime import datetime
 
 
-class PriceHistory(Base):
-    __tablename__ = "pricehistory"
+class ProductPriceHistory(Base):
+    __tablename__ = "products_price_history"
+    barcode = Column(Integer, primary_key=True)
+    old_price = Column(Float(precision=2))
+    date_changed = Column(DateTime, primary_key=True)
+
+    def __init__(self, barcode):
+        self.barcode = barcode
+        self.old_price = (MasterList.query
+                                 .filter_by(barcode=barcode)
+                                 .first()).price
+        self.date_changed = datetime.now()
+
+    """ 
+    Commented out for the time being as serialization 
+    of this object doesn't currently takes place during operation
+    """
+    # @property
+    # def serialize(self):
+    #     pass
+
+class ServicePriceHistory(Base):
+    __tablename__ = "service_price_history"
     barcode = Column(Integer, primary_key=True)
     old_price = Column(Float(precision=2))
     date_changed = Column(DateTime, primary_key=True)

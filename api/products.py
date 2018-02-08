@@ -22,9 +22,10 @@ from flask import abort, jsonify, make_response, request
 
 from models import db_session, engine
 from models.Product import Product as Product
-from models.PriceHistory import PriceHistory as PriceHistory
+from models.PriceHistory import ProductPriceHistory as PriceHistory
 from models.views import DepletedItems
 from models.MasterList import MasterList as MasterList
+from models.ProductsMasterlist import ProductsMasterlist as ProductsMasterlist
 from models.views import ProductStore as ProductStore
 from models.DrugStores import Drugstore
 
@@ -74,7 +75,7 @@ def add_product_1_0():
         m = MasterList.query.filter_by(barcode=request.json['barcode']).first()
         if m is not None:
             abort(409, {"message": "Producto existente"})
-        m = MasterList(request.json['barcode'], request.json['name'],
+        m = ProductsMasterlist(request.json['barcode'], request.json['name'],
             request.json['price'])
         db_session.add(m)
         db_session.commit()
@@ -94,7 +95,7 @@ def update_product_1_0(bCode):
     if not request.json:
         abort(400)
     p = Product.query.filter_by(barcode=bCode).first()
-    mlist = MasterList.query.filter_by(barcode=bCode).first()
+    mlist = ProductsMasterlist.query.filter_by(barcode=bCode).first()
     if p is None:
         abort(400)
     if (logger.log_op(request.json)):
@@ -109,7 +110,7 @@ def update_product_1_0(bCode):
         if 'units' in request.json:
             p.units = p.units + int(request.json['units'])
         if 'name' in request.json:
-            mlist = MasterList.query.filter_by(barcode=bCode).first()
+            mlist = ProductsMasterlist.query.filter_by(barcode=bCode).first()
             mlist.name = request.json['name']
             db_session.add(mlist)
         db_session.add(p)
@@ -139,9 +140,9 @@ def add_product_1_1():
        or 'units' not in request.json or 'price' not in request.json\
        or 'name' not in request.json or 'storeid' not in request.json :
         abort(400)
-    if request.json['barcode'] is '' or request.json['name'] is ''\
-       or request.json['units'] is '' or request.json['price'] is ''\
-       or request.json['storeid'] is '':
+    if not request.json['barcode'] or not request.json['name']\
+       or not request.json['units'] or not request.json['price']\
+       or not request.json['storeid']:
         abort(400)
     drugstore = Drugstore.query.filter_by(id=request.json['storeid']).first()
     if drugstore is None:
@@ -150,7 +151,7 @@ def add_product_1_1():
         m = MasterList.query.filter_by(barcode=request.json['barcode']).first()
         if m is not None:
             abort(409, { "message" : "Producto existente" })
-        m = MasterList(request.json['barcode'], request.json['name'],
+        m = ProductsMasterlist(request.json['barcode'], request.json['name'],
             request.json['price'])
         db_session.add(m)
         db_session.commit()
@@ -169,7 +170,7 @@ def add_product_1_1():
 def update_product_1_1(bCode):
     if not request.json or 'storeid' not in request.json:
         abort(400)
-    m = MasterList.query.filter_by(barcode=bCode).first()
+    m = ProductsMasterlist.query.filter_by(barcode=bCode).first()
     if m is None:
         abort(400)
     if (logger.log_op(request.json)):
@@ -213,8 +214,8 @@ def updateHelper(barcode, units, storeid):
     return "UPDATE product set units={0} where barcode='{1}' and storeid={2}"\
         .format(u, barcode, storeid)
 
-# @api.route('/v1.1/product_price_history/<bCode>', methods=['GET'])
-# @auth.login_required
-# def product_price_hisorty(bCode):
-#     # TODO Implement
-#     abort(501)
+@api.route('/v1.1/product_price_history/<bCode>', methods=['GET'])
+@auth.login_required
+def product_price_hisorty(bCode):
+    # TODO Implement
+    abort(501)

@@ -26,7 +26,7 @@ from models.MasterList import MasterList
 from models.views import ProductStore
 from models.Sale import Sale
 from models.SaleDetails import SaleDetails
-from models.PriceHistory import PriceHistory
+# from models.PriceHistory import PriceHistory
 from models.DrugStores import Drugstore
 
 from . import api, auth, logger

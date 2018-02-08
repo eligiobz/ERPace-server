@@ -26,3 +26,4 @@ from .reports import *
 from .sales import *
 from .management import *
 from .drugstore import *
+from .services import *

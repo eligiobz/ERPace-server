@@ -21,24 +21,13 @@
 from sqlalchemy import Column, Float, Integer, String
 from models import Base
 
+"""
+TODO: Merge with views
+"""
+
 class MasterList(Base):
     __tablename__ = "masterlist"
 
     barcode = Column(String(60), primary_key=True)
     name = Column(String(700))
     price = Column(Float(precision=2))
-
-    """MasterList"""
-    def __init__(self, barcode, name, price):
-        self.barcode = barcode
-        self.name = name
-        self.price = price
-      
-    """ 
-    Commented out for the time being as serialization 
-    of this object doesn't currently takes place during operation
-    """
-    # """Prepares the MasterList to be returned in JSON format"""
-    # @property
-    # def serialize(self):
-    #     return {'barcode': self.barcode, 'name': self.name, 'price': self.price}

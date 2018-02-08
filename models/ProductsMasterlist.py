@@ -2,7 +2,7 @@
 
 ##############################################################################
 # MobilEPR - A small self-hosted ERP that works with your smartphone.
-# Copyright (C) 2017  Eligio Becerra
+# Copyright (C) 2018  Eligio Becerra
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -18,18 +18,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-from sqlalchemy import Column, Float, Integer, String, ForeignKey
+from sqlalchemy import Column, Float, Integer, String
 from models import Base
 
-class Product(Base):
-    __tablename__ = "product"
+class ProductsMasterlist(Base):
+    __tablename__ = "products_masterlist"
 
-    barcode = Column(String, ForeignKey('products_masterlist.barcode'), primary_key=True)
-    units = Column(Integer)
-    storeid = Column(Integer, ForeignKey('drugstore.id'))
+    barcode = Column(String(60), primary_key=True)
+    name = Column(String(700))
+    price = Column(Float(precision=2))
 
-    """Products"""
-    def __init__(self, barcode, units, storeid):
+    """MasterList"""
+    def __init__(self, barcode, name, price):
         self.barcode = barcode
-        self.units = units
-        self.storeid = storeid
+        self.name = name
+        self.price = price

@@ -96,7 +96,7 @@ class SalesTestCase(unittest.TestCase):
 
 	@classmethod
 	def tearDownClass(cls):
-		engine.execute('delete from pricehistory; delete from product; delete from masterlist ;')
+		engine.execute('delete from products_price_history; delete from product; delete from products_masterlist ;')
 		engine.execute('delete from saledetails; ')
 		engine.execute("delete from drugstore;")
 
