@@ -56,7 +56,7 @@ def make_sale_1_0():
                 db_session.add(sd)
                 db_session.commit()
         sd = SaleDetails.query.filter_by(idsale=s.id).all()
-        return make_response(jsonify( [sd_.serialize for sd_ in sd] ), 200)
+        return make_response(jsonify( { "mobilerp" :[sd_.serialize for sd_ in sd] } ), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 
@@ -92,7 +92,7 @@ def make_sale_1_1():
                 db_session.add(sd)
                 db_session.commit()
         sd = SaleDetails.query.filter_by(idsale = s.id).all()
-        return make_response(jsonify( [sd_.serialize for sd_ in sd] ), 200)
+        return make_response(jsonify( { "mobilerp" :[sd_.serialize for sd_ in sd]}), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 

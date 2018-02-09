@@ -33,13 +33,13 @@ def add_drugstore():
 	store = Drugstore(request.json['name'])
 	db_session.add(store)
 	db_session.commit()
-	return make_response(jsonify( store.serialize ) , 200)
+	return make_response(jsonify( {"mobilerp" : store.serialize} ) , 200)
 
 @api.route('/v1.1/list_drugstores/', methods=['GET'])
 @auth.login_required
 def list_drugstores():
 	storeslist = Drugstore.query.all()
-	return make_response(jsonify( [s.serialize for s in storeslist] ), 200)
+	return make_response(jsonify( { "mobilerp" : [s.serialize for s in storeslist]} ), 200)
 
 @api.route('/v1.1/edit_drugstore/', methods=['PUT'])
 @auth.login_required
@@ -51,4 +51,4 @@ def edit_drugstore():
 	store.name = request.json['name']
 	db_session.add(store)
 	db_session.commit()
-	return make_response(jsonify( store.serialize ), 200)
+	return make_response(jsonify( { "mobilerp" : store.serialize }), 200)

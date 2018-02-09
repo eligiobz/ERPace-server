@@ -52,24 +52,24 @@ class DrugstoreTestCase(unittest.TestCase):
 		response = self.add_drugstore(self.drugstore_1)
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert jsoncompare.are_same(json_data, self.drugstore_1, False, ['id'])
+		assert jsoncompare.are_same(json_data["mobilerp"], self.drugstore_1, False, ['id'])
 		response = self.add_drugstore(self.drugstore_2)
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert jsoncompare.are_same(json_data, self.drugstore_2, False, ['id'])
+		assert jsoncompare.are_same(json_data["mobilerp"], self.drugstore_2, False, ['id'])
 
 	def test_002_list_drugstores(self):
 		response = self.open_with_auth('/api/v1.1/list_drugstores/', 'GET')
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert len(json_data) == 2
+		assert len(json_data["mobilerp"]) == 2
 
 	def test_003_edit_drugstore(self):
 		response = self.open_with_auth('/api/v1.1/list_drugstores/', 'GET')
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
 		i = 2
-		for item in json_data:
+		for item in json_data["mobilerp"]:
 			new_json = json.dumps({
 				'name' : 'Store X' + str(i),
 				'id': item['id']

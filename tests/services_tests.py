@@ -92,24 +92,24 @@ class ServiceTestCase(unittest.TestCase):
 	def update_service_1_1(self, barcode, data):
 		return self.open_with_auth('/api/v1.1/update_service/'+barcode, 'PUT', data)
 
-	def test_001_add_product_1_1(self):
+	def test_001_add_service_1_1(self):
 		response = self.add_service_1_1(self.json_serv_6)
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert jsoncompare.are_same(json_data, self.json_serv_6, True)
+		assert jsoncompare.are_same(json_data["mobilerp"], self.json_serv_6, True)
 
-	def test_002_find_product_1_1(self):
+	def test_002_find_service_1_1(self):
 		response = self.find_service_1_1('1000')
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert jsoncompare.are_same(json_data, self.json_serv_6, True)
+		assert jsoncompare.are_same(json_data["mobilerp"], self.json_serv_6, True)
 	
-	def test_003_list_products_1_1(self):
+	def test_003_list_services_1_1(self):
 		response = self.list_service_1_1()
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert len(json_data) == 6
-		for item in json_data:
+		assert len(json_data["mobilerp"]) == 6
+		for item in json_data["mobilerp"]:
 			if item['barcode'] == '0001':
 				assert jsoncompare.are_same(item, self.json_serv_1, True)
 			elif item['barcode'] == '0002':
@@ -133,9 +133,9 @@ class ServiceTestCase(unittest.TestCase):
 		response = self.update_service_1_1(service['bCode'], json.dumps(service))
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert jsoncompare.are_same(json_data, json.dumps(service))
+		assert jsoncompare.are_same(json_data["mobilerp"], json.dumps(service))
 
-	def test_005_update_item_1_0_change_price(self):
+	def test_005_update_service_1_1_change_price(self):
 		service = dict(
 			bCode = '0001',
 			price = 10.5
@@ -145,7 +145,7 @@ class ServiceTestCase(unittest.TestCase):
 		response = self.update_service_1_1(service['bCode'], json.dumps(service))
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert jsoncompare.are_same(json_data, json.dumps(service))
+		assert jsoncompare.are_same(json_data["mobilerp"], json.dumps(service))
 		
 	def test_006_update_service_1_1_change_all(self):
 		service = dict(
@@ -158,7 +158,7 @@ class ServiceTestCase(unittest.TestCase):
 		response = self.update_service_1_1(service['bCode'], json.dumps(service))
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert jsoncompare.are_same(json_data, json.dumps(service))
+		assert jsoncompare.are_same(json_data["mobilerp"], json.dumps(service))
 
 	def test_007_find_service_fail_1_1(self):
 		response = self.find_service_1_1('5001')

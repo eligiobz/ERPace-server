@@ -38,7 +38,7 @@ def find_service(bCode, storeid=None):
     if service is None:
         abort(404)
     else:
-        return make_response(jsonify( service.serialize ), 200)
+        return make_response(jsonify( { "mobilerp" :service.serialize} ), 200)
 
 @api.route('/v1.1/list_services/', methods=['GET'])
 @auth.login_required
@@ -46,7 +46,7 @@ def list_services():
     services = Service.query.order_by(Service.name.asc()).all()
     if services is None or len(services) == 0:
         abort(412, "Por alguna razon la lista esta vacia")
-    return make_response(jsonify( [p.serialize for p in services] ), 200)
+    return make_response(jsonify( { "mobilerp" :[p.serialize for p in services] }), 200)
 
 
 @api.route('/v1.1/add_service/', methods=['POST'])
@@ -66,7 +66,7 @@ def add_service():
             request.json['price'])
         db_session.add(m)
         db_session.commit()
-        return make_response(jsonify( m.serialize ), 200)
+        return make_response(jsonify( { "mobilerp" :m.serialize} ), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 
@@ -90,7 +90,7 @@ def update_service_1_1(bCode):
             m.name = request.json['name']
         db_session.add(m)
         db_session.commit()
-        return make_response(jsonify( m.serialize ), 200)
+        return make_response(jsonify( { "mobilerp" :m.serialize} ), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 

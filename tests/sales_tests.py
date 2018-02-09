@@ -128,11 +128,11 @@ class SalesTestCase(unittest.TestCase):
 		response = self.find_product_1_1('1', item_1['barcode'])
 		assert response.status_code == 200
 		data = json.loads(response.data)
-		item_1['price'] = float(data['price'])
+		item_1['price'] = float(data["mobilerp"]['price'])
 		response = self.find_product_1_1('1', item_2['barcode'])
 		assert response.status_code == 200
 		data = json.loads(response.data)
-		item_2['price'] = data['price']
+		item_2['price'] = data["mobilerp"]['price']
 		sale = json.dumps({
 					"barcode": [item_1['barcode'], item_2['barcode']],
 					"units" : [item_1['units'], item_2['units']],
@@ -141,7 +141,7 @@ class SalesTestCase(unittest.TestCase):
 		response = self.make_sale_1_0(sale)
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		for item in json_data:
+		for item in json_data["mobilerp"]:
 			if item['barcode'] == item_1['barcode']:
 				assert int(item['units']) == 2
 				assert (float(item['price']) * int (item['units'])) == item_1['price'] * item_1['units']
@@ -151,13 +151,13 @@ class SalesTestCase(unittest.TestCase):
 		response = self.find_product_1_1('1','0001')
 		assert response.status_code==200
 		data = json.loads(response.data)
-		assert int(data['storeid']) == 1
-		assert int(data['units']) == 2 # 4 - 2
+		assert int(data["mobilerp"]['storeid']) == 1
+		assert int(data["mobilerp"]['units']) == 2 # 4 - 2
 		response = self.find_product_1_1('1','0002')
 		assert response.status_code==200
 		data = json.loads(response.data)
-		assert int(data['storeid']) == 1
-		assert int(data['units']) == 0 # 8 - 4
+		assert int(data["mobilerp"]['storeid']) == 1
+		assert int(data["mobilerp"]['units']) == 0 # 8 - 4
 
 	def test_002_make_sale_1_1_normal(self):
 		item_1 = dict(
@@ -175,13 +175,13 @@ class SalesTestCase(unittest.TestCase):
 		response = self.find_product_1_1(str(item_1['storeid']), item_1['barcode'])
 		assert response.status_code == 200
 		data = json.loads(response.data)
-		item_1['price'] = float(data['price'])
+		item_1['price'] = float(data["mobilerp"]['price'])
 		response = self.find_product_1_1(str(item_2['storeid']), item_2['barcode'])
-		assert int(data['storeid']) == 2
+		assert int(data["mobilerp"]['storeid']) == 2
 		assert response.status_code == 200
 		data = json.loads(response.data)
-		item_2['price'] = data['price']
-		assert int(data['storeid']) == 2
+		item_2['price'] = data["mobilerp"]['price']
+		assert int(data["mobilerp"]['storeid']) == 2
 		sale = json.dumps({
 					"barcode": [item_1['barcode'], item_2['barcode']],
 					"units" : [item_1['units'], item_2['units']],
@@ -191,7 +191,7 @@ class SalesTestCase(unittest.TestCase):
 		response = self.make_sale_1_1(sale)
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		for item in json_data:
+		for item in json_data["mobilerp"]:
 			if item['barcode'] == item_1['barcode']:
 				assert int(item['units']) == 2 # 2
 				assert (float(item['price']) * int (item['units'])) == item_1['price'] * item_1['units']
@@ -201,11 +201,11 @@ class SalesTestCase(unittest.TestCase):
 		response = self.find_product_1_1('2', item_1['barcode'])
 		assert response.status_code==200
 		data = json.loads(response.data)
-		assert int(data['units']) == 3 # 5 - 2
+		assert int(data["mobilerp"]['units']) == 3 # 5 - 2
 		response = self.find_product_1_1('2', item_2['barcode'])
 		assert response.status_code==200
 		data = json.loads(response.data)
-		assert int(data['units']) == 0 # 3 - 1
+		assert int(data["mobilerp"]['units']) == 0 # 3 - 1
 
 	def test_003_make_sale_1_0_fail_duplicated_sale(self):
 		response = self.find_product_1_1('1', '0002')

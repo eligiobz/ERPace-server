@@ -149,36 +149,36 @@ class SalesTestCase(unittest.TestCase):
 		response = self.add_product_1_0(self.json_prod_6)
 		json_data = json.loads(response.data)
 		assert response.status_code == 200
-		assert jsoncompare.are_same(json_data, self.json_prod_6, False, ['storeid'])
+		assert jsoncompare.are_same(json_data["mobilerp"], self.json_prod_6, False, ['storeid'])
 
 	def test_002_add_product_1_1(self):
 		response = self.add_product_1_1(self.json_prod_7)
 		json_data = json.loads(response.data)
 		assert response.status_code == 200
-		assert jsoncompare.are_same(json_data, self.json_prod_7, True)
+		assert jsoncompare.are_same(json_data["mobilerp"], self.json_prod_7, True)
 
 	def test_003_find_product_1_0(self):
 		response = self.find_product_1_0('1000')
 		json_data = json.loads(response.data)
-		assert jsoncompare.are_same(json_data, self.json_prod_6, False, ['storeid'])
+		assert jsoncompare.are_same(json_data["mobilerp"], self.json_prod_6, False, ['storeid'])
 		assert response.status_code == 200
 
 	def test_004_find_product_1_1(self):
 		response = self.find_product_1_1('2','1001')
 		json_data = json.loads(response.data)
-		assert jsoncompare.are_same(json_data, self.json_prod_7, True)
+		assert jsoncompare.are_same(json_data["mobilerp"], self.json_prod_7, True)
 		assert response.status_code == 200
 
 	def test_005_list_products_1_0(self):
 		response = self.list_products_1_0()
 		json_data = json.loads(response.data)
-		assert len(json_data) == 4
+		assert len(json_data["mobilerp"]) == 4
 		assert response.status_code == 200
 		assert b'0001' in response.data
 		assert b'0002' in response.data
 		assert b'0003' in response.data
 		assert b'1000' in response.data
-		for item in json_data:
+		for item in json_data["mobilerp"]:
 			if item['barcode'] == '0001':
 				assert jsoncompare.are_same(item, self.json_prod_1, False, ['storeid'])
 			if item['barcode'] == '0002':
@@ -191,13 +191,13 @@ class SalesTestCase(unittest.TestCase):
 	def test_006_list_products_1_1(self):
 		response = self.list_products_1_1(1)
 		json_data = json.loads(response.data)
-		assert len(json_data) == 4
+		assert len(json_data["mobilerp"]) == 4
 		assert response.status_code == 200
 		assert b'0001' in response.data
 		assert b'0002' in response.data
 		assert b'0003' in response.data
 		assert b'1000' in response.data
-		for item in json_data:
+		for item in json_data["mobilerp"]:
 			if item['barcode'] == '0001':
 				assert jsoncompare.are_same(item, self.json_prod_1, True)
 			if item['barcode'] == '0002':
@@ -208,12 +208,12 @@ class SalesTestCase(unittest.TestCase):
 				assert jsoncompare.are_same(item, self.json_prod_6, True)
 		response = self.list_products_1_1(2)
 		json_data = json.loads(response.data)
-		assert len(json_data) == 3
+		assert len(json_data["mobilerp"]) == 3
 		assert response.status_code == 200
 		assert b'0004' in response.data
 		assert b'0005' in response.data
 		assert b'1001' in response.data
-		for item in json_data:
+		for item in json_data["mobilerp"]:
 			if item['barcode'] == '0004':
 				assert jsoncompare.are_same(item, self.json_prod_4, True)
 			if item['barcode'] == '0005':
@@ -222,159 +222,131 @@ class SalesTestCase(unittest.TestCase):
 				assert jsoncompare.are_same(item, self.json_prod_7, True)
 
 	def test_007_update_product_1_0_add_items(self):
-		bCode = '0001'
-		units = 4
-		response = self.find_product_1_0(bCode)
+		product = dict(
+			bCode = '0001',
+			units = 4)
+		response = self.find_product_1_0(product['bCode'])
 		assert response.status_code == 200
-		updated_product = json.dumps({
-			'barcode' : bCode,
-			'units' : units
-			})
-		response = self.update_product_1_0(bCode, updated_product)
+		response = self.update_product_1_0(product['bCode'], json.dumps(product))
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert json_data['barcode'] == bCode
-		assert float(json_data['price']) ==  50.5
-		assert int(json_data['units']) == 8 # 4 + 4 = 8
-		assert json_data['name'] == 'crema_1'
+		assert json_data["mobilerp"]['barcode'] == product['bCode']
+		assert float(json_data["mobilerp"]['price']) ==  50.5
+		assert int(json_data["mobilerp"]['units']) == 8 # 4 + 4 = 8
+		assert json_data["mobilerp"]['name'] == 'crema_1'
 
 	def test_008_update_item_1_1_add_items(self):
-		bCode = '0002'
-		units = 2
-		response = self.find_product_1_1('1',bCode)
+		product = dict(
+			bCode = '0002',
+			units = 2)
+		response = self.find_product_1_1('1',product['bCode'])
 		assert response.status_code == 200
-		updated_product = json.dumps({
-			'barcode' : bCode,
-			'units' : units,
-			})
-		response = self.update_product_1_0(bCode, updated_product)
+		response = self.update_product_1_0(product['bCode'], json.dumps(product))
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert json_data['barcode'] == bCode
-		assert float(json_data['price']) ==  1.0
-		assert int(json_data['units']) == 10 # 8 + 2 = 10
-		assert json_data['name'] == 'crema_2'
-		assert int(json_data['storeid']) == 1
+		assert json_data["mobilerp"]['barcode'] == product['bCode']
+		assert float(json_data["mobilerp"]['price']) ==  1.0
+		assert int(json_data["mobilerp"]['units']) == 10 # 8 + 2 = 10
+		assert json_data["mobilerp"]['name'] == 'crema_2'
+		assert int(json_data["mobilerp"]['storeid']) == 1
 
 	def test_009_update_item_1_0_change_name(self):
-		bCode = '0003'
-		name = 'doritos'
-		response = self.find_product_1_0(bCode)
+		product = dict(
+			bCode = '0003',
+			name = 'doritos'
+			)
+		response = self.find_product_1_0(product['bCode'])
 		assert response.status_code == 200
-		updated_product = json.dumps({
-			'barcode' : bCode,
-			'name' : name,
-			})
-		response = self.update_product_1_0(bCode, updated_product)
+		response = self.update_product_1_0(product['bCode'], json.dumps(product))
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert json_data['barcode'] == bCode
-		assert float(json_data['price']) ==  150
-		assert int(json_data['units']) == 6 
-		assert json_data['name'] == name
+		assert json_data["mobilerp"]['barcode'] == product['bCode']
+		assert float(json_data["mobilerp"]['price']) ==  150
+		assert int(json_data["mobilerp"]['units']) == 6 
+		assert json_data["mobilerp"]['name'] == product['name']
 
 	def test_010_update_item_1_1_change_name(self):
-		bCode = '0004'
-		name = 'tostitos'
-		response = self.find_product_1_1('2',bCode)
+		product = dict(
+			bCode = '0004',
+			name = 'tostitos',
+			storeid = 2)
+		response = self.find_product_1_1('2',product['bCode'])
 		assert response.status_code == 200
-		updated_product = json.dumps({
-			'barcode' : bCode,
-			'name' : name,
-			'storeid' : 2
-			})
-		response = self.update_product_1_1(bCode, updated_product)
+		response = self.update_product_1_1(product['bCode'], json.dumps(product))
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert json_data['barcode'] == bCode
-		assert float(json_data['price']) ==  3.4
-		assert int(json_data['units']) == 3
-		assert json_data['name'] == name
-		assert int(json_data['storeid']) ==  2
+		assert json_data["mobilerp"]['barcode'] == product['bCode']
+		assert float(json_data["mobilerp"]['price']) ==  3.4
+		assert int(json_data["mobilerp"]['units']) == 3
+		assert json_data["mobilerp"]['name'] == product['name']
+		assert int(json_data["mobilerp"]['storeid']) ==  product['storeid']
 
 	def test_011_update_item_1_0_change_price(self):
-		bCode = '0001'
-		price = 10.5
-		response = self.find_product_1_0(bCode)
+		product = dict(
+			bCode = '0001',
+			price = 10.5)
+		response = self.find_product_1_0(product['bCode'])
 		assert response.status_code == 200
-		updated_product = json.dumps({
-			'barcode' : bCode,
-			'price' : price
-			})
-		response = self.update_product_1_0(bCode, updated_product)
+		response = self.update_product_1_0(product['bCode'], json.dumps(product))
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert json_data['barcode'] == bCode
-		assert float(json_data['price']) ==  price
-		assert int(json_data['units']) == 8 # From last operation in database
-		assert json_data['name'] == 'crema_1'
+		assert json_data["mobilerp"]['barcode'] == product['bCode']
+		assert float(json_data["mobilerp"]['price']) ==  product['price']
+		assert int(json_data["mobilerp"]['units']) == 8 # From last operation in database
+		assert json_data["mobilerp"]['name'] == 'crema_1'
 
 	def test_012_update_item_1_1_change_price(self):
-		bCode = '0005'
-		price = 32.5
-		response = self.find_product_1_1('2',bCode)
+		product = dict(
+			bCode = '0005',
+			price = 32.5,
+			storeid = 2)
+		response = self.find_product_1_1('2',product['bCode'])
 		assert response.status_code == 200
-		updated_product = json.dumps({
-			'barcode' : bCode,
-			'price' : price,
-			'storeid': 2
-			})
-		response = self.update_product_1_1(bCode, updated_product)
+		response = self.update_product_1_1(product['bCode'], json.dumps(product))
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert json_data['barcode'] == bCode
-		assert float(json_data['price']) ==  price
-		assert int(json_data['units']) == 1 # From last operation in database
-		assert json_data['name'] == 'crema_5'
-		assert json_data['storeid'] == 2
+		assert json_data["mobilerp"]['barcode'] == product['bCode']
+		assert float(json_data["mobilerp"]['price']) ==  product['price']
+		assert int(json_data["mobilerp"]['units']) == 1 # From last operation in database
+		assert json_data["mobilerp"]['name'] == 'crema_5'
+		assert json_data["mobilerp"]['storeid'] == product['storeid']
 
 	def test_013_update_item_1_0_change_all(self):
-		bCode = '1000'
-		price = 597.15
-		name = 'orcos'
-		units = 4
-		response = self.find_product_1_0(bCode)
+		product = dict(
+			bCode = '1000',
+			price = 597.15,
+			name = 'orcos',
+			units = 4)
+		response = self.find_product_1_0(product['bCode'])
 		assert response.status_code == 200
-		updated_product = json.dumps({
-			'barcode' : bCode,
-			'price' : price,
-			'name' : name,
-			'units' : units
-			})
-		response = self.update_product_1_0(bCode, updated_product)
+		response = self.update_product_1_0(product['bCode'], json.dumps(product))
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert json_data['barcode'] == bCode
-		assert float(json_data['price']) ==  price
-		assert int(json_data['units']) == 12 # 8 + 4
-		assert json_data['name'] == name
+		assert json_data["mobilerp"]['barcode'] == product['bCode']
+		assert float(json_data["mobilerp"]['price']) ==  product['price']
+		assert int(json_data["mobilerp"]['units']) == 12 # 8 + 4
+		assert json_data["mobilerp"]['name'] == product['name']
 
 	def test_014_update_item_1_1_change_all(self):
-		bCode = '1001'
-		price = 701
-		name = 'mani'
-		units = 9
-		response = self.find_product_1_1('2', bCode)
+		product = dict(
+			bCode = '1001',
+			price = 701,
+			name = 'mani',
+			units = 9,
+			storeid=2)
+		response = self.find_product_1_1('2', product['bCode'])
 		assert response.status_code == 200
-		updated_product = json.dumps({
-			'barcode' : bCode,
-			'price' : price,
-			'name' : name,
-			'units' : units,
-			'storeid': 2
-			})
-		response = self.update_product_1_1(bCode, updated_product)
+		response = self.update_product_1_1(product['bCode'], json.dumps(product))
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert json_data['barcode'] == bCode
-		assert float(json_data['price']) ==  price
-		assert int(json_data['units']) == 13 # From last operation in database
-		assert json_data['name'] == name
-		assert json_data['storeid'] == 2
+		assert json_data["mobilerp"]['barcode'] == product['bCode']
+		assert float(json_data["mobilerp"]['price']) ==  product['price']
+		assert int(json_data["mobilerp"]['units']) == 13 # From last operation in database
+		assert json_data["mobilerp"]['name'] == product['name']
+		assert json_data["mobilerp"]['storeid'] == product['storeid']
 
-	def test_015_list_depleted_products_1_0_fail_no_products(self):
+	def test_015_list_depleted_products_1_0_fail_no_products_in_db(self):
 		response = self.list_depleted_products_1_0()
-		print (response.data)
 		assert response.status_code == 400
 	
 	def test_015_list_depleted_products_1_0_sucess(self):
@@ -389,7 +361,7 @@ class SalesTestCase(unittest.TestCase):
 		response = self.list_depleted_products_1_0()
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert len(json_data) == 2
+		assert len(json_data["mobilerp"]) == 2
 		assert b'0001' in response.data
 		assert b'0002' in response.data
 
@@ -409,7 +381,7 @@ class SalesTestCase(unittest.TestCase):
 		response = self.list_depleted_products_1_1(json_sale['storeid'])
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert len(json_data) == 2
+		assert len(json_data["mobilerp"]) == 2
 		assert b'0004' in response.data
 		assert b'0005' in response.data
 
@@ -538,32 +510,22 @@ class SalesTestCase(unittest.TestCase):
 		assert response.status_code == 400
 
 	def test_036_update_product_1_0_fail_duplicated_operation(self):
-		bCode = '1000'
-		price = 597.15
-		name = 'orcos'
-		units = 4
-		updated_product = json.dumps({
-			'barcode' : bCode,
-			'price' : price,
-			'name' : name,
-			'units' : units
-			})
-		response = self.update_product_1_0(bCode, updated_product)
+		product = dict(
+			bCode = '1000',
+			price = 597.15,
+			name = 'orcos',
+			units = 4)
+		response = self.update_product_1_0(product['bCode'], json.dumps(product))
 		assert response.status_code == 428
 
 	def test_037_update_product_1_0_fail_duplicated_operation(self):
-		bCode = '1001'
-		price = 701
-		name = 'mani'
-		units = 9
-		updated_product = json.dumps({
-			'barcode' : bCode,
-			'price' : price,
-			'name' : name,
-			'units' : units,
-			'storeid': 2
-			})
-		response = self.update_product_1_1(bCode, updated_product)
+		product = dict(
+			bCode = '1001',
+			price = 701,
+			name = 'mani',
+			units = 9,
+			storeid=2)
+		response = self.update_product_1_1(product['bCode'], json.dumps(product))
 		assert response.status_code == 428
 		
 	def test_038_add_product_1_1_fail_invalid_drugstore(self):

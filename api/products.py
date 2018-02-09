@@ -47,7 +47,7 @@ def find_product(bCode, storeid=None):
     if product is None:
         abort(404)
     else:
-        return make_response(jsonify( product.serialize ), 200)
+        return make_response(jsonify( { "mobilerp" : product.serialize} ), 200)
 
 @api.route('/v1.0/list_products/', methods=['GET'])
 @api.route('/v1.1/list_products/<int:storeid>', methods=['GET'])
@@ -59,7 +59,7 @@ def list_products(storeid=None):
         products = ProductStore.query.filter_by(storeid=storeid).order_by(ProductStore.name.asc()).all()
     if products is None or len(products) == 0:
         abort(412, "Por alguna razon la lista esta vacia")
-    return make_response(jsonify( [p.serialize for p in products] ), 200)
+    return make_response(jsonify( { "mobilerp" :[p.serialize for p in products] }), 200)
 
 @api.route('/v1.0/add_product/', methods=['POST'])
 @auth.login_required
@@ -84,7 +84,7 @@ def add_product_1_0():
         db_session.add(p)
         db_session.commit()
         prod = ProductStore.query.filter_by(barcode=request.json['barcode']).filter_by(storeid=1).first()
-        return make_response(jsonify( prod.serialize ), 200)
+        return make_response(jsonify( { "mobilerp" :prod.serialize} ), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 
@@ -116,7 +116,7 @@ def update_product_1_0(bCode):
         db_session.add(p)
         db_session.commit()
         ps = ProductStore.query.filter_by(storeid=1).filter_by(barcode=bCode).first()
-        return make_response(jsonify( ps.serialize ), 200)
+        return make_response(jsonify( { "mobilerp" :ps.serialize} ), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 
@@ -128,7 +128,7 @@ def list_depleted_products_1_0():
         abort(400)
     data = {'mobilerp': [p.serialize for p in products]}
     generateDepletedReport(data)
-    return make_response(jsonify([p.serialize for p in products]), 200)
+    return make_response(jsonify({ "mobilerp" :[p.serialize for p in products]}), 200)
 
 ################################## V1.1 #######################################
 
@@ -160,7 +160,7 @@ def add_product_1_1():
         db_session.add(p)
         db_session.commit()
         prod = ProductStore.query.filter_by(barcode=request.json['barcode']).filter_by(storeid=request.json['storeid']).first()
-        return make_response(jsonify( prod.serialize ), 200)
+        return make_response(jsonify( { "mobilerp" :prod.serialize} ), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 
@@ -190,7 +190,7 @@ def update_product_1_1(bCode):
         else:
             engine.execute(updateHelper(bCode, 0, int(request.json['storeid'])))
         ps = ProductStore.query.filter_by(barcode=bCode).filter_by(storeid=request.json['storeid']).first()
-        return make_response(jsonify( ps.serialize ), 200)
+        return make_response(jsonify( { "mobilerp" :ps.serialize} ), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 
@@ -202,7 +202,7 @@ def list_depleted_products_1_1(storeid):
         abort(400)
     data = {'mobilerp': [p.serialize for p in products]}
     generateDepletedReport(data)
-    return make_response(jsonify([p.serialize for p in products]), 200)
+    return make_response(jsonify({ "mobilerp" :[p.serialize for p in products]}), 200)
 
 def updateHelper(barcode, units, storeid):
     p = Product.query.filter_by(storeid=storeid, barcode=barcode).first()
