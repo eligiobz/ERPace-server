@@ -1,3 +1,4 @@
+ALTER TABLE pricehistory ALTER COLUMN barcode TYPE CHARACTER VARYING(60);
 ALTER TABLE masterlist RENAME TO products_masterlist;
 ALTER TABLE  pricehistory RENAME TO products_price_history;
 
@@ -10,7 +11,7 @@ CREATE TABLE services (
 create table service_price_history(
     date_changed timestamp without time zone NOT NULL,
     old_price double precision,
-    barcode integer NOT NULL
+    barcode varchar NOT NULL
 );
 
 CREATE VIEW masterlist AS 

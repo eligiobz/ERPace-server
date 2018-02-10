@@ -52,6 +52,8 @@ def list_services():
 @api.route('/v1.1/add_service/', methods=['POST'])
 @auth.login_required
 def add_service():
+    print (request)
+    print (request.json)
     if not request.json or 'barcode' not in request.json\
        or 'price' not in request.json or 'name' not in request.json :
         abort(400)

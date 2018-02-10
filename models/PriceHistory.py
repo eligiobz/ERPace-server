@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
-from sqlalchemy import Column, Integer, DateTime, Float
+from sqlalchemy import Column, Integer, DateTime, Float, String
 from models import Base
 from models.MasterList import MasterList
 from datetime import datetime
@@ -25,7 +25,7 @@ from datetime import datetime
 
 class ProductPriceHistory(Base):
     __tablename__ = "products_price_history"
-    barcode = Column(Integer, primary_key=True)
+    barcode = Column(String, primary_key=True)
     old_price = Column(Float(precision=2))
     date_changed = Column(DateTime, primary_key=True)
 
@@ -46,7 +46,7 @@ class ProductPriceHistory(Base):
 
 class ServicePriceHistory(Base):
     __tablename__ = "service_price_history"
-    barcode = Column(Integer, primary_key=True)
+    barcode = Column(String, primary_key=True)
     old_price = Column(Float(precision=2))
     date_changed = Column(DateTime, primary_key=True)
 
