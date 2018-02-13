@@ -59,9 +59,9 @@ class SalesReport(Base):
 
     @property
     def serialize(self):
-        return {'idSale': self.idsale, 'date': self.date,
-                'name': self.name, 'productprice': self.productprice,
-                'units': self.units, 'total_earning': self.total_earning}
+        return {'idsale': self.idsale, 'date': self.date,
+                'name': self.name, 'price': self.productprice,
+                'units': self.units, 'totalEarning': self.total_earning}
 
 class DepletedItems(Base):
 

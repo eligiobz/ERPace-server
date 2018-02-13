@@ -27,6 +27,7 @@ from datetime import datetime as ddate
 
 
 @api.route('/v1.0/dailyReport/', methods=['GET'])
+@api.route('/v1.1/dailyReport/', methods=['GET'])
 @auth.login_required
 def sendDailyReport():
     cdate = ddate.today()
@@ -36,6 +37,7 @@ def sendDailyReport():
 
 
 @api.route('/v1.0/monthlyReport/', methods=['GET'])
+@api.route('/v1.1/monthlyReport/', methods=['GET'])
 @auth.login_required
 def sendMonthlyReport():
     cdate = ddate.today()
@@ -44,6 +46,7 @@ def sendMonthlyReport():
     return make_response(jsonify({'mobilerp': data}), 200)
 
 @api.route('/v1.0/getReport/<fn>', methods=['GET'])
+@api.route('/v1.1/getReport/<fn>', methods=['GET'])
 @auth.login_required
 def getReport(fn):
 	return current_app.send_static_file("pdf/"+fn)

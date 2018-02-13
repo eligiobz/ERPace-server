@@ -44,6 +44,6 @@ class SaleDetails(Base):
 
     @property
     def serialize(self):
-        return { 'idSale': self.idsale, 'barcode': self.idproduct,
+        return { 'idsale': self.idsale, 'barcode': self.idproduct,
                 'price': self.productprice, 'storeid': self.storeid, 
                 'units': self.units }

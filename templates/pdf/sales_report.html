@@ -29,8 +29,8 @@
 			{% set lastId = -1 %}
 			{% set trclass = "darker" %}
 			{% for sale in sales %}
-				{% if lastId != sale.idSale %}
-					{% set lastId = sale.idSale %}
+				{% if lastId != sale.idsale %}
+					{% set lastId = sale.idsale %}
 					{% if trclass == "lighter" %}
 						{% set trclass = "darker" %}
 					{% else %}
@@ -38,11 +38,11 @@
 					{% endif %}
 				{% endif %}
 				<tr>
-					<td class="{{ trclass }}"> {{ sale.idSale }}</td>
+					<td class="{{ trclass }}"> {{ sale.idsale }}</td>
 					<td class="{{ trclass }}"> {{ sale.name }}</td>
 					<td class="{{ trclass }}"> {{ sale.units }}</td>
-					<td class="{{ trclass }}"> {{ sale.productprice }}</td>
-					<td class="{{ trclass }}"> {{ sale.total_earning }}</td>
+					<td class="{{ trclass }}"> {{ sale.price }}</td>
+					<td class="{{ trclass }}"> {{ sale.totalEarning }}</td>
 				</tr>
 			{% endfor %}
 		{% endwith %}
