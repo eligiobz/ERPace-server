@@ -44,16 +44,14 @@ def find_service(bCode, storeid=None):
 @auth.login_required
 def list_services():
     services = Service.query.order_by(Service.name.asc()).all()
-    if services is None or len(services) == 0:
-        abort(412, "Por alguna razon la lista esta vacia")
+    if services is None or len(services) == 0: 
+       abort(412, "Por alguna razon la lista esta vacia")
     return make_response(jsonify( { "mobilerp" :[p.serialize for p in services] }), 200)
 
 
 @api.route('/v1.1/add_service/', methods=['POST'])
 @auth.login_required
 def add_service():
-    print (request)
-    print (request.json)
     if not request.json or 'barcode' not in request.json\
        or 'price' not in request.json or 'name' not in request.json :
         abort(400)

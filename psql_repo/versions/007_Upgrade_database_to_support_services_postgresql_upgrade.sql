@@ -1,3 +1,4 @@
+DROP VIEW salesview;
 ALTER TABLE pricehistory ALTER COLUMN barcode TYPE CHARACTER VARYING(60);
 ALTER TABLE masterlist RENAME TO products_masterlist;
 ALTER TABLE  pricehistory RENAME TO products_price_history;
@@ -19,3 +20,15 @@ SELECT barcode, price, name FROM products_masterlist
 UNION
 SELECT barcode, price, name FROM services
 ;
+
+
+CREATE OR REPLACE VIEW salesview AS 
+SELECT sale.date,
+   masterlist.name,
+   saledetails.idsale,
+   saledetails.productprice,
+   saledetails.units,
+   saledetails.productprice * saledetails.units::double precision AS total_earning
+  FROM saledetails
+    JOIN sale ON sale.id = saledetails.idsale
+    JOIN masterlist ON masterlist.barcode::text = saledetails.idproduct::text;

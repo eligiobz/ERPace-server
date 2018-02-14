@@ -26,10 +26,26 @@ from models.MasterList import MasterList
 from models.views import ProductStore
 from models.Sale import Sale
 from models.SaleDetails import SaleDetails
-# from models.PriceHistory import PriceHistory
 from models.DrugStores import Drugstore
+# from models.PriceHistory import PriceHistory
+from models.Service import Service
 
 from . import api, auth, logger
+
+@api.route('/v1.1/find_article/<barcode>', methods=['GET'])
+@api.route('/v1.1/find_article/<barcode>/<storeid>', methods=['GET'])
+@auth.login_required
+def find_article(barcode, storeid=None):
+    if not barcode:
+        abort(404)
+    if storeid == None:
+        article  = Service.query.filter_by(barcode=barcode)\
+            .first()
+    else:
+        article = ProductStore.query.filter_by(barcode=barcode)\
+            .filter_by(storeid=storeid).first()
+    return make_response (jsonify({"mobilerp" : article.serialize}), 200)
+    # article = MasterList.query
 
 @api.route('/v1.0/make_sale/', methods=['POST'])
 @auth.login_required
@@ -37,24 +53,35 @@ def make_sale_1_0():
     if not request.json:
         abort(400)
     if 'barcode' not in request.json or len(request.json['barcode']) <= 0 or\
-        'units' not in request.json or len(request.json['units']) <= 0:
+        'units' not in request.json or len(request.json['units']) <= 0 or\
+        'is_service' not in request.json or len(request.json['is_service']) <= 0:
         abort(400)
     if (logger.log_op(request.json)):
         s = Sale()
         db_session.add(s)
         db_session.commit()
         for i in range(0, len(request.json['barcode'])):
-            bCode = request.json['barcode'][i]
-            units = request.json['units'][i]
-            ps = ProductStore.query.filter_by(barcode=bCode).filter_by(storeid=1).first()
-            if (ps.units - units < 0):
-                abort(406, {"message": 'articulos insuficientes'})
-            else:
-                q = updateHelper(bCode, units, 1)
-                engine.execute(q)
+            if int(request.json['is_service'][i]) == 0:
+                bCode = request.json['barcode'][i]
+                units = request.json['units'][i]
+                ps = ProductStore.query.filter_by(barcode=bCode).filter_by(storeid=1).first()
+                if (ps.units - units < 0):
+                    abort(406, {"message": 'articulos insuficientes'})
+                else:
+                    q = updateHelper(bCode, units, 1)
+                    engine.execute(q)
+                    sd = SaleDetails(s.id, ps.barcode, ps.price, units, 1)
+                    db_session.add(sd)
+                    db_session.commit()
+            elif int(request.json['is_service'][i]) == 1:
+                bCode = request.json['barcode'][i]
+                units = request.json['units'][i]
+                ps = MasterList.query.filter_by(barcode=bCode).first()
                 sd = SaleDetails(s.id, ps.barcode, ps.price, units, 1)
                 db_session.add(sd)
                 db_session.commit()
+            else:
+                abort(400)
         sd = SaleDetails.query.filter_by(idsale=s.id).all()
         return make_response(jsonify( { "mobilerp" :[sd_.serialize for sd_ in sd] } ), 200)
     else:
@@ -66,7 +93,8 @@ def make_sale_1_0():
 @auth.login_required
 def make_sale_1_1():
     if not request.json or 'storeid' not in request.json or\
-        'barcode' not in request.json or len(request.json['barcode']) <= 0:
+        'barcode' not in request.json or len(request.json['barcode']) <= 0 or\
+        'is_service' not in request.json or len(request.json['is_service']) <= 0:
         abort(400)
     drugstore = Drugstore.query.filter_by(id=request.json['storeid']).first()
     if drugstore is None:
@@ -76,18 +104,26 @@ def make_sale_1_1():
         db_session.add(s)
         db_session.commit()
         for i in range(0, len(request.json['barcode'])):
-            bCode = request.json['barcode'][i]
-            units = request.json['units'][i]
-            m = MasterList.query.filter_by(barcode=bCode).first()
-            ps = Product.query.filter_by(barcode=bCode).\
-                filter_by(storeid=request.json['storeid']).first()
-            if ps is None:
-                abort(406, {"message": 'Uno de tus articulos no existe'})
-            if (ps.units - units < 0):
-                abort(406, {"message": 'articulos insuficientes'})
-            else:
-                q = updateHelper(bCode, units, request.json['storeid'])
-                engine.execute(q)
+            if int(request.json['is_service'][i]) == 0:
+                bCode = request.json['barcode'][i]
+                units = request.json['units'][i]
+                m = MasterList.query.filter_by(barcode=bCode).first()
+                ps = Product.query.filter_by(barcode=bCode).\
+                    filter_by(storeid=request.json['storeid']).first()
+                if ps is None:
+                    abort(406, {"message": 'Uno de tus articulos no existe'})
+                if (ps.units - units < 0):
+                    abort(406, {"message": 'articulos insuficientes'})
+                else:
+                    q = updateHelper(bCode, units, request.json['storeid'])
+                    engine.execute(q)
+                    sd = SaleDetails(s.id, m.barcode, m.price, units, request.json['storeid'])
+                    db_session.add(sd)
+                    db_session.commit()
+            elif int(request.json['is_service'][i]) == 1:
+                bCode = request.json['barcode'][i]
+                units = request.json['units'][i]
+                m = MasterList.query.filter_by(barcode=bCode).first()
                 sd = SaleDetails(s.id, m.barcode, m.price, units, request.json['storeid'])
                 db_session.add(sd)
                 db_session.commit()

@@ -28,7 +28,7 @@ class ServiceTestCase(unittest.TestCase):
 	
 	json_serv_3 = json.dumps({
 			'barcode' : '0003',
-			'price' : 150,
+			'price' : 150.0,
 			'name' : 'servicio_3'
 			})
 	
@@ -51,7 +51,12 @@ class ServiceTestCase(unittest.TestCase):
 			})
 
 	def setupClass(self):
+		response = self.list_service_1_1()
+		assert response.status_code == 412
 		engine.execute("delete from operation_logs; delete from services;")
+		engine.execute("insert into drugstore(id, name) values(1, 'prod_1');")
+		engine.execute("insert into products_masterlist(barcode, name, price) values('2000', 'prod_1', 10);")
+		engine.execute("insert into product(barcode, units, storeid) values('2000', 5 , 1);")
 		self.add_service_1_1(self.json_serv_1)
 		self.add_service_1_1(self.json_serv_2)
 		self.add_service_1_1(self.json_serv_3)
@@ -62,7 +67,8 @@ class ServiceTestCase(unittest.TestCase):
 	@classmethod
 	def tearDownClass(cls):
 		engine.execute('delete from service_price_history; delete from services;')
-		engine.execute('delete from saledetails; ')
+		engine.execute('delete from saledetails;')
+		engine.execute("delete from product; delete from products_masterlist;")
 		engine.execute("delete from drugstore;")
 
 	def setUp(self):
@@ -125,37 +131,37 @@ class ServiceTestCase(unittest.TestCase):
 
 	def test_004_update_service_1_1_change_name(self):
 		service = dict(
-			bCode = '0003',
+			barcode = '0003',
 			name = 'doritos'
 			)
-		response = self.find_service_1_1(service['bCode'])
+		response = self.find_service_1_1(service['barcode'])
 		assert response.status_code == 200
-		response = self.update_service_1_1(service['bCode'], json.dumps(service))
+		response = self.update_service_1_1(service['barcode'], json.dumps(service))
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
 		assert jsoncompare.are_same(json_data["mobilerp"], json.dumps(service))
 
 	def test_005_update_service_1_1_change_price(self):
 		service = dict(
-			bCode = '0001',
+			barcode = '0001',
 			price = 10.5
 		)
-		response = self.find_service_1_1(service['bCode'])
+		response = self.find_service_1_1(service['barcode'])
 		assert response.status_code == 200
-		response = self.update_service_1_1(service['bCode'], json.dumps(service))
+		response = self.update_service_1_1(service['barcode'], json.dumps(service))
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
 		assert jsoncompare.are_same(json_data["mobilerp"], json.dumps(service))
 		
 	def test_006_update_service_1_1_change_all(self):
 		service = dict(
-			bCode = '0002',
+			barcode = '0002',
 			price = 701,
 			name = 'mani',
 		)
-		response = self.find_service_1_1(service['bCode'])
+		response = self.find_service_1_1(service['barcode'])
 		assert response.status_code == 200
-		response = self.update_service_1_1(service['bCode'], json.dumps(service))
+		response = self.update_service_1_1(service['barcode'], json.dumps(service))
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
 		assert jsoncompare.are_same(json_data["mobilerp"], json.dumps(service))
@@ -213,21 +219,34 @@ class ServiceTestCase(unittest.TestCase):
 
 	def test_015_update_service_1_0_fail_duplicated_operation(self):
 		service = dict(
-			bCode = '0002',
+			barcode = '0002',
 			price = 701,
 			name = 'mani'
 			)
-		response = self.update_service_1_1(service['bCode'], json.dumps(service))
+		response = self.update_service_1_1(service['barcode'], json.dumps(service))
 		assert response.status_code == 428
 		
-	def test_039_update_product_1_1_fail_inexistent_service(self):
+	def test_016_update_service_1_1_fail_inexistent_service(self):
 		service = dict(
-			bCode = '1111',
+			barcode = '1111',
 			price = 701,
 			name = 'mani'
 			)
-		response = self.update_service_1_1(service['bCode'], json.dumps(service))
+		response = self.update_service_1_1(service['barcode'], json.dumps(service))
 		assert response.status_code == 400
+
+	def test_017_add_service_1_1_sucess_no_price_change(self):
+		service = dict(
+			barcode = '0003',
+			price = 150.0,
+			)
+		response = self.find_service_1_1(service['barcode'])
+		assert response.status_code == 200
+		response = self.update_service_1_1(service['barcode'], json.dumps(service))
+		assert response.status_code == 200
+		json_data = json.loads(response.data)
+		assert float(json_data["mobilerp"]['price']) == service['price']
+
 
 if __name__ == "__main__":
 	unittest.main()

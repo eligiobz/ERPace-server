@@ -26,27 +26,36 @@ from . import api, auth
 from datetime import datetime as ddate
 
 
-@api.route('/v1.0/dailyReport/', methods=['GET'])
-@api.route('/v1.1/dailyReport/', methods=['GET'])
+@api.route('/v1.0/daily_report/', methods=['GET'])
+@api.route('/v1.1/daily_report/', methods=['GET'])
 @auth.login_required
-def sendDailyReport():
+def send_daily_report():
     cdate = ddate.today()
     data = salesReport(cdate)
     generateSalesPdf(data)
     return make_response(jsonify({'mobilerp': data}), 200)
 
 
-@api.route('/v1.0/monthlyReport/', methods=['GET'])
-@api.route('/v1.1/monthlyReport/', methods=['GET'])
+@api.route('/v1.0/monthly_report/', methods=['GET'])
+@api.route('/v1.1/monthly_report/', methods=['GET'])
 @auth.login_required
-def sendMonthlyReport():
+def send_monthly_report():
     cdate = ddate.today()
     data = salesReport(cdate, 30)
     generateSalesPdf(data)
     return make_response(jsonify({'mobilerp': data}), 200)
 
-@api.route('/v1.0/getReport/<fn>', methods=['GET'])
-@api.route('/v1.1/getReport/<fn>', methods=['GET'])
+# @api.route('/v1.1/monthlyReport/', methods=['GET'])
+# @auth.login_required
+# def sendMonthlyReport():
+#     cdate = ddate.today()
+#     data = salesReport(cdate, 30)
+#     generateSalesPdf(data)
+#     return make_response(jsonify({'mobilerp': data}), 200)
+
+
+@api.route('/v1.0/get_report/<fn>', methods=['GET'])
+@api.route('/v1.1/get_report/<fn>', methods=['GET'])
 @auth.login_required
-def getReport(fn):
+def get_report(fn):
 	return current_app.send_static_file("pdf/"+fn)

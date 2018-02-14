@@ -69,6 +69,7 @@ class SalesTestCase(unittest.TestCase):
 		engine.execute("delete from operation_logs;")
 		engine.execute("insert into drugstore(id, name) values (1, 'default');")
 		engine.execute("insert into drugstore(id, name) values (2, 'Store 2');")
+		engine.execute("insert into services(barcode, name, price) values('2000', 'serv_1', 10);")
 		self.add_product_1_1(self.json_prod_1)
 		self.add_product_1_1(self.json_prod_2)
 		self.add_product_1_1(self.json_prod_3)
@@ -80,9 +81,10 @@ class SalesTestCase(unittest.TestCase):
 
 	@classmethod
 	def tearDownClass(cls):
+
 		engine.execute('delete from saledetails; delete from sale; delete from\
 						products_price_history; delete from product; delete from products_masterlist ;')
-		engine.execute("delete from drugstore;")
+		engine.execute("delete from drugstore; delete from services;")
 
 	def setUp(self):
 		app.app.testing = True
@@ -114,7 +116,10 @@ class SalesTestCase(unittest.TestCase):
 	def make_sale_1_1(self, data):
 		return self.open_with_auth('/api/v1.1/make_sale/', 'POST', data)
 
-	def test_001_make_sale_1_0_normal(self):
+	def find_article_1_1(self, data):
+		return self.open_with_auth('/api/v1.1/find_article/'+data, 'GET')
+
+	def test_001_make_sale_1_0_normal_products_only(self):
 		item_1 = dict(
 			barcode = '0001',
 			units = 2,
@@ -136,6 +141,7 @@ class SalesTestCase(unittest.TestCase):
 		sale = json.dumps({
 					"barcode": [item_1['barcode'], item_2['barcode']],
 					"units" : [item_1['units'], item_2['units']],
+					"is_service" : [0, 0],
 					"token": "1"
 				})
 		response = self.make_sale_1_0(sale)
@@ -159,7 +165,7 @@ class SalesTestCase(unittest.TestCase):
 		assert int(data["mobilerp"]['storeid']) == 1
 		assert int(data["mobilerp"]['units']) == 0 # 8 - 4
 
-	def test_002_make_sale_1_1_normal(self):
+	def test_002_make_sale_1_1_normal_products_only(self):
 		item_1 = dict(
 			barcode = '0001',
 			units = 2,
@@ -185,6 +191,7 @@ class SalesTestCase(unittest.TestCase):
 		sale = json.dumps({
 					"barcode": [item_1['barcode'], item_2['barcode']],
 					"units" : [item_1['units'], item_2['units']],
+					"is_service" : [0, 0],
 					"token": "5",
 					"storeid": 2
 				})
@@ -213,18 +220,32 @@ class SalesTestCase(unittest.TestCase):
 		sale = json.dumps({
 					"barcode": ['0001', '0002'],
 					"units" : [2, 8],
+					"is_service" : [0, 0],
 					"token" : "1"
 				})
 		response = self.make_sale_1_0(sale)
 		assert response.status_code == 428
 
 	def test_004_make_sale_1_1_fail_duplicated_sale(self):
+		item_1 = dict(
+			barcode = '0001',
+			units = 2,
+			price = 0.0,
+			storeid = 2
+			)
+		item_2 = dict(
+			barcode = '0004',
+			units = 3,
+			price = 0.0,
+			storeid = 2 
+			)
 		response = self.find_product_1_1('2','0004')
 		assert response.status_code == 200
 		sale = json.dumps({
-					"barcode": ['0001', '0004'],
-					"units" : [2, 3],
-					"token" : "5",
+					"barcode": [item_1['barcode'], item_2['barcode']],
+					"units" : [item_1['units'], item_2['units']],
+					"is_service" : [0, 0],
+					"token": "5",
 					"storeid": 2
 				})
 		response = self.make_sale_1_1(sale)
@@ -236,6 +257,7 @@ class SalesTestCase(unittest.TestCase):
 		sale = json.dumps({
 					"barcode": ['0002'],
 					"units" : [8],
+					"is_service" : [0],
 					"token" : "2"
 				})
 		response = self.make_sale_1_0(sale)
@@ -250,6 +272,7 @@ class SalesTestCase(unittest.TestCase):
 					"barcode": ['0004'],
 					"units" : [8],
 					"token" : "8",
+					"is_service" : [0],
 					"storeid": 2
 				})
 		response = self.make_sale_1_1(sale)
@@ -261,6 +284,7 @@ class SalesTestCase(unittest.TestCase):
 		sale = json.dumps({
 					"barcode": [],
 					"units" : [8],
+					"is_service" : [0],
 					"token" : "2"
 				})
 		response = self.make_sale_1_0(sale)
@@ -270,6 +294,7 @@ class SalesTestCase(unittest.TestCase):
 		sale = json.dumps({
 					"barcode": [],
 					"units" : [8],
+					"is_service" : [0, 0],
 					"token" : "2"
 				})
 		response = self.make_sale_1_1(sale)
@@ -283,6 +308,7 @@ class SalesTestCase(unittest.TestCase):
 					"barcode": ['0004'],
 					"units" : [8],
 					"token" : "8",
+					"is_service" : [0]
 				})
 		response = self.make_sale_1_1(sale)
 		assert response.status_code == 400
@@ -294,6 +320,7 @@ class SalesTestCase(unittest.TestCase):
 					"barcode": ['0004'],
 					"units" : [8],
 					"token" : "8",
+					"is_service" : [0],
 					"storeid" : 10
 				})
 		response = self.make_sale_1_1(sale)
@@ -320,6 +347,7 @@ class SalesTestCase(unittest.TestCase):
 		sale = json.dumps({
 					"barcode": ['0010'],
 					"units" : [8],
+					"is_service" : [0],
 					"token" : "8",
 					"storeid": 2
 				})
@@ -334,11 +362,43 @@ class SalesTestCase(unittest.TestCase):
 					"barcode": ['0003'],
 					"units" : [8],
 					"token" : "8",
+					"is_service" : [0],
 					"storeid": 2
 				})
 		response = self.make_sale_1_1(sale)
 		assert response.status_code == 406
 		assert b'no existe' in response.data
+
+	def test_017_find_article_sucess(self):
+		response = self.find_article_1_1('0002/1')
+		assert response.status_code == 200
+		json_data = json.loads(response.data)
+		assert json_data['mobilerp']['barcode'] == "0002"
+		assert json_data['mobilerp']['name'] == "crema_2"
+		assert float(json_data['mobilerp']['price']) == 1.0
+		assert int(json_data['mobilerp']['units']) == 0
+		assert int(json_data['mobilerp']['storeid']) == 1
+		response = self.find_article_1_1('2000')
+		assert response.status_code == 200
+		json_data = json.loads(response.data)
+		assert json_data['mobilerp']['barcode'] == "2000"
+		assert json_data['mobilerp']['name'] == "serv_1"
+		assert float(json_data['mobilerp']['price']) == 10.0
+
+	def test_018_make_sale_1_0_normal_sale_with_services(self):
+		response = self.find_article_1_1('0001/1')
+		assert response.status_code == 200
+		response = self.find_article_1_1('2000')
+		assert response.status_code == 200
+		sale = dict(
+					barcode = ['0001','2000'],
+					units = [1, 3],
+					is_service = [0, 1],
+					token = "9",
+					storeid = 1
+				)
+		response = self.make_sale_1_0(json.dumps(sale))
+		assert response.status_code == 200
 
 if __name__ == "__main__":
 	unittest.main()

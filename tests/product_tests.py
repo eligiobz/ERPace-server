@@ -87,6 +87,7 @@ class SalesTestCase(unittest.TestCase):
 		engine.execute("delete from operation_logs;")
 		engine.execute("insert into drugstore(id, name) values (1, 'default');")
 		engine.execute("insert into drugstore(id, name) values (2, 'Store 2');")
+		engine.execute("insert into services(barcode, name, price) values ('2000', 'default', 10);")
 		self.add_product_1_1(self.json_prod_1)
 		self.add_product_1_1(self.json_prod_2)
 		self.add_product_1_1(self.json_prod_3)
@@ -99,6 +100,7 @@ class SalesTestCase(unittest.TestCase):
 		engine.execute('delete from products_price_history; delete from product; delete from products_masterlist ;')
 		engine.execute('delete from saledetails; ')
 		engine.execute("delete from drugstore;")
+		engine.execute("delete from services;")
 
 	def setUp(self):
 		app.app.testing = True
@@ -354,6 +356,7 @@ class SalesTestCase(unittest.TestCase):
 		json_sale = dict(
 			barcode = ['0001', '0002'],
 			units = [8, 10],
+			is_service = [0, 0],
 			storeid = 1
 			)
 		response = self.open_with_auth('/api/v1.1/make_sale/', 'POST', json.dumps(json_sale))
@@ -374,6 +377,7 @@ class SalesTestCase(unittest.TestCase):
 		json_sale = dict(
 			barcode = ['0004', '0005'],
 			units = [3, 1],
+			is_service = [0, 0],
 			storeid = 2
 			)
 		response = self.open_with_auth('/api/v1.1/make_sale/', 'POST', json.dumps(json_sale))
@@ -479,12 +483,10 @@ class SalesTestCase(unittest.TestCase):
 
 	def test_030_add_product_1_0_fail_duplicated_operation(self):
 		response = self.add_product_1_0(self.json_prod_6)
-		print (response.data)
 		assert response.status_code == 428
 
 	def test_031_add_product_1_1_fail_duplicated_operation(self):
 		response = self.add_product_1_1(self.json_prod_7)
-		print (response.data)
 		assert response.status_code == 428
 
 	def test_032_update_product_1_0_fail_no_json_data(self):
@@ -540,19 +542,36 @@ class SalesTestCase(unittest.TestCase):
 		assert response.status_code == 400
 
 	def test_039_update_product_1_1_fail_inexistent_product(self):
-		bCode = '1111'
-		price = 701
-		name = 'mani'
-		units = 9
-		updated_product = json.dumps({
-			'barcode' : bCode,
-			'price' : price,
-			'name' : name,
-			'units' : units,
-			'storeid': 2
-			})
-		response = self.update_product_1_1(bCode, updated_product)
+		product = dict(
+			barcode = '1111',
+			price = 701,
+			name = 'mani',
+			units = 9,
+			storeid = 2
+			)
+		response = self.update_product_1_1(product['barcode'], json.dumps(product))
 		assert response.status_code == 400
+
+	def test_040_add_product_1_0_fail_service_with_same_barcode(self):
+		product = dict(
+			barcode = '2000',
+			price = 701,
+			name = 'mani',
+			units = 9
+			)
+		response = self.add_product_1_0(json.dumps(product))
+		assert response.status_code == 409
+
+	def test_041_add_product_1_1_fail_service_with_same_barcode(self):
+		product = dict(
+			barcode = '2000',
+			price = 701,
+			name = 'mani',
+			units = 9,
+			storeid = 1
+			)
+		response = self.add_product_1_0(json.dumps(product))
+		assert response.status_code == 409
 
 if __name__ == '__main__':
 	unittest.main()
