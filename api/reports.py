@@ -23,8 +23,10 @@ from reporter.salesreport import salesReport as salesReport
 from reporter.pdfgenerator import generateSalesPdf
 from . import api, auth
 
+import ujson
+
 from datetime import datetime as ddate
-# from dateutil.parser import parser as parser
+from timeit import timeit
 
 @api.route('/v1.0/daily_report/', methods=['GET'])
 @api.route('/v1.1/daily_report/', methods=['GET'])
@@ -35,7 +37,10 @@ def send_daily_report():
 	if (data == 500):
 		abort(500)
 	generateSalesPdf(data)
-	return make_response(jsonify({'mobilerp': data}), 200)
+	del(data['sales'])
+	res = make_response(ujson.dumps({'mobilerp': data}), 200)
+	res.mimetype = "application/json"
+	return res
 
 
 @api.route('/v1.0/monthly_report/', methods=['GET'])
@@ -47,7 +52,10 @@ def send_monthly_report():
 	if (data == 500):
 		abort(500)
 	generateSalesPdf(data)
-	return make_response(jsonify({'mobilerp': data}), 200)
+	del(data['sales'])
+	res = make_response(ujson.dumps({'mobilerp': data}), 200)
+	res.mimetype = "application/json"
+	return res
 
 @api.route('/v1.1/custom_report/<init_date>/<end_date>', methods=['GET'])
 @auth.login_required
@@ -63,7 +71,10 @@ def send_custom_report(init_date, end_date):
 	if (data == 500):
 		abort(500)
 	generateSalesPdf(data)
-	return make_response(jsonify({'mobilerp': data}), 200)
+	del(data['sales'])
+	res = make_response(ujson.dumps({'mobilerp': data}), 200)
+	res.mimetype = "application/json"
+	return res
 
 
 @api.route('/v1.0/get_report/<fn>', methods=['GET'])

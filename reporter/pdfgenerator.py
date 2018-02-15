@@ -20,6 +20,7 @@
 
 from jinja2 import Environment, FileSystemLoader
 from weasyprint import HTML
+from timeit import timeit 
 
 from . import *
 
