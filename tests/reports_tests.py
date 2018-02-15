@@ -6,6 +6,7 @@ import unittest
 import tempfile
 import base64
 import json
+from datetime import date as ddate, timedelta
 from jsoncompare import jsoncompare
 from models.MasterList import MasterList as MasterList
 from models.Product import Product as Product
@@ -19,7 +20,7 @@ class SalesTestCase(unittest.TestCase):
 	json_prod_1 = dict(
 			barcode = '0001',
 			price = 50.50, 
-			units = 4,
+			units = 6,
 			name = 'prod_1',
 			storeid = 1)
 	
@@ -33,7 +34,7 @@ class SalesTestCase(unittest.TestCase):
 	json_prod_3 = dict(
 			barcode = '0003',
 			price = 150,
-			units = 6,
+			units = 8,
 			name = 'prod_3',
 			storeid = 2)
 	
@@ -53,15 +54,27 @@ class SalesTestCase(unittest.TestCase):
 			name = 'serv_3')
 
 	def setupClass(self):
+		response = self.open_with_auth('/api/v1.1/daily_report/', 'GET')
+		assert response.status_code == 500
 		engine.execute("delete from operation_logs;")
 		engine.execute("insert into drugstore(id, name) values (1, 'default');")
 		engine.execute("insert into drugstore(id, name) values (2, 'Store 2');")
+		engine.execute("insert into sale(date) values(CURRENT_DATE - 28);")
+		engine.execute("insert into saledetails(idsale, idproduct, productprice, units, storeid)\
+						select MAX(sale.id), '0001', 50.50, 2, 1 from sale;")
+		engine.execute("update product set units=units-2 where storeid = 1 and barcode='0001'")
+		engine.execute("insert into sale(date) values(CURRENT_DATE - 15);")
+		engine.execute("insert into saledetails(idsale, idproduct, productprice, units, storeid)\
+						select MAX(sale.id), '0003', 1, 2, 2 from sale;")
+		engine.execute("update product set units=units-2 where storeid = 1 and barcode='0003'")
+		
 		self.add_product_1_1(self.json_prod_1)
 		self.add_product_1_1(self.json_prod_2)
 		self.add_product_1_1(self.json_prod_3)
 		self.add_service_1_1(self.json_serv_1)
 		self.add_service_1_1(self.json_serv_2)
 		self.add_service_1_1(self.json_serv_3)
+
 		self.setUpSales()
 		unittest.TestCase.setUp(self)
 
@@ -139,6 +152,63 @@ class SalesTestCase(unittest.TestCase):
 			(self.json_serv_3["price"]*4)
 			)
 		assert len(json_data['mobilerp']['sales']) == 6
+
+	def test_002_get_monthly_report(self):
+		response = self.open_with_auth('/api/v1.1/monthly_report/', 'GET')
+		assert response.status_code == 200
+		json_data = json.loads(response.data)
+		assert json_data['mobilerp']['totalItemsSold'] == 27
+		assert json_data['mobilerp']['totalSales'] == 5
+		assert len(json_data['mobilerp']['sales']) == 8
+		assert json_data['mobilerp']['totalEarnings'] == (
+			(self.json_prod_1["price"]*4) +
+			(self.json_prod_2["price"]*4) +
+			(self.json_prod_3["price"]*6) +
+			(self.json_serv_1["price"]*1) +
+			(self.json_serv_2["price"]*4) +
+			(self.json_serv_3["price"]*4) +
+			(self.json_prod_1["price"]*2) +
+			(self.json_prod_2["price"]*2) 
+			)
+
+	def test_003_get_custom_report(self):
+		end = ddate.today()
+		init = ddate.today()-timedelta(days=16)
+		response = self.open_with_auth('/api/v1.1/custom_report/'+str(init)+'/'+str(end), 'GET')
+		assert response.status_code == 200
+		json_data = json.loads(response.data)
+		assert json_data['mobilerp']['totalItemsSold'] == 25
+		assert json_data['mobilerp']['totalSales'] == 4
+		assert len(json_data['mobilerp']['sales']) == 7
+		assert json_data['mobilerp']['totalEarnings'] == (
+			(self.json_prod_1["price"]*4) +
+			(self.json_prod_2["price"]*4) +
+			(self.json_prod_3["price"]*6) +
+			(self.json_serv_1["price"]*1) +
+			(self.json_serv_2["price"]*4) +
+			(self.json_serv_3["price"]*4) +
+			(self.json_prod_2["price"]*2) 
+			)
+
+	def test_004_get_custom_report_fail_invalid_dates(self):
+		"""
+		Tests that checks for failure when init date is larger
+		than end date
+		"""
+		init = ddate.today()+timedelta(days=1)
+		end = ddate.today()
+		response = self.open_with_auth('/api/v1.1/custom_report/'+str(init)+'/'+str(end), 'GET')
+		assert response.status_code == 400
+
+	def test_005_get_custom_report_fail_invalid_dates(self):
+		"""
+		Tests that checks for failure when end date is in the future
+		"""
+		init = ddate.today()
+		end = ddate.today()+timedelta(days=1)
+		response = self.open_with_auth('/api/v1.1/custom_report/'+str(init)+'/'+str(end), 'GET')
+		assert response.status_code == 400
+		
 
 if __name__ == "__main__":
 	unittest.main()

@@ -46,7 +46,7 @@ def salesReport(initDate, delta=0):
     sales = SalesReport.query.filter(SalesReport.date <= (cdate + timedelta(days=1)))\
                     .filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
                     .order_by(SalesReport.idsale)
-    if sales is None:
+    if sales is None or len(sales.all()) == 0:
         return 500
     else:
         data = {
