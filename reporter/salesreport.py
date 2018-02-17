@@ -57,5 +57,4 @@ def salesReport(initDate, delta=0):
                 'totalEarnings': totalEarnings,
                 'sales': [s.serialize for s in sales]
                 }
-        generateSalesPdf(data)
         return data

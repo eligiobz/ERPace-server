@@ -34,7 +34,9 @@ def send_daily_report():
 	data = salesReport(cdate)
 	if (data == 500):
 		abort(500)
-	generateSalesPdf(data)
+	task = generateSalesPdf.delay(data)
+	del(data['sales'])
+	data['report_id'] =  task.task_id
 	return make_response(jsonify({'mobilerp': data}), 200)
 
 
@@ -46,8 +48,10 @@ def send_monthly_report():
 	data = salesReport(cdate, 30)
 	if (data == 500):
 		abort(500)
-	generateSalesPdf(data)
-	return make_response(jsonify({'mobilerp': data}), 200)
+	task = generateSalesPdf.delay(data)
+	del(data['sales'])
+	data['report_id'] =  task.task_id
+	return make_response(jsonify({'mobilerp': data }), 200)
 
 @api.route('/v1.1/custom_report/<init_date>/<end_date>', methods=['GET'])
 @auth.login_required
@@ -62,7 +66,9 @@ def send_custom_report(init_date, end_date):
 	data = salesReport(d_end_date,(abs((d_end_date - d_init_date).days)))
 	if (data == 500):
 		abort(500)
-	generateSalesPdf(data)
+	task = generateSalesPdf.delay(data)
+	del(data['sales'])
+	data['report_id'] =  task.task_id
 	return make_response(jsonify({'mobilerp': data}), 200)
 
 

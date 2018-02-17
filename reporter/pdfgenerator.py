@@ -23,10 +23,14 @@ from weasyprint import HTML
 
 from . import *
 
+from . import celery
+
+
 env = Environment(loader=FileSystemLoader('.'),
                   extensions=['jinja2.ext.with_'])
 
 
+@celery.task
 def generateSalesPdf(data):
     template = env.get_template(SALES_REPORT_TEMPLATE)
     template_vars = data
