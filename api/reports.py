@@ -24,7 +24,10 @@ from reporter.pdfgenerator import generateSalesPdf
 from . import api, auth
 
 from datetime import datetime as ddate
-# from dateutil.parser import parser as parser
+import os
+
+
+import app
 
 @api.route('/v1.0/daily_report/', methods=['GET'])
 @api.route('/v1.1/daily_report/', methods=['GET'])
@@ -35,6 +38,7 @@ def send_daily_report():
 	if (data == 500):
 		abort(500)
 	generateSalesPdf(data)
+	del(data['sales'])
 	return make_response(jsonify({'mobilerp': data}), 200)
 
 
@@ -46,7 +50,10 @@ def send_monthly_report():
 	data = salesReport(cdate, 30)
 	if (data == 500):
 		abort(500)
-	generateSalesPdf(data)
+	print ("LAUNCHING TASK")
+	task = generateSalesPdf.delay(data)
+	task.wait()
+	del(data['sales'])
 	return make_response(jsonify({'mobilerp': data}), 200)
 
 @api.route('/v1.1/custom_report/<init_date>/<end_date>', methods=['GET'])
@@ -63,6 +70,7 @@ def send_custom_report(init_date, end_date):
 	if (data == 500):
 		abort(500)
 	generateSalesPdf(data)
+	del(data['sales'])
 	return make_response(jsonify({'mobilerp': data}), 200)
 
 

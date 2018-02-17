@@ -28,10 +28,12 @@ from flask import Flask, make_response, request, jsonify, url_for
 from flask_httpauth import HTTPBasicAuth
 from flask_compress import Compress
 from flask_script import Manager
+from celery import Celery
 
 
 from models import Base, engine, db_session
 from api.views import api as api
+from reporter import celery
 
 import os
 
@@ -51,12 +53,16 @@ Base.query = db_session.query_property()
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
+app.config['CELERY_BROKER_URL'] = os.environ['REDIS_URL']
+app.config['CELERY_RESULT_BACKEND'] = os.environ['REDIS_URL']
 app.register_blueprint(api, url_prefix="/api")
 Compress(app)
 manager = Manager(app)
+celery = Celery('app', broker=os.environ['REDIS_URL'])
+celery.conf.update(app.config)
+
 
 # manager commands
-
 @manager.command
 def list_routes():
     import urllib

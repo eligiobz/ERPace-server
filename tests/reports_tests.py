@@ -78,11 +78,11 @@ class SalesTestCase(unittest.TestCase):
 		self.setUpSales()
 		unittest.TestCase.setUp(self)
 
-	@classmethod
-	def tearDownClass(cls):
-		engine.execute('delete from saledetails; delete from sale; delete from\
-						products_price_history; delete from product; delete from products_masterlist ;')
-		engine.execute("delete from services; delete from drugstore;")
+	# @classmethod
+	# def tearDownClass(cls):
+	# 	engine.execute('delete from saledetails; delete from sale; delete from\
+	# 					products_price_history; delete from product; delete from products_masterlist ;')
+	# 	engine.execute("delete from services; delete from drugstore;")
 
 	def setUp(self):
 		app.app.testing = True
@@ -141,6 +141,7 @@ class SalesTestCase(unittest.TestCase):
 		response = self.open_with_auth('/api/v1.1/daily_report/', 'GET')
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
+		print (json_data)
 		assert json_data['mobilerp']['totalItemsSold'] == 23
 		assert json_data['mobilerp']['totalSales'] == 3
 		assert json_data['mobilerp']['totalEarnings'] == (

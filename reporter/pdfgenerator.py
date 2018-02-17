@@ -20,22 +20,35 @@
 
 from jinja2 import Environment, FileSystemLoader
 from weasyprint import HTML
+from timeit import timeit
 
-from . import *
+
+import app
+from . import celery
 
 env = Environment(loader=FileSystemLoader('.'),
                   extensions=['jinja2.ext.with_'])
 
 
+@celery.task()
 def generateSalesPdf(data):
+  print ("CELERY TASK LAUNCHED")
+  with app.app.app_context():
+    print ("ENTERING APP CONTEXT")
     template = env.get_template(SALES_REPORT_TEMPLATE)
     template_vars = data
+    start = timeit()
     html_output = template.render(template_vars)
+    end = timeit()
+    print("TIME RENDERING TEMPLATE :: ", (end - start))
     HTML(string=html_output).write_pdf(OUTPUT_FOLDER\
                                        + "salesreport.pdf",
                                        stylesheets=[SALES_REPORT_STYLE])
+    end_2 = timeit()
+    print("TIME PRINTING PDF :: ", (end_2 - end))
+    return True
 
-
+# @celery.task
 def generateDepletedReport(data):
     template = env.get_template(DEPLETED_REPORT_TEMPLATE)
     template_vars = data
