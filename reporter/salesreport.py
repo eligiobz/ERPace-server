@@ -22,39 +22,44 @@ from models import db_session as db_session, mfunc
 from datetime import date as ddate, timedelta
 from flask import jsonify
 from .pdfgenerator import generateSalesPdf
+from models import engine
 
-cdate = ddate.today()
+import asyncio
 
+from multiprocessing import Process
 
-def salesReport(initDate, delta=0):
+def salesReport(end_date, delta_days=0):
+    end_date = end_date 
+    init_date = end_date - timedelta(days=delta_days)
     totalItemsSold = SalesReport.query\
-                    .filter(SalesReport.date <= (cdate + timedelta(days=1)))\
-                    .filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
+                    .filter(SalesReport.date >= init_date)\
+                    .filter((SalesReport.date <= end_date))\
                     .with_entities(mfunc.sum(SalesReport.units))\
                     .scalar()
     totalSales = len(db_session.query(\
                     SalesReport.idsale,\
                     mfunc.count(SalesReport.idsale))\
-                    .filter(SalesReport.date <= (cdate + timedelta(days=1)))\
-                    .filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
+                    .filter(SalesReport.date >= init_date)\
+                    .filter((SalesReport.date <= end_date))\
                     .group_by(SalesReport.idsale).all())
     totalEarnings = SalesReport.query\
-                    .filter(SalesReport.date <= (cdate + timedelta(days=1)))\
-                    .filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
+                    .filter(SalesReport.date >= init_date)\
+                    .filter((SalesReport.date <= end_date))\
                     .with_entities(mfunc.sum(SalesReport.total_earning))\
                     .scalar()
-    sales = SalesReport.query.filter(SalesReport.date <= (cdate + timedelta(days=1)))\
-                    .filter((SalesReport.date >= (cdate - timedelta(days=delta))))\
-                    .order_by(SalesReport.idsale)
+    sales = SalesReport.query.filter(SalesReport.date >= init_date)\
+            .filter((SalesReport.date <= end_date))\
+            .order_by(SalesReport.idsale)
     if sales is None or len(sales.all()) == 0:
         return 500
     else:
         data = {
-                'title': "Reporte del " + (str(cdate - timedelta(days=delta))\
-                         + " a " if delta > 0 else "") + str(cdate),
+                'title': "Reporte del " + (str(init_date.date())\
+                         + " a " if delta_days > 0 else "") + str(end_date.date()),
                 'totalItemsSold': totalItemsSold,
                 'totalSales': totalSales,
                 'totalEarnings': totalEarnings,
                 'sales': [s.serialize for s in sales]
                 }
         return data
+        

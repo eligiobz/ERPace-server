@@ -21,10 +21,9 @@
 from jinja2 import Environment, FileSystemLoader
 from weasyprint import HTML
 
+
 from . import *
-
-from . import celery
-
+import app
 
 env = Environment(loader=FileSystemLoader('.'),
                   extensions=['jinja2.ext.with_'])
@@ -32,14 +31,16 @@ env = Environment(loader=FileSystemLoader('.'),
 
 @celery.task
 def generateSalesPdf(data):
+  with app.app.app_context():
     template = env.get_template(SALES_REPORT_TEMPLATE)
     template_vars = data
     html_output = template.render(template_vars)
     HTML(string=html_output).write_pdf(OUTPUT_FOLDER\
                                        + "salesreport.pdf",
                                        stylesheets=[SALES_REPORT_STYLE])
+    return True
 
-
+@celery.task
 def generateDepletedReport(data):
     template = env.get_template(DEPLETED_REPORT_TEMPLATE)
     template_vars = data
