@@ -139,6 +139,8 @@ class SalesTestCase(unittest.TestCase):
 		
 	def test_001_get_daily_report(self):
 		response = self.open_with_auth('/api/v1.1/daily_report/', 'GET')
+		print (response.status_code)
+		print (response.data)
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
 		print (json_data)
@@ -152,7 +154,7 @@ class SalesTestCase(unittest.TestCase):
 			(self.json_serv_2["price"]*4) +
 			(self.json_serv_3["price"]*4)
 			)
-		assert len(json_data['mobilerp']['sales']) == 6
+		assert "sales" not in json_data['mobilerp']
 
 	def test_002_get_monthly_report(self):
 		response = self.open_with_auth('/api/v1.1/monthly_report/', 'GET')
@@ -160,7 +162,7 @@ class SalesTestCase(unittest.TestCase):
 		json_data = json.loads(response.data)
 		assert json_data['mobilerp']['totalItemsSold'] == 27
 		assert json_data['mobilerp']['totalSales'] == 5
-		assert len(json_data['mobilerp']['sales']) == 8
+		assert "sales" not in json_data['mobilerp']
 		assert json_data['mobilerp']['totalEarnings'] == (
 			(self.json_prod_1["price"]*4) +
 			(self.json_prod_2["price"]*4) +
@@ -180,7 +182,7 @@ class SalesTestCase(unittest.TestCase):
 		json_data = json.loads(response.data)
 		assert json_data['mobilerp']['totalItemsSold'] == 25
 		assert json_data['mobilerp']['totalSales'] == 4
-		assert len(json_data['mobilerp']['sales']) == 7
+		assert sales not in json_data['mobilerp']
 		assert json_data['mobilerp']['totalEarnings'] == (
 			(self.json_prod_1["price"]*4) +
 			(self.json_prod_2["price"]*4) +
