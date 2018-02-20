@@ -38,12 +38,17 @@ from . import api, auth, logger
 def find_article(barcode, storeid=None):
     if not barcode:
         abort(404)
-    if storeid == None:
-        article  = Service.query.filter_by(barcode=barcode)\
-            .first()
-    else:
+    print("Will look  for product?")
+    if storeid is not None:
+        print("Looking for product")
         article = ProductStore.query.filter_by(barcode=barcode)\
             .filter_by(storeid=storeid).first()
+    if article is None:
+        print("Looking for service")
+        article  = Service.query.filter_by(barcode=barcode)\
+            .first()
+    if article is None:
+        abort(404)
     return make_response (jsonify({"mobilerp" : article.serialize}), 200)
     # article = MasterList.query
 
