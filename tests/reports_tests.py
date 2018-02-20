@@ -59,11 +59,11 @@ class SalesTestCase(unittest.TestCase):
 		engine.execute("delete from operation_logs;")
 		engine.execute("insert into drugstore(id, name) values (1, 'default');")
 		engine.execute("insert into drugstore(id, name) values (2, 'Store 2');")
-		engine.execute("insert into sale(date) values(CURRENT_DATE - 28);")
+		engine.execute("insert into sale(date) values((CURRENT_DATE - 28) + interval '1 hour');")
 		engine.execute("insert into saledetails(idsale, idproduct, productprice, units, storeid)\
 						select MAX(sale.id), '0001', 50.50, 2, 1 from sale;")
 		engine.execute("update product set units=units-2 where storeid = 1 and barcode='0001'")
-		engine.execute("insert into sale(date) values(CURRENT_DATE - 15);")
+		engine.execute("insert into sale(date) values((CURRENT_DATE - 15) + interval '1 hour');")
 		engine.execute("insert into saledetails(idsale, idproduct, productprice, units, storeid)\
 						select MAX(sale.id), '0003', 1, 2, 2 from sale;")
 		engine.execute("update product set units=units-2 where storeid = 1 and barcode='0003'")
@@ -78,11 +78,11 @@ class SalesTestCase(unittest.TestCase):
 		self.setUpSales()
 		unittest.TestCase.setUp(self)
 
-	# @classmethod
-	# def tearDownClass(cls):
-	# 	engine.execute('delete from saledetails; delete from sale; delete from\
-	# 					products_price_history; delete from product; delete from products_masterlist ;')
-	# 	engine.execute("delete from services; delete from drugstore;")
+	@classmethod
+	def tearDownClass(cls):
+		engine.execute('delete from saledetails; delete from sale; delete from\
+						products_price_history; delete from product; delete from products_masterlist ;')
+		engine.execute("delete from services; delete from drugstore;")
 
 	def setUp(self):
 		app.app.testing = True
@@ -139,11 +139,8 @@ class SalesTestCase(unittest.TestCase):
 		
 	def test_001_get_daily_report(self):
 		response = self.open_with_auth('/api/v1.1/daily_report/', 'GET')
-		print (response.status_code)
-		print (response.data)
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		print (json_data)
 		assert json_data['mobilerp']['totalItemsSold'] == 23
 		assert json_data['mobilerp']['totalSales'] == 3
 		assert json_data['mobilerp']['totalEarnings'] == (
@@ -176,13 +173,12 @@ class SalesTestCase(unittest.TestCase):
 
 	def test_003_get_custom_report(self):
 		end = ddate.today()
-		init = ddate.today()-timedelta(days=16)
+		init = ddate.today() - timedelta(days=16)
 		response = self.open_with_auth('/api/v1.1/custom_report/'+str(init)+'/'+str(end), 'GET')
 		assert response.status_code == 200
 		json_data = json.loads(response.data)
-		assert json_data['mobilerp']['totalItemsSold'] == 25
 		assert json_data['mobilerp']['totalSales'] == 4
-		assert sales not in json_data['mobilerp']
+		assert json_data['mobilerp']['totalItemsSold'] == 25
 		assert json_data['mobilerp']['totalEarnings'] == (
 			(self.json_prod_1["price"]*4) +
 			(self.json_prod_2["price"]*4) +
@@ -192,6 +188,7 @@ class SalesTestCase(unittest.TestCase):
 			(self.json_serv_3["price"]*4) +
 			(self.json_prod_2["price"]*2) 
 			)
+		assert 'sales' not in json_data['mobilerp']
 
 	def test_004_get_custom_report_fail_invalid_dates(self):
 		"""

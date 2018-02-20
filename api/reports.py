@@ -23,7 +23,7 @@ from reporter.salesreport import salesReport as salesReport
 from reporter.pdfgenerator import generateSalesPdf
 from . import api, auth
 
-from datetime import datetime as ddate
+from datetime import datetime as ddate, timedelta
 # from dateutil.parser import parser as parser
 
 @api.route('/v1.0/daily_report/', methods=['GET'])
@@ -31,6 +31,7 @@ from datetime import datetime as ddate
 @auth.login_required
 def send_daily_report():
 	cdate = ddate.today()
+	cdate = ddate.strptime(str(cdate.date())+" 23:59:59", "%Y-%m-%d %H:%M:%S")
 	data = salesReport(cdate)
 	if (data == 500):
 		abort(500)
@@ -45,6 +46,7 @@ def send_daily_report():
 @auth.login_required
 def send_monthly_report():
 	cdate = ddate.today()
+	cdate = ddate.strptime(str(cdate.date())+" 23:59:59", "%Y-%m-%d %H:%M:%S")
 	data = salesReport(cdate, 30)
 	if (data == 500):
 		abort(500)
@@ -56,14 +58,14 @@ def send_monthly_report():
 @api.route('/v1.1/custom_report/<init_date>/<end_date>', methods=['GET'])
 @auth.login_required
 def send_custom_report(init_date, end_date):
-	d_init_date = ddate.strptime(init_date, "%Y-%m-%d")
-	d_end_date = ddate.strptime(end_date, "%Y-%m-%d")
+	d_init_date = ddate.strptime(init_date+" 00:00:00", "%Y-%m-%d %H:%M:%S")
+	d_end_date = ddate.strptime(end_date+" 23:59:59", "%Y-%m-%d %H:%M:%S")
 	days = (d_end_date - d_init_date).days
 	if (days < 0):
 		abort(400)
 	if (d_end_date.date() > ddate.today().date()):
 		abort(400)
-	data = salesReport(d_end_date,(abs((d_end_date - d_init_date).days)))
+	data = salesReport(d_end_date,days)
 	if (data == 500):
 		abort(500)
 	task = generateSalesPdf.delay(data)
