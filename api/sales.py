@@ -36,6 +36,7 @@ from . import api, auth, logger
 @api.route('/v1.1/find_article/<barcode>/<storeid>', methods=['GET'])
 @auth.login_required
 def find_article(barcode, storeid=None):
+    article = None
     if not barcode:
         abort(404)
     print("Will look  for product?")
