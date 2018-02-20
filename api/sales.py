@@ -39,19 +39,15 @@ def find_article(barcode, storeid=None):
     article = None
     if not barcode:
         abort(404)
-    print("Will look  for product?")
     if storeid is not None:
-        print("Looking for product")
         article = ProductStore.query.filter_by(barcode=barcode)\
             .filter_by(storeid=storeid).first()
     if article is None:
-        print("Looking for service")
         article  = Service.query.filter_by(barcode=barcode)\
             .first()
     if article is None:
         abort(404)
     return make_response (jsonify({"mobilerp" : article.serialize}), 200)
-    # article = MasterList.query
 
 @api.route('/v1.0/make_sale/', methods=['POST'])
 @auth.login_required
