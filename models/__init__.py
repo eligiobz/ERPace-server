@@ -25,7 +25,8 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 import os
 
 Base = declarative_base()
-engine = create_engine(os.environ['DATABASE_URL'], convert_unicode=True)
+engine = create_engine(os.environ['DATABASE_URL'], convert_unicode=True, pool_recycle=3600,\
+						pool_size=10, max_overflow=10)
 db_session = scoped_session(sessionmaker(autocommit=False,
                             autoflush=False,
                             bind=engine))
