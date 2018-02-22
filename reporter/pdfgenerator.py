@@ -20,7 +20,7 @@
 
 from jinja2 import Environment, FileSystemLoader
 from weasyprint import HTML
-
+from celery import uuid as uuid
 
 from . import *
 import app
@@ -29,22 +29,22 @@ env = Environment(loader=FileSystemLoader('.'),
                   extensions=['jinja2.ext.with_'])
 
 
-@celery.task
+@my_celery.task
 def generateSalesPdf(data):
   with app.app.app_context():
     template = env.get_template(SALES_REPORT_TEMPLATE)
     template_vars = data
     html_output = template.render(template_vars)
     HTML(string=html_output).write_pdf(OUTPUT_FOLDER\
-                                       + "salesreport.pdf",
+                                       + "salesreport"+str(uuid())+".pdf",
                                        stylesheets=[SALES_REPORT_STYLE])
     return True
 
-@celery.task
+@my_celery.task
 def generateDepletedReport(data):
     template = env.get_template(DEPLETED_REPORT_TEMPLATE)
     template_vars = data
     html_output = template.render(template_vars)
     HTML(string=html_output).write_pdf(OUTPUT_FOLDER\
-                                       + "depletedreport.pdf",
+                                       + "depletedreport"+str(uuid())+".pdf",
                                        stylesheets=[DEPLETED_REPORT_STYLE])

@@ -33,7 +33,7 @@ from celery import Celery
 
 from models import Base, engine, db_session
 from api.views import api as api
-from reporter import celery
+from reporter import my_celery
 
 import os
 
@@ -58,7 +58,7 @@ app.config['CELERY_RESULT_BACKEND'] = os.environ['REDIS_URL']
 app.register_blueprint(api, url_prefix="/api")
 Compress(app)
 manager = Manager(app)
-celery.conf.update(app.config)
+my_celery.conf.update(app.config)
 
 
 # manager commands

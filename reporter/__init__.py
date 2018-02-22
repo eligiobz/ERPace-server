@@ -28,4 +28,4 @@ DEPLETED_REPORT_STYLE = 'static/css/depleted_report_style.css'
 OUTPUT_FOLDER = 'static/pdf/'
 
 
-celery = Celery('app', broker=os.environ['REDIS_URL'])
+my_celery = Celery('app', broker=os.environ['REDIS_URL'])
