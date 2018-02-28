@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-from celery import Celery
 import os
 
 SALES_REPORT_TEMPLATE = 'templates/pdf/sales_report.html'
@@ -26,6 +25,3 @@ SALES_REPORT_STYLE = 'static/css/sales_report_style.css'
 DEPLETED_REPORT_TEMPLATE = 'templates/pdf/depleted_product.html'
 DEPLETED_REPORT_STYLE = 'static/css/depleted_report_style.css'
 OUTPUT_FOLDER = 'static/pdf/'
-
-
-my_celery = Celery('app', broker=os.environ['REDIS_URL'])
