@@ -34,7 +34,7 @@ def generateSalesPdf(data):
   template_vars = data
   html_output = template.render(template_vars)
   output = pypandoc.convert_text(html_output, format='html', to='pdf',
-    extra_args=['--pdf-engine=xelatex', '-V mainfont="DejaVu Serif"',
+    extra_args=['--pdf-engine xelatex', '-V mainfont="DejaVu Serif"',
     '-V sansfont=Arial'], outputfile="static/pdf/salesreport.pdf")
   
 
