@@ -26,24 +26,19 @@ import app
 
 env = Environment(loader=FileSystemLoader('.'),
                   extensions=['jinja2.ext.with_'])
-
+env.trim_blocks = True
+env.lstrip_blocks = True
 
 def generateSalesPdf(data):
-  with app.app.app_context():
-    template = env.get_template(SALES_REPORT_TEMPLATE)
-    template_vars = data
-    html_output = template.render(template_vars)
-    output = pypandoc.convert_text(html_output, format='html', to='pdf', extra_args=['-c static/css/sales_report_style.css'], outputfile="static/pdf/salesreport.pdf")
-    assert output == ""
-    # HTML(string=html_output).write_pdf(OUTPUT_FOLDER\
-    #                                    + "salesreport.pdf",
-    #                                    stylesheets=[SALES_REPORT_STYLE])
-    return True
+  template = env.get_template(SALES_REPORT_TEMPLATE)
+  template_vars = data
+  html_output = template.render(template_vars)
+  output = pypandoc.convert_text(html_output, format='html', to='pdf', outputfile="static/pdf/salesreport.pdf")
+  
 
 def generateDepletedReport(data):
     template = env.get_template(DEPLETED_REPORT_TEMPLATE)
     template_vars = data
     html_output = template.render(template_vars)
-    # HTML(string=html_output).write_pdf(OUTPUT_FOLDER\
-    #                                    + "depletedreport.pdf",
-    #                                    stylesheets=[DEPLETED_REPORT_STYLE])
+    output = pypandoc.convert_text(html_output, format='html', to='pdf', outputfile="static/pdf/salesreport.pdf")
+    assert output == ""
