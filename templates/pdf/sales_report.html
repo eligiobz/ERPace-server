@@ -17,12 +17,15 @@
 
 	<table>
 		<thead>
-			<th>No. de Venta</th>
-			<th>Articulo</th>
-			<th>Cantidad</th>
-			<th>Precio</th>
-			<th>Ganancia</th>
+			<tr>
+				<th>No. de Venta</th>
+				<th>Articulo</th>
+				<th>Cantidad</th>
+				<th>Precio</th>
+				<th>Ganancia</th>
+			<tr>
 		</thead>
+		<tbody>
 		{% with %}
 			{% set lastId = -1 %}
 			{% set trclass = "darker" %}
@@ -44,7 +47,7 @@
 				</tr>
 			{% endfor %}
 		{% endwith %}
+		</tbody>
 	</table>
-
 </body>	
 </html>
