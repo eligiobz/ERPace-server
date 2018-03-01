@@ -31,3 +31,8 @@ class MasterList(Base):
     barcode = Column(String(60), primary_key=True)
     name = Column(String(700))
     price = Column(Float(precision=2))
+
+    @property
+    def serialize(self):
+        return {'barcode': self.barcode, 'name': self.name,
+                'price': self.price}

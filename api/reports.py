@@ -35,7 +35,7 @@ def send_daily_report():
 	data = salesReport(cdate)
 	if (data == 500):
 		abort(500)
-	generateSalesPdf(data)
+	#generateSalesPdf(data)
 	del(data['sales'])
 	return make_response(jsonify({'mobilerp': data}), 200)
 
@@ -49,7 +49,7 @@ def send_monthly_report():
 	data = salesReport(cdate, 30)
 	if (data == 500):
 		abort(500)
-	generateSalesPdf(data)
+	#generateSalesPdf(data)
 	del(data['sales'])
 	return make_response(jsonify({'mobilerp': data }), 200)
 
@@ -66,9 +66,8 @@ def send_custom_report(init_date, end_date):
 	data = salesReport(d_end_date,days)
 	if (data == 500):
 		abort(500)
-	task = generateSalesPdf.delay(data)
+	#generateSalesPdf(data)
 	del(data['sales'])
-	data['report_id'] =  task.task_id
 	return make_response(jsonify({'mobilerp': data}), 200)
 
 

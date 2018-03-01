@@ -1,1 +1,6 @@
-pandoc texlive pandoc-data
+pandoc 
+pandoc-data
+texlive
+texlive-latex-recommended
+texlive-latex-extra
+texlive-xetex
