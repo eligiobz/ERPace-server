@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "dokku": {
+      "predeploy": "apt-get update && apt-get -y install texlive texlive-latex-recommended texlive-latex-extra texlive-xetex wget && wget https://github.com/jgm/pandoc/releases/download/2.1.2/pandoc-2.1.2-1-amd64.deb && dpkg -i pandoc-2.1.2-1-amd64.deb"
+    }
+  }
+}
