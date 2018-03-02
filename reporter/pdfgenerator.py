@@ -31,10 +31,10 @@ env.lstrip_blocks = True
 
 pdf_or_latex = ''
 
-if pypandoc.get_pandoc_version().startswith('2'):
-  pdf_or_latex = '--pdf-engine=xelatex'
-else:
-  pdf_or_latex = '--latex-engine=xelatex'
+# if pypandoc.get_pandoc_version().startswith('2'):
+#   pdf_or_latex = '--pdf-engine=xelatex'
+# else:
+#   pdf_or_latex = '--latex-engine=xelatex'
 
 
 def generateSalesPdf(data):
@@ -42,7 +42,7 @@ def generateSalesPdf(data):
   template_vars = data
   html_output = template.render(template_vars)
   output = pypandoc.convert_text(html_output, format='html', to='pdf',
-    extra_args=[pdf_or_latex, '-V mainfont="DejaVu Serif"',
+    extra_args=['-V mainfont="DejaVu Serif"',
     '-V sansfont=Arial'], outputfile="static/pdf/salesreport.pdf")
   
 
