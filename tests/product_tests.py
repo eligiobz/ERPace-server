@@ -397,13 +397,19 @@ class SalesTestCase(unittest.TestCase):
 		response = self.find_product_1_1('1', '5001')
 		assert response.status_code == 404
 
-	def test_019_find_product_fail_1_1_product_exists_not_in_this_store(self):
+	def test_019_find_product_failsafe_1_1_product_exists_not_in_this_store(self):
 		response = self.find_product_1_1('1', '0004')
-		assert response.status_code == 404
+		json_data = json.loads(response.data)
+		assert response.status_code == 200
+		assert json_data['mobilerp']['barcode'] == '0004'
+		assert json_data['mobilerp']['price'] == 3.4
+		assert json_data['mobilerp']['name'] == 'tostitos'
+		assert json_data['mobilerp']['units'] == 0
+		
 
 	def test_020_find_product_fail_1_1_product_exists_invalid_store(self):
 		response = self.find_product_1_1('5', '0004')
-		assert response.status_code == 404
+		assert response.status_code == 406
 
 	def test_021_list_products_non_existent_store(self):
 		response = self.list_products_1_1('5')

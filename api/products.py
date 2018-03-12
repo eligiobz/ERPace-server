@@ -36,18 +36,24 @@ from . import logger
 @api.route('/v1.0/find_product/<bCode>', methods=['GET'])
 @api.route('/v1.1/find_product/<storeid>/<bCode>', methods=['GET'])
 @auth.login_required
-def find_product(bCode, storeid=None):
+def find_product(bCode, storeid=1):
     rule = request.url_rule
-    product = None
-    if '/v1.1/' in rule.rule:
-        product = ProductStore.query.filter_by(barcode=bCode).\
+    product = ProductStore.query.filter_by(barcode=bCode).\
                     filter_by(storeid=storeid).first()
-    else:
-        product = ProductStore.query.filter_by(barcode=bCode).first()
+    valid_store = Drugstore.query.filter_by(id=storeid).first()
+    if valid_store is None:
+        abort(406)
+    if product is None and '/v1.1/' in rule.rule:
+        product = MasterList.query.filter_by(barcode=bCode).first()
     if product is None:
         abort(404)
     else:
-        return make_response(jsonify( { "mobilerp" : product.serialize} ), 200)
+        if isinstance(product, MasterList):
+            data = product.serialize
+            data['units'] = 0
+            return make_response(jsonify( { "mobilerp" : data} ), 200)
+        else: 
+            return make_response(jsonify( { "mobilerp" : product.serialize} ), 200)
 
 @api.route('/v1.0/list_products/', methods=['GET'])
 @api.route('/v1.1/list_products/<int:storeid>', methods=['GET'])
