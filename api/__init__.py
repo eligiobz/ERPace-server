@@ -19,9 +19,10 @@
 ##############################################################################
 
 from flask import Blueprint, make_response, jsonify
-from flask_httpauth import HTTPBasicAuth
+from flask_httpauth import HTTPBasicAuth, HTTPDigestAuth
 
 from models.User import User as User
+#from models import pwd_context
 from utils.Logger import Logger as Logger
 
 api = Blueprint('api', __name__, static_folder='static', template_folder='templates')
@@ -36,6 +37,25 @@ def get_password(user):
         return None
     return user.password
 
+# @auth.get_password
+# def get_password(user):
+#     user = User.query.filter_by(username=user).first()
+#     if user is None:
+#         return None
+#     hashed_pass = pwd_context.hash(HTTPDigestAuth.get_password())
+#     if hashed_pass == user.password:
+#     	return user.password
+#     else:
+#     	return None
+
+# @auth.verify_password
+# def verify_password(username, passwd):
+# 	user = User.query.filter_by(username=username).first()
+# 	if not user:
+# 		return False
+# 	res=  pwd_context.verify(passwd, user.password)
+# 	print ("Password verification says :: ", res)
+# 	return pwd_context.verify(passwd, user.password)
 
 @auth.error_handler
 def unauthorized():

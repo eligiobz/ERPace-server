@@ -19,7 +19,7 @@
 ##############################################################################
 
 from jinja2 import Environment, FileSystemLoader
-import pypandoc
+import pydf
 
 from . import *
 import app
@@ -29,26 +29,18 @@ env = Environment(loader=FileSystemLoader('.'),
 env.trim_blocks = True
 env.lstrip_blocks = True
 
-pdf_or_latex = ''
-
-if pypandoc.get_pandoc_version().startswith('2'):
-  pdf_or_latex = '--pdf-engine=xelatex'
-else:
-  pdf_or_latex = '--latex-engine=xelatex'
-
-
 def generateSalesPdf(data):
   template = env.get_template(SALES_REPORT_TEMPLATE)
   template_vars = data
   html_output = template.render(template_vars)
-  output = pypandoc.convert_text(html_output, format='html', to='pdf',
-    extra_args=[pdf_or_latex, '-V mainfont="DejaVu Serif"',
-    '-V sansfont=Arial'], outputfile="static/pdf/salesreport.pdf")
+  pdf = pydf.generate_pdf(html_output)
+  with open('static/pdf/salesreport.pdf', 'wb') as f:
+    f.write(pdf)
   
-
 def generateDepletedReport(data):
-    template = env.get_template(DEPLETED_REPORT_TEMPLATE)
-    template_vars = data
-    html_output = template.render(template_vars)
-    output = pypandoc.convert_text(html_output, format='html', to='pdf', outputfile="static/pdf/salesreport.pdf")
-    assert output == ""
+  template = env.get_template(DEPLETED_REPORT_TEMPLATE)
+  template_vars = data
+  html_output = template.render(template_vars)
+  pdf = pydf.generate_pdf(html_output)
+  with open('static/pdf/depletedreport.pdf', 'wb') as f:
+    f.write(pdf)

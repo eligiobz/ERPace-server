@@ -21,6 +21,7 @@
 from sqlalchemy import create_engine, func as mfunc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
+#from passlib.context import CryptContext
 
 import os
 
@@ -30,3 +31,5 @@ engine = create_engine(os.environ['DATABASE_URL'], convert_unicode=True, pool_re
 db_session = scoped_session(sessionmaker(autocommit=False,
                             autoflush=False,
                             bind=engine))
+
+#pwd_context = CryptContext(schemes=["sha512_crypt"], deprecated="auto")
