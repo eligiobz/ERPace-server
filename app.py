@@ -84,6 +84,10 @@ def list_routes():
 def index():
     return make_response(jsonify({'mobilerp': 'Welcome to instance xxx'}), 200)
 
+@app.route('/its_alive')
+def its_alive():
+    return make_response('yeeees!!!!', 200)
+
 if __name__ == '__main__':
 	# manager.run()
     port = int(os.environ.get('PORT', 5000))

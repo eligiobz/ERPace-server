@@ -22,6 +22,7 @@ from flask import abort, jsonify, make_response, request
 
 from models.User import User as User
 from models import db_session
+#from models import pwd_context
 
 from . import api, auth
 
@@ -57,7 +58,8 @@ def delete_user(username):
 @auth.login_required
 def update_pass(n_pass):
     user = User.query.filter_by(username=auth.username()).first()
-    user.password = n_pass
+    hashed_pass = pwd_context.hash(n_pass)
+    user.password = hashed_pass
     db_session.add(user)
     db_session.commit()
     return jsonify({'user': [user.serialize]})
