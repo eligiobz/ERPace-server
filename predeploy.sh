@@ -1,5 +1,12 @@
 #!/bin/bash
 
+##############################################################################
+# PLACE CUSTOM UPGRADE OPERATIONS/IMAGE MANIPULATION HERE
+##############################################################################
+
+###
+# Example manipulating image
+###
 # echo "Updating repos"
 
 # apt-get update
@@ -14,5 +21,11 @@
 
 # wget https://github.com/jgm/pandoc/releases/download/2.1.2/pandoc-2.1.2-1-amd64.deb &&\
 # dpkg -i pandoc-2.1.2-1-amd64.deb
+
+###
+# Example of upgrade operations
+###
+
+# TBW
 
 echo "Nothing done"
