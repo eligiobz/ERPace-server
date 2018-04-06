@@ -22,7 +22,6 @@ from flask import abort, jsonify, make_response, request
 
 from models.User import User as User
 from models import db_session
-#from models import pwd_context
 
 from . import api, auth
 

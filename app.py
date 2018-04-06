@@ -31,6 +31,7 @@ from flask_script import Manager
 
 from models import Base, engine, db_session
 from api.views import api as api
+from api import init_crypt
 
 import os
 
@@ -49,11 +50,12 @@ Base.query = db_session.query_property()
 # PREPARING APP
 
 app = Flask(__name__)
-app.config['DEBUG'] = True
+app.config['DEBUG'] = os.getenv('DEBUG') or False
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') or 'NOT_A_SAFE_SECRET'
 app.register_blueprint(api, url_prefix="/api")
 Compress(app)
 manager = Manager(app)
-
+print ("Init Crypt :: ", init_crypt(app.config['SECRET_KEY'][:15]))
 
 # manager commands
 @manager.command
