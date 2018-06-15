@@ -32,6 +32,7 @@ from models.Service import Service
 
 from . import api, auth, logger
 
+
 @api.route('/v1.1/find_article/<barcode>', methods=['GET'])
 @api.route('/v1.1/find_article/<barcode>/<storeid>', methods=['GET'])
 @auth.login_required
@@ -47,7 +48,8 @@ def find_article(barcode, storeid=None):
             .first()
     if article is None:
         abort(404)
-    return make_response (jsonify({"mobilerp" : article.serialize}), 200)
+    return make_response(jsonify({"mobilerp": article.serialize}), 200)
+
 
 @api.route('/v1.0/make_sale/', methods=['POST'])
 @auth.login_required
@@ -55,8 +57,8 @@ def make_sale_1_0():
     if not request.json:
         abort(400)
     if 'barcode' not in request.json or len(request.json['barcode']) <= 0 or\
-        'units' not in request.json or len(request.json['units']) <= 0 or\
-        'is_service' not in request.json or len(request.json['is_service']) <= 0:
+            'units' not in request.json or len(request.json['units']) <= 0 or\
+            'is_service' not in request.json or len(request.json['is_service']) <= 0:
         abort(400)
     if (logger.log_op(request.json)):
         s = Sale()
@@ -66,7 +68,8 @@ def make_sale_1_0():
             if int(request.json['is_service'][i]) == 0:
                 bCode = request.json['barcode'][i]
                 units = request.json['units'][i]
-                ps = ProductStore.query.filter_by(barcode=bCode).filter_by(storeid=1).first()
+                ps = ProductStore.query.filter_by(
+                    barcode=bCode).filter_by(storeid=1).first()
                 if (ps.units - units < 0):
                     abort(406, {"message": 'articulos insuficientes'})
                 else:
@@ -85,22 +88,23 @@ def make_sale_1_0():
             else:
                 abort(400)
         sd = SaleDetails.query.filter_by(idsale=s.id).all()
-        return make_response(jsonify( { "mobilerp" :[sd_.serialize for sd_ in sd] } ), 200)
+        return make_response(jsonify({"mobilerp": [sd_.serialize for sd_ in sd]}), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 
 ################################## V1.1 #######################################
 
+
 @api.route('/v1.1/make_sale/', methods=['POST'])
 @auth.login_required
 def make_sale_1_1():
     if not request.json or 'storeid' not in request.json or\
-        'barcode' not in request.json or len(request.json['barcode']) <= 0 or\
-        'is_service' not in request.json or len(request.json['is_service']) <= 0:
+            'barcode' not in request.json or len(request.json['barcode']) <= 0 or\
+            'is_service' not in request.json or len(request.json['is_service']) <= 0:
         abort(400)
     drugstore = Drugstore.query.filter_by(id=request.json['storeid']).first()
     if drugstore is None:
-        abort (406, { "message" : "storeid invalido"})
+        abort(406, {"message": "storeid invalido"})
     if (logger.log_op(request.json)):
         s = Sale()
         db_session.add(s)
@@ -119,20 +123,23 @@ def make_sale_1_1():
                 else:
                     q = updateHelper(bCode, units, request.json['storeid'])
                     engine.execute(q)
-                    sd = SaleDetails(s.id, m.barcode, m.price, units, request.json['storeid'])
+                    sd = SaleDetails(s.id, m.barcode, m.price,
+                                     units, request.json['storeid'])
                     db_session.add(sd)
                     db_session.commit()
             elif int(request.json['is_service'][i]) == 1:
                 bCode = request.json['barcode'][i]
                 units = request.json['units'][i]
                 m = MasterList.query.filter_by(barcode=bCode).first()
-                sd = SaleDetails(s.id, m.barcode, m.price, units, request.json['storeid'])
+                sd = SaleDetails(s.id, m.barcode, m.price,
+                                 units, request.json['storeid'])
                 db_session.add(sd)
                 db_session.commit()
-        sd = SaleDetails.query.filter_by(idsale = s.id).all()
-        return make_response(jsonify( { "mobilerp" :[sd_.serialize for sd_ in sd]}), 200)
+        sd = SaleDetails.query.filter_by(idsale=s.id).all()
+        return make_response(jsonify({"mobilerp": [sd_.serialize for sd_ in sd]}), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
+
 
 def updateHelper(barcode, units, storeid):
     p = Product.query.filter_by(storeid=storeid, barcode=barcode).first()

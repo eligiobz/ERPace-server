@@ -28,7 +28,7 @@ separate entity inside this model.
 
 
 from sqlalchemy import Column, Integer, DateTime, PrimaryKeyConstraint,\
-                       String, Float
+    String, Float
 from models import Base
 
 from datetime import datetime
@@ -63,6 +63,7 @@ class SalesReport(Base):
                 'name': self.name, 'price': self.productprice,
                 'units': self.units, 'totalEarning': self.total_earning}
 
+
 class DepletedItems(Base):
 
     __tablename__ = "depleteditemsview"
@@ -81,8 +82,8 @@ class DepletedItems(Base):
     @property
     def serialize(self):
         return {'idSale': self.idsale, 'name': self.name,
-            'date': self.date, 'storeid' : self.storeid,
-            'units' : self.units, 'barcode': self.barcode}
+                'date': self.date, 'storeid': self.storeid,
+                'units': self.units, 'barcode': self.barcode}
 
 
 class ProductStore(Base):
@@ -97,7 +98,7 @@ class ProductStore(Base):
     name = Column(String(700))
     units = Column(Integer)
     price = Column(Float(precision=2))
-    storeid =  Column(Integer)
+    storeid = Column(Integer)
 
     @property
     def serialize(self):

@@ -21,6 +21,7 @@
 from sqlalchemy import Column, Float, Integer, String
 from models import Base
 
+
 class Drugstore(Base):
     __tablename__ = "drugstore"
 
@@ -28,9 +29,10 @@ class Drugstore(Base):
     name = Column(String(700))
 
     """Drugstore"""
+
     def __init__(self, name):
         self.name = name
-        
+
     """Prepares the Drugstore to be returned in JSON format"""
     @property
     def serialize(self):

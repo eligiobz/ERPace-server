@@ -20,22 +20,24 @@
 
 from flask import Blueprint, make_response, jsonify
 from flask_httpauth import HTTPBasicAuth, HTTPDigestAuth
+from passlib.hash import sha512_crypt
 
 from models.User import User as User
-#from models import pwd_context
 from utils.Logger import Logger as Logger
+import os
+
 
 api = Blueprint('api', __name__, static_folder='static', template_folder='templates')
 auth = HTTPBasicAuth()
 logger = Logger()
+crypt = sha512_crypt.using(salt= os.getenv('SECRET_KEY')[:15] or 'NOT_A_SAFE_SECRET')
 
-
-@auth.get_password
-def get_password(user):
-    user = User.query.filter_by(username=user).first()
-    if user is None:
-        return None
-    return user.password
+# @auth.get_password
+# def get_password(user):
+#     user = User.query.filter_by(username=user).first()
+#     if user is None:
+#         return None
+#     return user.password
 
 # @auth.get_password
 # def get_password(user):
@@ -48,14 +50,21 @@ def get_password(user):
 #     else:
 #     	return None
 
-# @auth.verify_password
-# def verify_password(username, passwd):
-# 	user = User.query.filter_by(username=username).first()
-# 	if not user:
-# 		return False
-# 	res=  pwd_context.verify(passwd, user.password)
-# 	print ("Password verification says :: ", res)
-# 	return pwd_context.verify(passwd, user.password)
+def init_crypt(secret):
+	try:
+		crypt = sha512_crypt.using(salt=secret)
+		return True
+	except RuntimeError:
+		return False
+
+@auth.verify_password
+def verify_password(username, passwd):
+	user = User.query.filter_by(username=username).first()
+	if not user:
+		return False
+	res =  crypt.verify(passwd, user.password)
+	print ("Password verification says :: ", res)
+	return crypt.verify(passwd, user.password)
 
 @auth.error_handler
 def unauthorized():

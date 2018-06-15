@@ -23,14 +23,16 @@ from reporter.salesreport import salesReport as salesReport
 from reporter.pdfgenerator import generateSalesPdf
 from . import api, auth
 
-import os, shutil
+import os
+import shutil
+
 
 @api.route('/v1.0/dbBackup/', methods=['GET'])
 @auth.login_required
 def sendDatabase():
-	try:
-		os.makedirs('static/db/')
-	except FileExistsError:
-		print ("Already exist")
-	shutil.copyfile("mobilerp.db", "static/db/mobilerp.db")
-	return current_app.send_static_file("db/mobilerp.db")
+    try:
+        os.makedirs('static/db/')
+    except FileExistsError:
+        print("Already exist")
+    shutil.copyfile("mobilerp.db", "static/db/mobilerp.db")
+    return current_app.send_static_file("db/mobilerp.db")

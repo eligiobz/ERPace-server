@@ -29,18 +29,20 @@ env = Environment(loader=FileSystemLoader('.'),
 env.trim_blocks = True
 env.lstrip_blocks = True
 
+
 def generateSalesPdf(data):
-  template = env.get_template(SALES_REPORT_TEMPLATE)
-  template_vars = data
-  html_output = template.render(template_vars)
-  pdf = pydf.generate_pdf(html_output)
-  with open('static/pdf/salesreport.pdf', 'wb') as f:
-    f.write(pdf)
-  
+    template = env.get_template(SALES_REPORT_TEMPLATE)
+    template_vars = data
+    html_output = template.render(template_vars)
+    pdf = pydf.generate_pdf(html_output)
+    with open('static/pdf/salesreport.pdf', 'wb') as f:
+        f.write(pdf)
+
+
 def generateDepletedReport(data):
-  template = env.get_template(DEPLETED_REPORT_TEMPLATE)
-  template_vars = data
-  html_output = template.render(template_vars)
-  pdf = pydf.generate_pdf(html_output)
-  with open('static/pdf/depletedreport.pdf', 'wb') as f:
-    f.write(pdf)
+    template = env.get_template(DEPLETED_REPORT_TEMPLATE)
+    template_vars = data
+    html_output = template.render(template_vars)
+    pdf = pydf.generate_pdf(html_output)
+    with open('static/pdf/depletedreport.pdf', 'wb') as f:
+        f.write(pdf)

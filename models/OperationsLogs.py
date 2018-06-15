@@ -21,12 +21,12 @@
 from sqlalchemy import Column, Float, Integer, String, func
 from models import Base
 
+
 class OperationsLogs(Base):
 
-	__tablename__ = "operation_logs"
-	id = Column(Integer, primary_key=True, autoincrement=True)
-	str_data = Column(String)
+    __tablename__ = "operation_logs"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    str_data = Column(String)
 
-
-	def __init__(self, str_data):
-		self.str_data = str_data
+    def __init__(self, str_data):
+        self.str_data = str_data
