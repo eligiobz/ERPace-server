@@ -32,8 +32,8 @@ class ProductPriceHistory(Base):
     def __init__(self, barcode):
         self.barcode = barcode
         self.old_price = (MasterList.query
-                                 .filter_by(barcode=barcode)
-                                 .first()).price
+                          .filter_by(barcode=barcode)
+                          .first()).price
         self.date_changed = datetime.now()
 
     """ 
@@ -44,6 +44,7 @@ class ProductPriceHistory(Base):
     # def serialize(self):
     #     pass
 
+
 class ServicePriceHistory(Base):
     __tablename__ = "service_price_history"
     barcode = Column(String, primary_key=True)
@@ -53,8 +54,8 @@ class ServicePriceHistory(Base):
     def __init__(self, barcode):
         self.barcode = barcode
         self.old_price = (MasterList.query
-                                 .filter_by(barcode=barcode)
-                                 .first()).price
+                          .filter_by(barcode=barcode)
+                          .first()).price
         self.date_changed = datetime.now()
 
     """ 

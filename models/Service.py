@@ -21,6 +21,7 @@
 from sqlalchemy import Column, Float, Integer, String, ForeignKey
 from models import Base
 
+
 class Service(Base):
     __tablename__ = "services"
 
@@ -29,6 +30,7 @@ class Service(Base):
     price = Column(Float(precision=2))
 
     """Service"""
+
     def __init__(self, barcode, name, price):
         self.barcode = barcode
         self.name = name
@@ -37,8 +39,7 @@ class Service(Base):
     @property
     def serialize(self):
         return {
-            'barcode' : self.barcode,
-            'name' : self.name,
-            'price' : self.price
+            'barcode': self.barcode,
+            'name': self.name,
+            'price': self.price
         }
-

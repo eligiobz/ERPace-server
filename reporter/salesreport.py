@@ -28,40 +28,40 @@ import asyncio
 
 from multiprocessing import Process
 
+
 def salesReport(end_date, delta_days=0):
     if delta_days == 0:
-        delta_days = 1 
+        delta_days = 1
     init_date = end_date - timedelta(days=delta_days)
     totalItemsSold = SalesReport.query\
-                    .filter(init_date <= SalesReport.date)\
-                    .filter((SalesReport.date <= end_date))\
-                    .with_entities(mfunc.sum(SalesReport.units))\
-                    .scalar()
-    totalSales = len(db_session.query(\
-                    SalesReport.idsale,\
-                    mfunc.count(SalesReport.idsale))\
-                    .filter(init_date <= SalesReport.date)\
-                    .filter((SalesReport.date <= end_date))\
-                    .group_by(SalesReport.idsale).all())
+        .filter(init_date <= SalesReport.date)\
+        .filter((SalesReport.date <= end_date))\
+        .with_entities(mfunc.sum(SalesReport.units))\
+        .scalar()
+    totalSales = len(db_session.query(
+        SalesReport.idsale,
+        mfunc.count(SalesReport.idsale))
+        .filter(init_date <= SalesReport.date)
+        .filter((SalesReport.date <= end_date))
+        .group_by(SalesReport.idsale).all())
     totalEarnings = SalesReport.query\
-                    .filter(init_date <= SalesReport.date)\
-                    .filter((SalesReport.date <= end_date))\
-                    .with_entities(mfunc.sum(SalesReport.total_earning))\
-                    .scalar()
+        .filter(init_date <= SalesReport.date)\
+        .filter((SalesReport.date <= end_date))\
+        .with_entities(mfunc.sum(SalesReport.total_earning))\
+        .scalar()
     sales = SalesReport.query.filter(init_date <= SalesReport.date)\
-                    .filter((SalesReport.date <= end_date))\
-            .order_by(SalesReport.idsale)
+        .filter((SalesReport.date <= end_date))\
+        .order_by(SalesReport.idsale)
     if sales is None or len(sales.all()) == 0:
         return 500
     else:
         data = {
-                'title': "Reporte del " \
-                         +  ((str(init_date.date()) + " al ") if delta_days > 0 else "")\
-                         + str(end_date.date()),
-                'totalItemsSold': totalItemsSold,
-                'totalSales': totalSales,
-                'totalEarnings': totalEarnings,
-                'sales': [s.serialize for s in sales]
-                }
+            'title': "Reporte del "
+            + ((str(init_date.date()) + " al ") if delta_days > 0 else "")
+            + str(end_date.date()),
+            'totalItemsSold': totalItemsSold,
+            'totalSales': totalSales,
+            'totalEarnings': totalEarnings,
+            'sales': [s.serialize for s in sales]
+        }
         return data
-        

@@ -31,6 +31,7 @@ from reporter.pdfgenerator import generateDepletedReport
 from . import auth, api
 from . import logger
 
+
 @api.route('/v1.1/find_service/<bCode>', methods=['GET'])
 @auth.login_required
 def find_service(bCode, storeid=None):
@@ -38,22 +39,23 @@ def find_service(bCode, storeid=None):
     if service is None:
         abort(404)
     else:
-        return make_response(jsonify( { "mobilerp" :service.serialize} ), 200)
+        return make_response(jsonify({"mobilerp": service.serialize}), 200)
+
 
 @api.route('/v1.1/list_services/', methods=['GET'])
 @auth.login_required
 def list_services():
     services = Service.query.order_by(Service.name.asc()).all()
-    if services is None or len(services) == 0: 
-       abort(412, "Por alguna razon la lista esta vacia")
-    return make_response(jsonify( { "mobilerp" :[p.serialize for p in services] }), 200)
+    if services is None or len(services) == 0:
+        abort(412, "Por alguna razon la lista esta vacia")
+    return make_response(jsonify({"mobilerp": [p.serialize for p in services]}), 200)
 
 
 @api.route('/v1.1/add_service/', methods=['POST'])
 @auth.login_required
 def add_service():
     if not request.json or 'barcode' not in request.json\
-       or 'price' not in request.json or 'name' not in request.json :
+       or 'price' not in request.json or 'name' not in request.json:
         abort(400)
     if not request.json['barcode'] or not request.json['name']\
        or not request.json['price']:
@@ -61,12 +63,12 @@ def add_service():
     if (logger.log_op(request.json)):
         m = MasterList.query.filter_by(barcode=request.json['barcode']).first()
         if m is not None:
-            abort(409, { "message" : "Servicio existente" })
+            abort(409, {"message": "Servicio existente"})
         m = Service(request.json['barcode'], request.json['name'],
-            request.json['price'])
+                    request.json['price'])
         db_session.add(m)
         db_session.commit()
-        return make_response(jsonify( { "mobilerp" :m.serialize} ), 200)
+        return make_response(jsonify({"mobilerp": m.serialize}), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
 
@@ -90,9 +92,10 @@ def update_service_1_1(bCode):
             m.name = request.json['name']
         db_session.add(m)
         db_session.commit()
-        return make_response(jsonify( { "mobilerp" :m.serialize} ), 200)
+        return make_response(jsonify({"mobilerp": m.serialize}), 200)
     else:
         return make_response(jsonify({'mobilerp': 'Operacion duplicada, saltando'}), 428)
+
 
 @api.route('/v1.1/service_price_history/<bCode>', methods=['GET'])
 @auth.login_required

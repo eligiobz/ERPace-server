@@ -3,7 +3,7 @@
 ##############################################################################
 # MobilEPR - A small self-hosted ERP that works with your smartphone.
 # Copyright (C) 2017  Eligio Becerra
-#
+# 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
@@ -23,7 +23,8 @@ from flask import abort, jsonify, make_response, request
 from models.User import User as User
 from models import db_session
 
-from . import api, auth
+from . import api, auth, crypt
+
 
 @api.route('/v1.0/user/add/', methods=['POST'])
 @api.route('/v1.1/user/add/', methods=['POST'])
@@ -33,14 +34,15 @@ def add_user():
                             'level' not in request.json):
         abort(406)
     if not request.json['username'] or \
-        not request.json['password'] or \
-        not request.json['level']:
+            not request.json['password'] or \
+            not request.json['level']:
         abort(406)
     user = User(request.json['username'], request.json['password'],
                 request.json['level'])
     db_session.add(user)
     db_session.commit()
     return jsonify({'mobilerp': [user.serialize]})
+
 
 @api.route('/v1.1/user/delete/<username>', methods=['DELETE'])
 @auth.login_required
@@ -52,16 +54,18 @@ def delete_user(username):
     db_session.commit()
     return make_response(jsonify({'mobilerp': 'deleted'}, 200))
 
-@api.route('/v1.0/user/update_pass/<string:n_pass>', methods=['PUT'])
-@api.route('/v1.1/user/update_pass/<string:n_pass>', methods=['PUT'])
+
+@api.route('/v1.0/user/update_pass/<_user>/<string:n_pass>', methods=['PUT'])
+@api.route('/v1.1/user/update_pass/<_user>/<string:n_pass>', methods=['PUT'])
 @auth.login_required
-def update_pass(n_pass):
-    user = User.query.filter_by(username=auth.username()).first()
-    hashed_pass = pwd_context.hash(n_pass)
+def update_pass(_user, n_pass):
+    user = User.query.filter_by(username=_user).first()
+    hashed_pass = crypt.hash(n_pass)
     user.password = hashed_pass
     db_session.add(user)
     db_session.commit()
     return jsonify({'user': [user.serialize]})
+
 
 @api.route('/v1.0/user/check_login/', methods=['GET'])
 @api.route('/v1.1/user/check_login/', methods=['GET'])

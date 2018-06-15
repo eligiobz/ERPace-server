@@ -21,14 +21,17 @@
 from sqlalchemy import Column, Float, Integer, String, ForeignKey
 from models import Base
 
+
 class Product(Base):
     __tablename__ = "product"
 
-    barcode = Column(String, ForeignKey('products_masterlist.barcode'), primary_key=True)
+    barcode = Column(String, ForeignKey(
+        'products_masterlist.barcode'), primary_key=True)
     units = Column(Integer)
     storeid = Column(Integer, ForeignKey('drugstore.id'))
 
     """Products"""
+
     def __init__(self, barcode, units, storeid):
         self.barcode = barcode
         self.units = units

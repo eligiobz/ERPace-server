@@ -21,35 +21,38 @@
 from . import OperationsLogs
 from models import db_session
 
-import os, json
+import os
+import json
+
 
 class Logger:
 
-	str_data = ""
-	log_limit = 6
+    str_data = ""
+    log_limit = 6
 
-	def log_op(self, op):
-		self.str_data = json.dumps(op)
-		if(self.__check_op__()):
-			op = OperationsLogs(self.str_data)
-			db_session.add(op)
-			db_session.commit()
-			self.__remove_last_op__()
-			return True
-		else:
-			return False
+    def log_op(self, op):
+        self.str_data = json.dumps(op)
+        if(self.__check_op__()):
+            op = OperationsLogs(self.str_data)
+            db_session.add(op)
+            db_session.commit()
+            self.__remove_last_op__()
+            return True
+        else:
+            return False
 
-	def __remove_last_op__(self):
-		total_ops = OperationsLogs.query.count()
-		while (total_ops > self.log_limit):
-			op = OperationsLogs.query.first()
-			db_session.delete(op)
-			db_session.commit()
-			total_ops -= 1
+    def __remove_last_op__(self):
+        total_ops = OperationsLogs.query.count()
+        while (total_ops > self.log_limit):
+            op = OperationsLogs.query.first()
+            db_session.delete(op)
+            db_session.commit()
+            total_ops -= 1
 
-	def __check_op__(self):
-		ops_log = OperationsLogs.query.filter_by(str_data=self.str_data).first()
-		if ops_log is None:
-			return True
-		else:
-			return False
+    def __check_op__(self):
+        ops_log = OperationsLogs.query.filter_by(
+            str_data=self.str_data).first()
+        if ops_log is None:
+            return True
+        else:
+            return False

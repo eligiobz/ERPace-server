@@ -21,6 +21,7 @@
 from sqlalchemy import Column, Float, Integer, String
 from models import Base
 
+
 class ProductsMasterlist(Base):
     __tablename__ = "products_masterlist"
 
@@ -29,6 +30,7 @@ class ProductsMasterlist(Base):
     price = Column(Float(precision=2))
 
     """MasterList"""
+
     def __init__(self, barcode, name, price):
         self.barcode = barcode
         self.name = name

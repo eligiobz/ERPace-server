@@ -25,6 +25,7 @@ from models import Base
 TODO: Merge with views
 """
 
+
 class MasterList(Base):
     __tablename__ = "masterlist"
 
