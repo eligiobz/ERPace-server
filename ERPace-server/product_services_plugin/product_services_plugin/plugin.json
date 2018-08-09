@@ -1,12 +1,18 @@
 {
     "name": "Product and Service Manager",
     "description": "Manages Products and services",
+    "pkg_name": "product_services",
     "level": 0,
     "min_db_version": 7,
     "max_db_version": 7, 
     "requires": [ "stores_plugins" ],
+    "prefix": "api",
     "urls": [
         "/add_product/",
-        "/find_product/"
+        "/find_product/",
+        "/list_product/",
+        "/add_service/",
+        "/find_service/",
+        "/list_service/"
     ]    
 }

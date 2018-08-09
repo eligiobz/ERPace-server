@@ -20,14 +20,15 @@
 
 import os, json
 
-class ProductServicePlugin:
+class ProductServicesPlugin:
 
     description = ""
 
     def __init__(self, subdir):
         path = (os.getcwd()+"/"+subdir+"/"+subdir+"/")
         self.description = json.loads(open(path+"plugin.json").read())
+        print(self.description["name"], " loaded")
 
 
-if __name__ == "__main__":
-    psp = ProductServicePlugin("m_product_services_management")
+# if __name__ == "__main__":
+#     psp = ProductServicePlugin("m_product_services_management")

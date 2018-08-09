@@ -18,12 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-import os
-import importlib as loader
+import os, json
+import importlib
 
 class ModuleLoader():
+    """
+    This class 
 
-    __found_dirs__ = []
+    TODO: Write proper documentation, make this singleton
+    """
+
+    __found_plugins__ = []
     __loaded_modules__ = []
 
     def __init__(self):
@@ -31,15 +36,30 @@ class ModuleLoader():
         Find all possible modules in current working directory
         """
         for dirs in os.listdir(os.getcwd()):
-            if dirs.startswith("m_") and not dirs == "m_module_loader":
-                self.__found_dirs__.append(dirs)
-        print (self.__found_dirs__)
+            if dirs.endswith("_plugin"):
+                try:
+                    pkg_path = os.getcwd()+"/"+dirs+"/"+dirs+"/"
+                    pkg_name = json.loads(open(pkg_path+"/plugin.json").read())["pkg_name"]
+                    self.__found_plugins__.append([dirs, pkg_name])
+                except FileNotFoundError as e:
+                    print(dirs, " is an invalid plugin")
+                #self.__found_dirs__.append(dirs,)
+        print (self.__found_plugins__)
+        self.__load_modules__()
 
     def __load_modules__(self):
         """
         Attemping to load modules
         """
-        for module in self.__found_dirs__:
-            loader.import_module(module, )
-        pass
+        print ("CURRENT WORKING DIR ::", os.getcwd())
+        for module in self.__found_plugins__:
+            try:
+                print("Clearing caches")
+                #importlib.invalidate_caches()
+                print("Attemping to load", module[0])
+                m = importlib.import_module("."+module[0]+"."+module[0]+".", module[0])
+                print ("Module loaded", module[0])
+            except Exception as e:
+                print (e, "in", os.getcwd())
+            
 
