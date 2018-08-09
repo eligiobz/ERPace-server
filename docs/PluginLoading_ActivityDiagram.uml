@@ -1,0 +1,14 @@
+@startuml
+
+entity Core
+control PluginManager
+entity Plugin
+
+Core -> PluginManager: Request list of urls to register
+PluginManager -> PluginManager: Find list of possible plugins
+PluginManager -> Plugin: Request for urls to register
+Plugin -> PluginManager: Return lists of list of urls
+PluginManager -> PluginManager: Load and instance plugin
+PluginManager --> Core: Return list of urls to register
+
+@enduml

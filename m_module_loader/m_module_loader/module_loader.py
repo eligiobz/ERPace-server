@@ -19,13 +19,27 @@
 ##############################################################################
 
 import os
+import importlib as loader
 
 class ModuleLoader():
 
     __found_dirs__ = []
+    __loaded_modules__ = []
 
     def __init__(self):
+        """
+        Find all possible modules in current working directory
+        """
         for dirs in os.listdir(os.getcwd()):
-            if (dirs.startswith("m_")):
+            if dirs.startswith("m_") and not dirs == "m_module_loader":
                 self.__found_dirs__.append(dirs)
         print (self.__found_dirs__)
+
+    def __load_modules__(self):
+        """
+        Attemping to load modules
+        """
+        for module in self.__found_dirs__:
+            loader.import_module(module, )
+        pass
+

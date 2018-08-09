@@ -1,2 +1,0 @@
-/add_product/, add_product
-/find_product/, find_product

@@ -1,0 +1,12 @@
+{
+    "name": "Product and Service Manager",
+    "description": "Manages Products and services",
+    "level": 0,
+    "min_db_version": 7,
+    "max_db_version": 7, 
+    "requires": [ "stores_plugins" ],
+    "urls": [
+        "/add_product/",
+        "/find_product/"
+    ]    
+}

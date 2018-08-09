@@ -3,7 +3,7 @@
 ##############################################################################
 # MobilEPR - A small self-hosted ERP that works with your smartphone.
 # Copyright (C) 2018  Eligio Becerra
-#
+# 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
@@ -18,29 +18,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
-from setuptools import setup
+import os, json
 
-def readme():
-    with open('README.rst') as f:
-        return f.read()
+class ProductServicePlugin:
 
-setup(name='module_loader',
-      version='0.1',
-      description='ERPace module loader',
-      long_description=readme(),
-      url='http://github.com/eligiobz/MobilEPR',
-      author='Eligio Becerra',
-      author_email='eligio_bz@mail.com',
-      license='GNU Affero',
-      packages=['module_loader'],
-      # test_suite='nose.collector',
-      # tests_require=['nose'],
-      #install_requires=[]
-      # classifiers=[
-      #   'Development Status :: 3 - Alpha',
-      #   'License :: OSI Approved :: MIT License',
-      #   'Programming Language :: Python :: 2.7',
-      #   'Topic :: Text Processing :: Linguistic',
-      # ],
-      include_package_data=True,
-      zip_safe=False)
+    description = ""
+
+    def __init__(self, subdir):
+        path = (os.getcwd()+"/"+subdir+"/"+subdir+"/")
+        self.description = json.loads(open(path+"plugin.json").read())
+
+
+if __name__ == "__main__":
+    psp = ProductServicePlugin("m_product_services_management")
