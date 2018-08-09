@@ -1,0 +1,25 @@
+
+@startuml
+
+interface "Plugin scanner" as plugInter
+
+[Core component] --> [Plugin master component]
+[Plugin master component] ..> plugInter
+
+plugInter ..> [Component 1]
+plugInter ..> [Component 2]
+plugInter ..> [Component N]
+
+[Component 1] --> [Methods 1]
+[Component 1] --> [URLs 1]
+[Component 1] --> [Description 1]
+
+[Component 2] --> [Methods 2]
+[Component 2] --> [URLs 2]
+[Component 2] --> [Description 2]
+
+[Component N] --> [Methods N]
+[Component N] --> [URLs ]
+[Component N] --> [Description N]
+
+@enduml
