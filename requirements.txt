@@ -60,5 +60,5 @@ Tempita==0.5.2
 tinycss2==0.6.1
 urllib3==1.22
 webencodings==0.5.1
-Werkzeug==0.14.1
+Werkzeug==0.15.3
 wrapt==1.10.11
